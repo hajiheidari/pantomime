@@ -53,3 +53,6 @@ ios/Flutter/AdKeys.xcconfig
 # Local provider packages resolve on their own only for standalone analysis
 packages/*/pubspec.lock
 packages/*/.dart_tool/
+
+# Gradle output
+/android/build/
