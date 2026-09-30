@@ -1,1 +1,91 @@
-# pantomime
+# پانتومیم دورهمی (Pantomime Dorehami)
+
+Offline Persian charades party game for iOS + Android, built with Flutter.
+Full product spec: [`docs/PROJECT_SPEC.md`](docs/PROJECT_SPEC.md).
+
+## Status
+
+| Milestone | State |
+|---|---|
+| M1 – Core offline team game (home, setup, team mode, scoring, words, summary/scoreboard, cartoon theme, RTL) | ✅ done |
+| M2 – Forehead mode (sensors, calibration, sounds) | ⏳ next |
+| M3 – Ads abstraction + remote config | — |
+| M4 – Cloudflare Worker + Telegram bot | — |
+| M5 – Recording & sharing | — |
+| M6 – Store flavors & release | — |
+
+## Run
+
+Requirements: Flutter stable (developed with 3.47 / Dart 3.13), Xcode for iOS,
+Android SDK for Android.
+
+```bash
+flutter pub get
+flutter run            # on a connected device / emulator
+flutter test           # unit + widget tests
+flutter analyze
+```
+
+## Project layout
+
+```
+lib/
+  main.dart, app.dart            # bootstrap, MaterialApp, locale/RTL
+  core/
+    l10n/app_strings.dart        # all UI strings (fa primary, en for reviewers)
+    theme/app_theme.dart         # cartoon palette, team colours/avatars
+    widgets/cartoon.dart         # CartoonButton, CartoonCard, chips, animations
+    utils/persian_text.dart      # normalization (ی/ک, ZWNJ…), Persian digits
+    providers.dart               # prefs, language, strings providers
+  features/
+    words/                       # WordRepository (asset JSON), WordPicker (no-repeat), seen store
+    game/
+      domain/                    # GameConfig, GameState (turn order, scoring, sudden death) – pure Dart
+      application/               # GameController (timer, phases), FeedbackService (haptics/sounds)
+      presentation/              # setup + game screens
+    settings/                    # settings model/controller/screen
+    home/                        # splash + home
+assets/
+  words/words_fa.json            # Persian word pack (primary)
+  words/words_en.json            # small English pack
+  fonts/Vazirmatn-*.ttf          # bundled font (OFL, see assets/fonts/OFL.txt)
+```
+
+Game rules live in `GameState` (immutable, no timers/I/O) so they are fully
+unit-tested; `GameController` only adds the clock and word picking.
+
+## Adding a word category
+
+Edit `assets/words/words_fa.json` only — no code changes:
+
+```json
+{
+  "id": "unique_id",
+  "title": "عنوان دسته",
+  "emoji": "🎲",
+  "words": { "easy": ["…"], "medium": ["…"], "hard": ["…"] }
+}
+```
+
+- `id` must be unique and stable (it keys the "already seen" history).
+- Duplicates are dropped automatically after Persian normalization
+  (Arabic ي/ك vs Persian ی/ک, ZWNJ, spacing).
+- Content rules: no +18, politics, religion or controversial public figures.
+- `flutter test` checks the pack parses and every level is non-empty.
+
+Words go through the `WordRepository` interface, so downloadable packs can be
+added later without touching game logic.
+
+## Language
+
+Persian is primary. The app picks Persian when any preferred device language is
+Persian, English when the device's first language is English, otherwise
+Persian; users can override in Settings. English uses the small
+`words_en.json` pack.
+
+## Ad keys / releasing
+
+Covered in M3 (ad keys via `--dart-define` or a git-ignored `ad_keys.dart`) and
+M6 (store flavors `play` / `bazaar` / `myket`, signing, `docs/store_notes.md`).
+
+Bundle/application ID placeholder: `com.REPLACE_ME.pantomime`.

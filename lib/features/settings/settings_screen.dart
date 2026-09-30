@@ -1,0 +1,214 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../core/providers.dart';
+import '../../core/theme/app_theme.dart';
+import '../../core/widgets/cartoon.dart';
+import 'settings_controller.dart';
+
+/// Placeholder until the real policy page is hosted (see docs/store_notes.md).
+const privacyPolicyUrl = 'https://REPLACE_ME.example/privacy';
+
+class SettingsScreen extends ConsumerWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final s = ref.watch(stringsProvider);
+    final settings = ref.watch(settingsProvider);
+    final ctrl = ref.read(settingsProvider.notifier);
+
+    Widget toggle(
+      String emoji,
+      String title,
+      bool value,
+      ValueChanged<bool>? onChanged, {
+      String? subtitle,
+    }) {
+      return _Row(
+        emoji: emoji,
+        title: title,
+        subtitle: subtitle,
+        trailing: Switch(value: value, onChanged: onChanged),
+        onTap: onChanged == null ? null : () => onChanged(!value),
+      );
+    }
+
+    return Scaffold(
+      appBar: AppBar(title: Text(s.settings)),
+      extendBodyBehindAppBar: true,
+      body: DecoratedBox(
+        decoration: appBackground,
+        child: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.all(20),
+            children: [
+              CartoonCard(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Column(
+                  children: [
+                    toggle('🔊', s.sound, settings.soundOn, ctrl.setSound),
+                    const _Divider(),
+                    toggle(
+                      '📳',
+                      s.vibration,
+                      settings.vibrationOn,
+                      ctrl.setVibration,
+                    ),
+                    const _Divider(),
+                    // Recording is implemented in M5.
+                    toggle(
+                      '🎥',
+                      s.recording,
+                      false,
+                      null,
+                      subtitle: s.recordingHint,
+                    ),
+                  ],
+                ),
+              ),
+              SectionTitle(s.language),
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: [
+                  for (final l in AppLanguage.values)
+                    CartoonChip(
+                      label: switch (l) {
+                        AppLanguage.system => s.languageSystem,
+                        AppLanguage.fa => 'فارسی',
+                        AppLanguage.en => 'English',
+                      },
+                      selected: settings.language == l,
+                      onTap: () => ctrl.setLanguage(l),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              CartoonCard(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Column(
+                  children: [
+                    _Row(
+                      emoji: '⭐',
+                      title: s.rateApp,
+                      // Store-specific deep link arrives with StoreService (M6).
+                      onTap: () => ScaffoldMessenger.of(context)
+                          .showSnackBar(SnackBar(content: Text(s.comingSoon))),
+                    ),
+                    const _Divider(),
+                    _Row(
+                      emoji: '🔒',
+                      title: s.privacyPolicy,
+                      onTap: () => _info(
+                        context,
+                        s.privacyPolicy,
+                        '${s.privacyBody}\n\n$privacyPolicyUrl',
+                        s.close,
+                      ),
+                    ),
+                    const _Divider(),
+                    _Row(
+                      emoji: '🎭',
+                      title: s.about,
+                      onTap: () =>
+                          _info(context, s.about, s.aboutBody, s.close),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _info(BuildContext context, String title, String body, String close) {
+    showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: SingleChildScrollView(child: Text(body)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              close,
+              style: const TextStyle(
+                fontWeight: FontWeight.w900,
+                color: AppColors.ink,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Row extends StatelessWidget {
+  const _Row({
+    required this.emoji,
+    required this.title,
+    this.subtitle,
+    this.trailing,
+    this.onTap,
+  });
+
+  final String emoji;
+  final String title;
+  final String? subtitle;
+  final Widget? trailing;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) => InkWell(
+    onTap: onTap,
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          Text(emoji, style: const TextStyle(fontSize: 26)),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.ink,
+                  ),
+                ),
+                if (subtitle != null)
+                  Text(
+                    subtitle!,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: AppColors.ink.withValues(alpha: 0.6),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          ?trailing,
+        ],
+      ),
+    ),
+  );
+}
+
+class _Divider extends StatelessWidget {
+  const _Divider();
+
+  @override
+  Widget build(BuildContext context) => Divider(
+    height: 1,
+    indent: 16,
+    endIndent: 16,
+    color: AppColors.ink.withValues(alpha: 0.12),
+  );
+}

@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "language": "en",
+  "categories": [
+    {
+      "id": "movies_series",
+      "title": "Movies & TV",
+      "emoji": "🎬",
+      "words": {
+        "easy": ["Shrek", "The Lion King", "Titanic", "Frozen", "Tom and Jerry", "Spider-Man", "Batman", "Harry Potter"],
+        "medium": ["Home Alone", "Jumanji", "Pirates of the Caribbean", "Night at the Museum", "Finding Nemo", "Toy Story"],
+        "hard": ["Gladiator", "The Matrix", "The Godfather", "The Lord of the Rings", "Forrest Gump", "Inception", "Star Wars"]
+      }
+    },
+    {
+      "id": "animals",
+      "title": "Animals",
+      "emoji": "🦁",
+      "words": {
+        "easy": ["Lion", "Elephant", "Monkey", "Giraffe", "Penguin", "Rabbit", "Dog", "Cat", "Snake", "Duck"],
+        "medium": ["Bear", "Kangaroo", "Dolphin", "Rhino", "Camel", "Peacock", "Turtle", "Spider", "Bat"],
+        "hard": ["Armadillo", "Chameleon", "Anteater", "Koala", "Sloth", "Octopus", "Eagle", "Cheetah"]
+      }
+    },
+    {
+      "id": "jobs",
+      "title": "Jobs",
+      "emoji": "👷",
+      "words": {
+        "easy": ["Doctor", "Teacher", "Chef", "Driver", "Baker", "Firefighter", "Farmer", "Pilot", "Police officer"],
+        "medium": ["Dentist", "Tailor", "Butcher", "Fisherman", "Waiter", "Mail carrier", "Photographer", "Gardener"],
+        "hard": ["Astronaut", "Scuba diver", "Flight attendant", "Film director", "Referee", "Veterinarian", "Watchmaker"]
+      }
+    },
+    {
+      "id": "sports",
+      "title": "Sports",
+      "emoji": "⚽",
+      "words": {
+        "easy": ["Football", "Volleyball", "Swimming", "Basketball", "Cycling", "Tennis", "Boxing", "Skiing"],
+        "medium": ["Gymnastics", "Long jump", "Archery", "Horse riding", "Fencing", "Rowing", "Rock climbing", "Karate"],
+        "hard": ["Pole vault", "Synchronized swimming", "Curling", "Water polo", "Figure skating", "Weightlifting"]
+      }
+    },
+    {
+      "id": "household_objects",
+      "title": "Things at home",
+      "emoji": "🏠",
+      "words": {
+        "easy": ["Key", "Umbrella", "Glasses", "Spoon", "Clock", "Phone", "Fridge", "Shoe", "Chair", "TV"],
+        "medium": ["Vacuum cleaner", "Iron", "Hair dryer", "Kettle", "Mirror", "Scissors", "Hammer", "Camera", "Fan"],
+        "hard": ["Washing machine", "Razor", "Compass", "Telescope", "Hourglass", "Record player", "Magnifying glass"]
+      }
+    },
+    {
+      "id": "actions",
+      "title": "Actions",
+      "emoji": "🏃",
+      "words": {
+        "easy": ["Sleeping", "Eating", "Running", "Swimming", "Driving", "Singing", "Dancing", "Crying", "Laughing"],
+        "medium": ["Fishing", "Ironing", "Pouring tea", "Flying a kite", "Taking a photo", "Climbing stairs", "Cooking"],
+        "hard": ["Being surprised", "Feeling shy", "Peeking", "Daydreaming", "Eavesdropping", "Catching a cold", "Dozing off"]
+      }
+    }
+  ]
+}
