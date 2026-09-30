@@ -109,8 +109,10 @@ cp ad_keys.example.json ad_keys.json     # fill in; git-ignored
 flutter build apk --dart-define=STORE=bazaar --dart-define-from-file=ad_keys.json
 ```
 
-The committed profile is `dev` (all ad SDKs, for tests/analysis). Never ship a
-`dev` build. Store flavors, signing and release checklists come in M6
+The committed profile is `dev` (Adivery + AdMob) so `flutter run` works.
+Never ship a `dev` build; switch to the store's profile first. Tapsell Plus
+is currently not buildable (see docs/ads.md). Run every check with
+`tool/check.sh`. Store flavors, signing and release checklists come in M6
 (`docs/store_notes.md`).
 
 Bundle/application ID placeholder: `com.REPLACE_ME.pantomime`.

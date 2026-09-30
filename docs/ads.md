@@ -43,7 +43,7 @@ dart run tool/store.dart bazaar     # adivery
 dart run tool/store.dart myket      # adivery
 dart run tool/store.dart play       # adivery + admob
 dart run tool/store.dart ios        # admob
-dart run tool/store.dart dev        # all three (committed default: tests/analysis)
+dart run tool/store.dart dev        # adivery + admob (committed default)
 # then `flutter pub get` (or `flutter pub upgrade google_mobile_ads` when the
 # tool says so), then build.
 ```
@@ -55,27 +55,45 @@ validator rejects configs that name AdMob for those stores.
 Only SDKs compiled into a build can be switched remotely. A brand-new network
 needs an app update. No code is ever downloaded.
 
-## ⚠️ Tapsell Plus finding (checked 2026-09-30)
+## ⚠️ Tapsell Plus finding (checked 2026-09-30, verified by building)
 
-`tapsell_plus` 2.3.2 (latest on pub.dev, published 2025-02-24):
+`tapsell_plus` 2.3.2 (latest on pub.dev, published 2025-02-24) **does not
+build** with the current Flutter toolchain (Flutter 3.47, AGP 9, Gradle 9):
 
-1. Its Dart code imports `google_mobile_ads` and pins it to `^4.0.0`
-   (a 2023 version). In any build that includes Tapsell, AdMob is held at 4.0.0.
-2. Its native SDK (`ir.tapsell.plus:tapsell-plus-sdk-flutter:2.3.2`) pulls
-   `com.google.android.gms:play-services-auth` and `play-services-appset`.
+1. Its `android/build.gradle` calls `jcenter()`, which Gradle 9 removed. The
+   build fails at configuration.
+2. It pins `google_mobile_ads ^4.0.0`, whose Android build also fails on
+   Gradle 9 (`configurations.all`). Forcing 9.1.0 via `dependency_overrides`
+   fixes this part (the Dart side still resolves), but not point 1.
+3. Its native SDK (`ir.tapsell.plus:tapsell-plus-sdk-flutter:2.3.2`) pulls
+   `play-services-auth` and `play-services-appset`, which isn't allowed in
+   Bazaar/Myket builds.
 
-So a Bazaar/Myket build with Tapsell would contain AdMob and Google Play
-Services code, which the spec forbids. Tapsell is therefore **opt-in**
-(`--with-tapsell`) and **off by default in every store profile**. The Tapsell
-provider is fully implemented and tested through `dev`.
+So Tapsell is **opt-in (`--with-tapsell`) and excluded from every profile,
+`dev` included**. The provider (`packages/ads_tapsell`) is implemented and
+analyzed standalone, ready for when Tapsell ships a fixed plugin. Remote
+config may still list `tapsell`; it's simply skipped because it isn't
+compiled in.
 
-Options:
-- (a) Keep Adivery only on Bazaar/Myket (default). Adivery also mediates other
-  networks.
-- (b) Accept Tapsell's dependencies with `--with-tapsell`, after testing the
-  build on a phone without Play Services.
-- (c) Later: wrap Tapsell's plain Android SDK through our own platform channel,
-  if it doesn't need GMS. This needs a decision first.
+Ways forward (your call):
+- (a) Adivery only on Bazaar/Myket (current default). Adivery mediates
+  other networks itself. The A/B test then compares Adivery vs. nothing, so
+  keep `ab_split` off for now.
+- (b) Vendor a patched copy of `tapsell_plus` (remove `jcenter()`, loosen
+  the AdMob constraint). This is small, but check Tapsell's license first and
+  test on a phone without Play Services.
+- (c) Ask Tapsell support for an updated Flutter plugin, or wrap their
+  plain Android SDK through our own platform channel.
+
+### What the Bazaar build actually contains (verified)
+
+`flutter build apk --dart-define=STORE=bazaar` with the `bazaar` profile
+builds. `apkanalyzer` shows **no** `com.google.android.gms` classes defined
+in the APK. Only Adivery's built-in AdMob mediation adapter
+(`com.adivery.sdk.networks.admob.*`) *references* AdMob types, and it's
+dormant without the AdMob SDK. The merged manifest does contain
+`com.google.android.gms.permission.AD_ID` (from the ad SDK). It's harmless
+without Play Services, but will be stripped in the Bazaar/Myket flavors in M6.
 
 Adivery 4.9.0's native SDK depends only on OkHttp, Kotlin coroutines and
 **Sentry** (crash reporting inside the ad SDK). Declare Sentry in the store

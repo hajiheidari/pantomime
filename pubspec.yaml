@@ -48,8 +48,6 @@ dependencies:
     path: packages/ads_core
   ads_adivery:
     path: packages/ads_adivery
-  ads_tapsell:
-    path: packages/ads_tapsell
   ads_admob:
     path: packages/ads_admob
   # <<< ad providers

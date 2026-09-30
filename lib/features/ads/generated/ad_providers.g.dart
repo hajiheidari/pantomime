@@ -3,7 +3,6 @@
 
 import 'package:ads_core/ads_core.dart';
 import 'package:ads_adivery/ads_adivery.dart';
-import 'package:ads_tapsell/ads_tapsell.dart';
 import 'package:ads_admob/ads_admob.dart';
 
 const adStoreProfile = 'dev';
@@ -11,6 +10,5 @@ const adStoreProfile = 'dev';
 /// Ad networks compiled into this build.
 Map<String, AdProvider Function()> compiledAdProviders() => {
   'adivery': AdiveryProvider.new,
-  'tapsell': TapsellProvider.new,
   'admob': AdmobProvider.new,
 };

@@ -7,7 +7,8 @@
 // gets its own dependency set: Bazaar/Myket builds must never contain AdMob
 // or Google Play Services. This rewrites the managed block in pubspec.yaml
 // and lib/features/ads/generated/ad_providers.g.dart. `dev` (committed
-// default) includes everything so analysis and tests cover all providers.
+// default) = Adivery + AdMob so `flutter run` works on Android and iOS;
+// packages/ads_tapsell is analyzed on its own (see docs/ads.md).
 import 'dart:io';
 
 const _packages = {
@@ -16,10 +17,11 @@ const _packages = {
   'admob': ('ads_admob', 'AdmobProvider'),
 };
 
-/// Tapsell is opt-in: tapsell_plus 2.3.2 pins google_mobile_ads ^4.0.0 and
-/// pulls Google Play Services (see docs/ads.md).
+/// Tapsell is opt-in and currently NOT buildable: tapsell_plus 2.3.2 uses
+/// jcenter() (removed in Gradle 9) and pins google_mobile_ads ^4.0.0 (also
+/// unbuildable with AGP 9), and pulls Google Play Services. See docs/ads.md.
 List<String> _profile(String store, bool withTapsell) => switch (store) {
-  'dev' => ['adivery', 'tapsell', 'admob'],
+  'dev' => ['adivery', if (withTapsell) 'tapsell', 'admob'],
   'play' => ['adivery', if (withTapsell) 'tapsell', 'admob'],
   'bazaar' || 'myket' => ['adivery', if (withTapsell) 'tapsell'],
   'ios' => ['admob'],
