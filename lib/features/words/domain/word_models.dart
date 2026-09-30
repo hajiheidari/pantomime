@@ -48,9 +48,14 @@ class WordCategory {
     required this.title,
     required this.emoji,
     required this.words,
+    this.bonus = false,
   });
 
   final String id;
+
+  /// Bonus categories are unlocked for the session by a rewarded ad (or
+  /// freely when ads are off / unavailable).
+  final bool bonus;
   final String title;
   final String emoji;
   final Map<Difficulty, List<WordEntry>> words;

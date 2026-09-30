@@ -9,8 +9,8 @@ Full product spec: [`docs/PROJECT_SPEC.md`](docs/PROJECT_SPEC.md).
 |---|---|
 | M1 – Core offline team game (home, setup, team mode, scoring, words, summary/scoreboard, cartoon theme, RTL) | ✅ done |
 | M2 – Forehead mode (sensors, calibration, sounds, haptics) | ✅ done |
-| M3 – Ads abstraction + remote config | ⏳ next |
-| M4 – Cloudflare Worker + Telegram bot | — |
+| M3 – Ads abstraction + remote config (see [docs/ads.md](docs/ads.md)) | ✅ done |
+| M4 – Cloudflare Worker + Telegram bot | ⏳ next |
 | M5 – Recording & sharing | — |
 | M6 – Store flavors & release | — |
 
@@ -98,9 +98,19 @@ Persian, English when the device's first language is English, otherwise
 Persian; users can override in Settings. English uses the small
 `words_en.json` pack.
 
-## Ad keys / releasing
+## Ads, store builds and keys
 
-Covered in M3 (ad keys via `--dart-define` or a git-ignored `ad_keys.dart`) and
-M6 (store flavors `play` / `bazaar` / `myket`, signing, `docs/store_notes.md`).
+Details: [docs/ads.md](docs/ads.md). In short:
+
+```bash
+dart run tool/store.dart bazaar          # dev | play | bazaar | myket | ios
+flutter pub get                          # (or the command the tool prints)
+cp ad_keys.example.json ad_keys.json     # fill in; git-ignored
+flutter build apk --dart-define=STORE=bazaar --dart-define-from-file=ad_keys.json
+```
+
+The committed profile is `dev` (all ad SDKs, for tests/analysis). Never ship a
+`dev` build. Store flavors, signing and release checklists come in M6
+(`docs/store_notes.md`).
 
 Bundle/application ID placeholder: `com.REPLACE_ME.pantomime`.

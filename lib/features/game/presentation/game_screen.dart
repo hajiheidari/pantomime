@@ -7,6 +7,7 @@ import '../../../core/l10n/app_strings.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/cartoon.dart';
+import '../../ads/ads_providers.dart';
 import '../application/game_controller.dart';
 import '../domain/game_config.dart';
 import '../domain/game_state.dart';
@@ -557,14 +558,36 @@ class _ResultTile extends StatelessWidget {
 // ---------------------------------------------------------------------------
 // Scoreboard
 
-class _ScoreboardView extends ConsumerWidget {
+class _ScoreboardView extends ConsumerStatefulWidget {
   const _ScoreboardView({required this.session, required this.s});
 
   final GameSession session;
   final AppStrings s;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_ScoreboardView> createState() => _ScoreboardViewState();
+}
+
+class _ScoreboardViewState extends ConsumerState<_ScoreboardView> {
+  bool _busy = false;
+
+  /// Between turns is the only interstitial slot. The ad manager skips
+  /// silently when nothing is ready within ~3 s.
+  Future<void> _next() async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    try {
+      await ref.read(adManagerProvider).onTurnTransition();
+    } finally {
+      ref.read(gameControllerProvider.notifier).nextTurn();
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final session = widget.session;
+    final s = widget.s;
     final game = session.game;
     final preview = game.advance();
     final enteringSuddenDeath =
@@ -595,7 +618,7 @@ class _ScoreboardView extends ConsumerWidget {
           color: nextName == null
               ? AppColors.yellow
               : TeamStyle.of(preview.currentTeamIndex).color,
-          onPressed: ref.read(gameControllerProvider.notifier).nextTurn,
+          onPressed: _busy ? null : _next,
         ),
       ],
     );

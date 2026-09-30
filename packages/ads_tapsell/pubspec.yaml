@@ -1,0 +1,17 @@
+name: ads_tapsell
+description: Tapsell Plus implementation of AdProvider. Android only.
+publish_to: none
+version: 1.0.0
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  ads_core:
+    path: ../ads_core
+  # NOTE: tapsell_plus 2.3.2 depends on google_mobile_ads ^4.0.0 and its
+  # native SDK pulls play-services-auth / play-services-appset. See
+  # docs/ads.md before adding this package to a store profile.
+  tapsell_plus: ^2.3.2

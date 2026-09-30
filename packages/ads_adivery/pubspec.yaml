@@ -1,0 +1,14 @@
+name: ads_adivery
+description: Adivery (Yektanet) implementation of AdProvider. Android only.
+publish_to: none
+version: 1.0.0
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  ads_core:
+    path: ../ads_core
+  adivery: ^4.9.0

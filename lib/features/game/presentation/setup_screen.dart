@@ -8,6 +8,8 @@ import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/cartoon.dart';
 import '../../words/domain/word_models.dart';
+import '../../ads/ad_manager.dart';
+import '../../ads/ads_providers.dart';
 import '../../words/words_providers.dart';
 import '../application/game_controller.dart';
 import '../domain/game_config.dart';
@@ -113,17 +115,69 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
         .pushReplacement(MaterialPageRoute(builder: (_) => const GameScreen()));
   }
 
+  /// Rewarded ad → bonus category for this session. If no ad can be shown
+  /// the category unlocks anyway: ads never block gameplay.
+  Future<void> _unlock(WordCategory c) async {
+    final s = ref.read(stringsProvider);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('${c.emoji} ${s.unlockTitle}'),
+        content: Text('«${c.title}»\n${s.unlockBody}'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(s.cancel, style: const TextStyle(color: AppColors.ink)),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.green,
+              foregroundColor: AppColors.ink,
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(
+              '🎬 ${s.watchAd}',
+              style: const TextStyle(fontWeight: FontWeight.w900),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    final outcome = await ref.read(adManagerProvider).showRewarded();
+    if (!mounted) return;
+    if (outcome == RewardOutcome.skipped) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(s.unlockSkipped)));
+      return;
+    }
+    ref.read(unlockedBonusProvider.notifier).unlock(c.id);
+    setState(() => _selected = {...?_selected, c.id});
+  }
+
   @override
   Widget build(BuildContext context) {
     final s = ref.watch(stringsProvider);
     final categoriesAsync = ref.watch(wordCategoriesProvider);
     final categories = categoriesAsync.value ?? const <WordCategory>[];
+    final unlocked = ref.watch(unlockedBonusProvider);
+    final rewardedOffered = ref.watch(adManagerProvider).rewardedOffered;
+    bool locked(WordCategory c) =>
+        c.bonus && rewardedOffered && !unlocked.contains(c.id);
+    final available = {
+      for (final c in categories)
+        if (!locked(c)) c.id,
+    };
     if (_selected == null && categoriesAsync.hasValue) {
-      final ids = categories.map((c) => c.id).toSet();
-      final saved = _savedCategoryIds.intersection(ids);
-      _selected = saved.isEmpty ? ids : saved;
+      final defaults = {
+        for (final c in categories)
+          if (!c.bonus) c.id,
+      };
+      final saved = _savedCategoryIds.intersection(available);
+      _selected = saved.isEmpty ? defaults : saved;
     }
-    final selected = _selected ?? const <String>{};
+    // Never play a category that is (still) locked.
+    final selected = (_selected ?? const <String>{}).intersection(available);
 
     return Scaffold(
       appBar: AppBar(title: Text(s.setupTitle)),
@@ -205,15 +259,15 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                       trailing: categories.isEmpty
                           ? null
                           : CartoonChip(
-                              label: selected.length == categories.length
+                              label: selected.length == available.length
                                   ? s.clearAll
                                   : s.selectAll,
                               selected: false,
                               onTap: () => setState(
                                 () => _selected =
-                                    selected.length == categories.length
+                                    selected.length == available.length
                                     ? {}
-                                    : categories.map((c) => c.id).toSet(),
+                                    : {...available},
                               ),
                             ),
                     ),
@@ -226,14 +280,18 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                           category: c,
                           count: c.wordsFor(_config.difficulty.levels).length,
                           selected: selected.contains(c.id),
+                          locked: locked(c),
+                          badge: c.bonus ? s.bonusBadge : null,
                           countLabel: s.wordsCount,
-                          onTap: () => setState(() {
-                            final next = {...selected};
-                            next.contains(c.id)
-                                ? next.remove(c.id)
-                                : next.add(c.id);
-                            _selected = next;
-                          }),
+                          onTap: locked(c)
+                              ? () => _unlock(c)
+                              : () => setState(() {
+                                  final next = {...selected};
+                                  next.contains(c.id)
+                                      ? next.remove(c.id)
+                                      : next.add(c.id);
+                                  _selected = next;
+                                }),
                         ),
                       ),
                   ],
@@ -349,6 +407,8 @@ class _CategoryTile extends StatelessWidget {
     required this.category,
     required this.count,
     required this.selected,
+    this.locked = false,
+    this.badge,
     required this.countLabel,
     required this.onTap,
   });
@@ -356,6 +416,8 @@ class _CategoryTile extends StatelessWidget {
   final WordCategory category;
   final int count;
   final bool selected;
+  final bool locked;
+  final String? badge;
   final String Function(int) countLabel;
   final VoidCallback onTap;
 
@@ -380,13 +442,41 @@ class _CategoryTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    category.title,
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                      color: selected ? AppColors.ink : AppColors.text,
-                    ),
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          category.title,
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w800,
+                            color: selected ? AppColors.ink : AppColors.text,
+                          ),
+                        ),
+                      ),
+                      if (badge != null) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 1,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.yellow,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: AppColors.outline),
+                          ),
+                          child: Text(
+                            badge!,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.ink,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                   Text(
                     countLabel(count),
@@ -404,11 +494,19 @@ class _CategoryTile extends StatelessWidget {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: selected ? AppColors.green : Colors.white,
+                color: locked
+                    ? AppColors.yellow
+                    : selected
+                    ? AppColors.green
+                    : Colors.white,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: AppColors.outline, width: 2.5),
               ),
-              child: selected
+              child: locked
+                  ? const Center(
+                      child: Text('🔒', style: TextStyle(fontSize: 16)),
+                    )
+                  : selected
                   ? const Icon(Icons.check_rounded, color: AppColors.ink)
                   : null,
             ),

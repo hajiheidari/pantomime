@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Remote config (ads settings) and ads. Gameplay itself is offline. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="پانتومیم"
         android:name="${applicationName}"
@@ -30,6 +32,12 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <!-- AdMob app id (play build only uses AdMob). Set with
+             -PADMOB_APP_ID=… ; defaults to Google's test app id. Harmless in
+             builds without the AdMob SDK. -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="${admobAppId}" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

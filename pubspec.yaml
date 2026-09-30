@@ -39,6 +39,20 @@ dependencies:
   wakelock_plus: ^1.8.1
   sensors_plus: ^7.1.0
   audioplayers: ^6.8.1
+  http: ^1.6.0
+  package_info_plus: ^10.2.1
+
+  # >>> ad providers (managed by tool/store.dart — do not edit)
+  # store: dev
+  ads_core:
+    path: packages/ads_core
+  ads_adivery:
+    path: packages/ads_adivery
+  ads_tapsell:
+    path: packages/ads_tapsell
+  ads_admob:
+    path: packages/ads_admob
+  # <<< ad providers
 
 dev_dependencies:
   flutter_test:
@@ -65,6 +79,7 @@ flutter:
   assets:
     - assets/words/
     - assets/sounds/
+    - assets/config/
 
   fonts:
     - family: Vazirmatn

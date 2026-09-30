@@ -1,1 +1,6 @@
 #include "Generated.xcconfig"
+
+// AdMob app id. Google's test id by default; put the real one in the
+// git-ignored ios/Flutter/AdKeys.xcconfig as ADMOB_APP_ID=ca-app-pub-…~…
+ADMOB_APP_ID=ca-app-pub-3940256099942544~1458002511
+#include? "AdKeys.xcconfig"

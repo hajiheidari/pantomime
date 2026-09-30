@@ -18,3 +18,15 @@ final wordCategoriesProvider = FutureProvider<List<WordCategory>>((ref) {
   final lang = ref.watch(languageCodeProvider);
   return ref.watch(wordRepositoryProvider).loadCategories(lang);
 });
+
+/// Bonus categories unlocked in this app session (rewarded ad).
+final unlockedBonusProvider = NotifierProvider<UnlockedBonus, Set<String>>(
+  UnlockedBonus.new,
+);
+
+class UnlockedBonus extends Notifier<Set<String>> {
+  @override
+  Set<String> build() => const {};
+
+  void unlock(String categoryId) => state = {...state, categoryId};
+}

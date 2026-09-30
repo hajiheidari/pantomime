@@ -1,0 +1,17 @@
+name: ads_admob
+description: Google AdMob implementation of AdProvider (Android + iOS).
+publish_to: none
+version: 1.0.0
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  ads_core:
+    path: ../ads_core
+  # Wide range: tapsell_plus pins ^4.0.0 when both are in one build; builds
+  # without Tapsell resolve to the latest version. Only APIs stable across
+  # 4.x–9.x are used.
+  google_mobile_ads: '>=4.0.0 <10.0.0'

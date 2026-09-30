@@ -5,10 +5,11 @@ import 'package:pantomime/features/words/data/word_repository.dart';
 import 'package:pantomime/features/words/domain/word_models.dart';
 
 void main() {
-  test('Persian pack: 11 categories, every level filled, no duplicates', () {
+  test('Persian pack: 11 regular categories + bonus, every level filled, no duplicates', () {
     final raw = File('assets/words/words_fa.json').readAsStringSync();
     final cats = parseWordPack(raw);
-    expect(cats.length, 11);
+    expect(cats.where((c) => !c.bonus).length, 11);
+    expect(cats.where((c) => c.bonus), isNotEmpty);
     for (final c in cats) {
       for (final d in Difficulty.values) {
         expect(c.words[d], isNotEmpty, reason: '${c.id}/${d.name}');

@@ -74,6 +74,15 @@ abstract class AppStrings {
   String get sensorUnavailable;
   String get startWithButtons;
 
+  // Bonus pack / notices
+  String get bonusBadge;
+  String get unlockTitle;
+  String get unlockBody;
+  String get watchAd;
+  String get cancel;
+  String get unlockSkipped;
+  String get updateAvailable;
+
   // Summary / scores
   String get roundSummary;
   String get tapToFix;
@@ -238,6 +247,22 @@ class FaStrings extends AppStrings {
   String get startWithButtons => 'شروع با دکمه‌ها';
 
   @override
+  String get bonusBadge => '🎁 ویژه';
+  @override
+  String get unlockTitle => 'باز کردن دسته ویژه';
+  @override
+  String get unlockBody =>
+      'با دیدن یک تبلیغ کوتاه، این دسته تا وقتی بازی باز است در دسترس می‌ماند.';
+  @override
+  String get watchAd => 'دیدن تبلیغ';
+  @override
+  String get cancel => 'بی‌خیال';
+  @override
+  String get unlockSkipped => 'برای باز شدن دسته، تبلیغ باید تا آخر دیده شود.';
+  @override
+  String get updateAvailable => 'نسخه جدید بازی آمده؛ از فروشگاه به‌روز کن!';
+
+  @override
   String get roundSummary => 'خلاصه نوبت';
   @override
   String get tapToFix => 'اگر اشتباه زدید، روی کلمه بزنید تا درست شود.';
@@ -301,7 +326,11 @@ class FaStrings extends AppStrings {
       'این بازی حساب کاربری ندارد و هیچ اطلاعات شخصی از شما جمع نمی‌کند.\n'
       'همه تنظیمات و سوابق کلمات فقط روی گوشی خودتان ذخیره می‌شود.\n'
       'ویدیوهای ضبط‌شده (در صورت فعال کردن) فقط روی گوشی شما ذخیره می‌شوند و '
-      'هرگز جایی آپلود نمی‌شوند.';
+      'هرگز جایی آپلود نمی‌شوند.\n'
+      'این بازی تبلیغ نمایش می‌دهد؛ شبکه‌های تبلیغاتی (مثل عدیوری، تپسل یا '
+      'ادموب) ممکن است شناسه تبلیغاتی دستگاه و اطلاعات فنی گوشی را برای '
+      'نمایش تبلیغ جمع کنند. هنگام شروع، بازی فقط یک فایل تنظیمات کوچک '
+      'دانلود می‌کند و هیچ اطلاعاتی از شما ارسال نمی‌کند.';
   @override
   String get rateApp => 'امتیاز به بازی';
   @override
@@ -435,6 +464,22 @@ class EnStrings extends AppStrings {
   String get startWithButtons => 'Start with buttons';
 
   @override
+  String get bonusBadge => '🎁 Bonus';
+  @override
+  String get unlockTitle => 'Unlock bonus category';
+  @override
+  String get unlockBody =>
+      'Watch a short ad to unlock this category until you close the app.';
+  @override
+  String get watchAd => 'Watch ad';
+  @override
+  String get cancel => 'Cancel';
+  @override
+  String get unlockSkipped => 'Watch the ad to the end to unlock.';
+  @override
+  String get updateAvailable => 'A new version is available in the store!';
+
+  @override
   String get roundSummary => 'Turn summary';
   @override
   String get tapToFix => 'Tapped the wrong button? Tap a word to fix it.';
@@ -498,7 +543,11 @@ class EnStrings extends AppStrings {
       'This game has no accounts and collects no personal data.\n'
       'Settings and word history are stored only on your device.\n'
       'Recorded videos (if enabled) stay on your device and are never '
-      'uploaded.';
+      'uploaded.\n'
+      'The game shows ads; ad networks (Adivery, Tapsell or AdMob) may collect '
+      'the device advertising ID and technical device data to serve ads. On '
+      'start the game downloads a small settings file and sends nothing about '
+      'you.';
   @override
   String get rateApp => 'Rate the app';
   @override

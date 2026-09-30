@@ -68,6 +68,7 @@ List<WordCategory> parseWordPack(String raw) {
         title: title,
         emoji: c['emoji'] as String? ?? '🎲',
         words: words,
+        bonus: c['bonus'] == true,
       ),
     );
   }

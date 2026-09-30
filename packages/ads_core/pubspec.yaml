@@ -1,0 +1,11 @@
+name: ads_core
+description: Ad provider interface shared by the app and the provider packages.
+publish_to: none
+version: 1.0.0
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  flutter:
+    sdk: flutter

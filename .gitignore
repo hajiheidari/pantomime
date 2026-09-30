@@ -46,3 +46,10 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Ad keys (never commit)
+ad_keys.json
+ios/Flutter/AdKeys.xcconfig
+# Local provider packages resolve on their own only for standalone analysis
+packages/*/pubspec.lock
+packages/*/.dart_tool/
