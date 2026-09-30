@@ -61,6 +61,19 @@ abstract class AppStrings {
   String get paused;
   String get resume;
 
+  // Forehead mode
+  String get players;
+  String defaultPlayerName(int index);
+  String get addPlayer;
+  String get turnsPerPlayer;
+  String get foreheadHowTo;
+  String get putOnForehead;
+  String get holdStill;
+  String get tiltDownCorrect;
+  String get tiltUpPass;
+  String get sensorUnavailable;
+  String get startWithButtons;
+
   // Summary / scores
   String get roundSummary;
   String get tapToFix;
@@ -196,6 +209,33 @@ class FaStrings extends AppStrings {
   String get paused => 'مکث';
   @override
   String get resume => 'ادامه';
+
+  @override
+  String get players => 'بازیکن‌ها';
+  @override
+  String defaultPlayerName(int index) => 'بازیکن ${n(index + 1)}';
+  @override
+  String get addPlayer => 'بازیکن جدید';
+  @override
+  String get turnsPerPlayer => 'تعداد نوبت هر بازیکن';
+  @override
+  String get foreheadHowTo =>
+      'گوشی را افقی روی پیشانی بگذار، صفحه رو به جمع.\n'
+      'بقیه بدون حرف زدن ادا درمی‌آورند و تو حدس می‌زنی.\n'
+      'سر پایین = درست  •  سر بالا = پاس';
+  @override
+  String get putOnForehead => 'گوشی را روی پیشانی بگذار';
+  @override
+  String get holdStill => 'صفحه رو به جمع، صاف و بی‌حرکت نگه دار…';
+  @override
+  String get tiltDownCorrect => 'سر پایین = درست';
+  @override
+  String get tiltUpPass => 'سر بالا = پاس';
+  @override
+  String get sensorUnavailable =>
+      'حسگر حرکت پیدا نشد؛ یک نفر دیگر دکمه‌ها را بزند.';
+  @override
+  String get startWithButtons => 'شروع با دکمه‌ها';
 
   @override
   String get roundSummary => 'خلاصه نوبت';
@@ -366,6 +406,33 @@ class EnStrings extends AppStrings {
   String get paused => 'Paused';
   @override
   String get resume => 'Resume';
+
+  @override
+  String get players => 'Players';
+  @override
+  String defaultPlayerName(int index) => 'Player ${index + 1}';
+  @override
+  String get addPlayer => 'Add player';
+  @override
+  String get turnsPerPlayer => 'Turns per player';
+  @override
+  String get foreheadHowTo =>
+      'Hold the phone sideways on your forehead, screen facing the group.\n'
+      'Friends act the word out silently; you guess.\n'
+      'Tilt down = correct  •  Tilt up = pass';
+  @override
+  String get putOnForehead => 'Put the phone on your forehead';
+  @override
+  String get holdStill => 'Screen facing the group, hold it still…';
+  @override
+  String get tiltDownCorrect => 'Tilt down = correct';
+  @override
+  String get tiltUpPass => 'Tilt up = pass';
+  @override
+  String get sensorUnavailable =>
+      'No motion sensor found; someone else taps the buttons.';
+  @override
+  String get startWithButtons => 'Start with buttons';
 
   @override
   String get roundSummary => 'Turn summary';

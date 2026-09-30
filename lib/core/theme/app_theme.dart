@@ -18,6 +18,7 @@ abstract final class AppColors {
   static const orange = Color(0xFFFF8A3D);
   static const red = Color(0xFFFF4D5A);
   static const purple = Color(0xFF9B6BFF);
+  static const lime = Color(0xFFB8F25A);
   static const card = Color(0xFFFFF8E7);
 }
 
@@ -33,6 +34,10 @@ class TeamStyle {
     TeamStyle(AppColors.cyan, '🐼'),
     TeamStyle(AppColors.green, '🐸'),
     TeamStyle(AppColors.yellow, '🐯'),
+    TeamStyle(AppColors.purple, '🐨'),
+    TeamStyle(AppColors.orange, '🦁'),
+    TeamStyle(AppColors.red, '🐙'),
+    TeamStyle(AppColors.lime, '🐵'),
   ];
 
   static TeamStyle of(int index) => all[index % all.length];

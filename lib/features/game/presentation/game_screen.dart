@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
@@ -7,9 +8,13 @@ import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/cartoon.dart';
 import '../application/game_controller.dart';
+import '../domain/game_config.dart';
 import '../domain/game_state.dart';
+import 'forehead_views.dart';
+import 'game_widgets.dart';
 
 /// Hosts a whole game. Switches between phases driven by [GameController].
+/// Forehead mode is landscape-locked for the whole game.
 class GameScreen extends ConsumerStatefulWidget {
   const GameScreen({super.key});
 
@@ -19,10 +24,20 @@ class GameScreen extends ConsumerStatefulWidget {
 
 class _GameScreenState extends ConsumerState<GameScreen> {
   late final AppLifecycleListener _lifecycle;
+  late final bool _forehead;
 
   @override
   void initState() {
     super.initState();
+    _forehead =
+        ref.read(gameControllerProvider)?.config.mode == GameMode.forehead;
+    if (_forehead) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    }
     WakelockPlus.enable().catchError((_) {});
     _lifecycle = AppLifecycleListener(
       onInactive: () =>
@@ -34,6 +49,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   void dispose() {
     _lifecycle.dispose();
     WakelockPlus.disable().catchError((_) {});
+    if (_forehead) {
+      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    }
     super.dispose();
   }
 
@@ -90,8 +109,12 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
     final Widget view = switch (session.phase) {
       GamePhase.ready => _ReadyView(session: session, s: s),
+      GamePhase.calibrating => CalibrateView(session: session, s: s),
       GamePhase.countdown => _CountdownView(session: session, s: s),
-      GamePhase.playing => _PlayView(session: session, s: s),
+      GamePhase.playing =>
+        session.isForehead
+            ? ForeheadPlayView(session: session, s: s)
+            : _PlayView(session: session, s: s),
       GamePhase.summary => _SummaryView(session: session, s: s),
       GamePhase.scoreboard => _ScoreboardView(session: session, s: s),
       GamePhase.finished => _FinishedView(
@@ -100,6 +123,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         onHome: _leave,
       ),
     };
+
+    final showClose =
+        session.phase != GamePhase.playing &&
+        session.phase != GamePhase.countdown;
 
     return PopScope(
       canPop: false,
@@ -123,7 +150,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                     ),
                   ),
                 ),
-                if (session.phase != GamePhase.playing)
+                if (showClose)
                   PositionedDirectional(
                     top: 4,
                     start: 4,
@@ -156,64 +183,100 @@ class _ReadyView extends ConsumerWidget {
     final game = session.game;
     final team = game.currentTeamIndex;
     final style = TeamStyle.of(team);
+    final landscape = isLandscape(context);
+
+    final roundLabel = game.isSuddenDeath
+        ? GameBanner(text: '⚡ ${s.suddenDeath}', color: AppColors.red)
+        : Text(
+            s.roundOf(game.currentRound, game.config.roundsPerTeam),
+            style: const TextStyle(
+              fontSize: 18,
+              color: AppColors.textMuted,
+              fontWeight: FontWeight.w700,
+            ),
+          );
+    final who = [
+      PopIn(
+        child: TeamAvatar(teamIndex: team, size: landscape ? 96 : 130),
+      ),
+      const SizedBox(height: 14),
+      Text(
+        s.turnOf(game.config.teamNames[team]),
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: landscape ? 32 : 38,
+          fontWeight: FontWeight.w900,
+          color: style.color,
+          shadows: const [
+            Shadow(color: AppColors.outline, offset: Offset(0, 4)),
+          ],
+        ),
+      ),
+      const SizedBox(height: 4),
+      Text(
+        s.score(game.scoreOf(team)),
+        style: const TextStyle(fontSize: 18, color: AppColors.textMuted),
+      ),
+    ];
+    final howTo = CartoonCard(
+      child: Text(
+        session.isForehead ? s.foreheadHowTo : s.howToPlay,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          fontSize: 15,
+          color: AppColors.ink,
+          height: 1.7,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+    final start = CartoonButton(
+      label: s.start,
+      icon: '▶️',
+      height: landscape ? 76 : 90,
+      fontSize: 32,
+      color: style.color,
+      onPressed: ref.read(gameControllerProvider.notifier).startTurn,
+    );
+
+    if (landscape) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+        child: Row(
+          children: [
+            Expanded(
+              child: FillOrScroll(
+                padding: const EdgeInsets.only(top: 36),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [roundLabel, const SizedBox(height: 10), ...who],
+                ),
+              ),
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: FillOrScroll(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [howTo, const SizedBox(height: 16), start],
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
     return FillOrScroll(
       padding: const EdgeInsets.fromLTRB(24, 56, 24, 20),
       child: Column(
         children: [
-          if (game.isSuddenDeath)
-            _Banner(text: '⚡ ${s.suddenDeath}', color: AppColors.red)
-          else
-            Text(
-              s.roundOf(game.currentRound, game.config.roundsPerTeam),
-              style: const TextStyle(
-                fontSize: 18,
-                color: AppColors.textMuted,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+          roundLabel,
           const Spacer(),
-          PopIn(child: TeamAvatar(teamIndex: team, size: 130)),
-          const SizedBox(height: 18),
-          Text(
-            s.turnOf(game.config.teamNames[team]),
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 38,
-              fontWeight: FontWeight.w900,
-              color: style.color,
-              shadows: const [
-                Shadow(color: AppColors.outline, offset: Offset(0, 4)),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            s.score(game.scoreOf(team)),
-            style: const TextStyle(fontSize: 18, color: AppColors.textMuted),
-          ),
+          ...who,
           const Spacer(),
-          CartoonCard(
-            child: Text(
-              s.howToPlay,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 15,
-                color: AppColors.ink,
-                height: 1.7,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
+          howTo,
           const SizedBox(height: 24),
-          CartoonButton(
-            label: s.start,
-            icon: '▶️',
-            height: 90,
-            fontSize: 32,
-            color: style.color,
-            onPressed: () =>
-                ref.read(gameControllerProvider.notifier).beginCountdown(),
-          ),
+          start,
         ],
       ),
     );
@@ -238,7 +301,7 @@ class _CountdownView extends StatelessWidget {
         child: Text(
           s.n(session.countdown),
           style: TextStyle(
-            fontSize: 200,
+            fontSize: isLandscape(context) ? 160 : 200,
             fontWeight: FontWeight.w900,
             color: color,
             shadows: const [
@@ -252,7 +315,7 @@ class _CountdownView extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Play
+// Play (team mode)
 
 class _PlayView extends ConsumerWidget {
   const _PlayView({required this.session, required this.s});
@@ -275,7 +338,7 @@ class _PlayView extends ConsumerWidget {
                 children: [
                   TeamAvatar(teamIndex: team, size: 48),
                   const Spacer(),
-                  _TimerBadge(seconds: session.remainingSeconds, s: s),
+                  TimerBadge(seconds: session.remainingSeconds, s: s),
                   const Spacer(),
                   IconButton(
                     iconSize: 34,
@@ -352,73 +415,8 @@ class _PlayView extends ConsumerWidget {
           ),
         ),
         if (session.paused)
-          Positioned.fill(
-            child: ColoredBox(
-              color: AppColors.backgroundDeep.withValues(alpha: 0.96),
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text('⏸️', style: TextStyle(fontSize: 80)),
-                    Text(
-                      s.paused,
-                      style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    CartoonButton(
-                      label: s.resume,
-                      icon: '▶️',
-                      expand: false,
-                      color: AppColors.green,
-                      onPressed: () => ctrl.setPaused(false),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          PausedOverlay(s: s, onResume: () => ctrl.setPaused(false)),
       ],
-    );
-  }
-}
-
-class _TimerBadge extends StatelessWidget {
-  const _TimerBadge({required this.seconds, required this.s});
-
-  final int seconds;
-  final AppStrings s;
-
-  @override
-  Widget build(BuildContext context) {
-    final warning = seconds <= GameController.warningSeconds;
-    return TweenAnimationBuilder<double>(
-      key: ValueKey(warning ? seconds : -1),
-      tween: Tween(begin: warning ? 1.25 : 1, end: 1),
-      duration: const Duration(milliseconds: 350),
-      curve: Curves.easeOutBack,
-      builder: (context, scale, child) =>
-          Transform.scale(scale: scale, child: child),
-      child: Container(
-        width: 96,
-        height: 96,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: warning ? AppColors.red : AppColors.yellow,
-          shape: BoxShape.circle,
-          border: Border.all(color: AppColors.outline, width: 4),
-        ),
-        child: Text(
-          s.n(seconds),
-          style: TextStyle(
-            fontSize: 40,
-            fontWeight: FontWeight.w900,
-            color: warning ? Colors.white : AppColors.ink,
-          ),
-        ),
-      ),
     );
   }
 }
@@ -437,73 +435,68 @@ class _SummaryView extends ConsumerWidget {
     final ctrl = ref.read(gameControllerProvider.notifier);
     final turn = session.lastTurn!;
     final color = TeamStyle.of(turn.teamIndex).color;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 56, 20, 20),
-      child: Column(
-        children: [
-          Text(
-            s.timeUp,
+    return PhaseLayout(
+      header: [
+        Text(
+          s.timeUp,
+          style: const TextStyle(
+            fontSize: 20,
+            color: AppColors.textMuted,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        Text(
+          session.config.teamNames[turn.teamIndex],
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 30,
+            fontWeight: FontWeight.w900,
+            color: color,
+          ),
+        ),
+        PopIn(
+          key: ValueKey(turn.score),
+          child: Text(
+            s.score(turn.score),
             style: const TextStyle(
-              fontSize: 20,
-              color: AppColors.textMuted,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          Text(
-            session.config.teamNames[turn.teamIndex],
-            style: TextStyle(
-              fontSize: 30,
+              fontSize: 44,
               fontWeight: FontWeight.w900,
-              color: color,
+              color: AppColors.yellow,
+              shadows: [Shadow(color: AppColors.outline, offset: Offset(0, 4))],
             ),
           ),
-          PopIn(
-            key: ValueKey(turn.score),
-            child: Text(
-              s.score(turn.score),
-              style: const TextStyle(
-                fontSize: 44,
-                fontWeight: FontWeight.w900,
-                color: AppColors.yellow,
-                shadows: [
-                  Shadow(color: AppColors.outline, offset: Offset(0, 4)),
-                ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          s.tapToFix,
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 14, color: AppColors.textMuted),
+        ),
+        const SizedBox(height: 12),
+      ],
+      body: turn.results.isEmpty
+          ? Center(
+              child: Text(
+                s.noWordsPlayed,
+                style: const TextStyle(fontSize: 20),
+              ),
+            )
+          : ListView.separated(
+              itemCount: turn.results.length,
+              separatorBuilder: (_, _) => const SizedBox(height: 8),
+              itemBuilder: (context, i) => _ResultTile(
+                result: turn.results[i],
+                s: s,
+                onTap: () => ctrl.toggleSummaryWord(i),
               ),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            s.tapToFix,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 14, color: AppColors.textMuted),
-          ),
-          const SizedBox(height: 12),
-          Expanded(
-            child: turn.results.isEmpty
-                ? Center(
-                    child: Text(
-                      s.noWordsPlayed,
-                      style: const TextStyle(fontSize: 20),
-                    ),
-                  )
-                : ListView.separated(
-                    itemCount: turn.results.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 8),
-                    itemBuilder: (context, i) => _ResultTile(
-                      result: turn.results[i],
-                      s: s,
-                      onTap: () => ctrl.toggleSummaryWord(i),
-                    ),
-                  ),
-          ),
-          const SizedBox(height: 12),
-          CartoonButton(
-            label: s.continueLabel,
-            color: AppColors.yellow,
-            onPressed: ctrl.confirmSummary,
-          ),
-        ],
-      ),
+      actions: [
+        CartoonButton(
+          label: s.continueLabel,
+          color: AppColors.yellow,
+          onPressed: ctrl.confirmSummary,
+        ),
+      ],
     );
   }
 }
@@ -579,35 +572,32 @@ class _ScoreboardView extends ConsumerWidget {
     final nextName = preview.finished
         ? null
         : game.config.teamNames[preview.currentTeamIndex];
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 56, 20, 20),
-      child: Column(
-        children: [
-          Text(
-            s.scoreboard,
-            style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w900),
+    return PhaseLayout(
+      header: [
+        Text(
+          s.scoreboard,
+          style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w900),
+        ),
+        const SizedBox(height: 16),
+      ],
+      body: _Standings(session: session, s: s),
+      actions: [
+        if (enteringSuddenDeath) ...[
+          GameBanner(
+            text: '⚡ ${s.suddenDeath} ${s.suddenDeathHint}',
+            color: AppColors.red,
           ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: _Standings(session: session, s: s),
-          ),
-          if (enteringSuddenDeath) ...[
-            _Banner(
-              text: '⚡ ${s.suddenDeath} ${s.suddenDeathHint}',
-              color: AppColors.red,
-            ),
-            const SizedBox(height: 12),
-          ],
-          CartoonButton(
-            label: nextName == null ? s.seeResults : s.nextTurn(nextName),
-            icon: nextName == null ? '🏆' : null,
-            color: nextName == null
-                ? AppColors.yellow
-                : TeamStyle.of(preview.currentTeamIndex).color,
-            onPressed: ref.read(gameControllerProvider.notifier).nextTurn,
-          ),
+          const SizedBox(height: 12),
         ],
-      ),
+        CartoonButton(
+          label: nextName == null ? s.seeResults : s.nextTurn(nextName),
+          icon: nextName == null ? '🏆' : null,
+          color: nextName == null
+              ? AppColors.yellow
+              : TeamStyle.of(preview.currentTeamIndex).color,
+          onPressed: ref.read(gameControllerProvider.notifier).nextTurn,
+        ),
+      ],
     );
   }
 }
@@ -625,6 +615,7 @@ class _Standings extends StatelessWidget {
     final ranking = game.ranking;
     final best = game.scoreOf(ranking.first);
     return ListView(
+      padding: const EdgeInsets.only(top: 4),
       children: [
         for (final (rank, team) in ranking.indexed)
           Padding(
@@ -711,88 +702,56 @@ class _FinishedView extends ConsumerWidget {
     final game = session.game;
     final leaders = game.leaders;
     final tie = leaders.length > 1;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 48, 20, 20),
-      child: Column(
-        children: [
-          Text(
-            s.finalResults,
-            style: const TextStyle(
-              fontSize: 20,
-              color: AppColors.textMuted,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 8),
-          BouncyEmoji(tie ? '🤝' : '🏆', size: 90),
-          const SizedBox(height: 8),
-          PopIn(
-            child: Text(
-              tie
-                  ? s.itsATie
-                  : s.winnerIs(game.config.teamNames[leaders.first]),
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 34,
-                fontWeight: FontWeight.w900,
-                color: tie
-                    ? AppColors.yellow
-                    : TeamStyle.of(leaders.first).color,
-                shadows: const [
-                  Shadow(color: AppColors.outline, offset: Offset(0, 4)),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: _Standings(session: session, s: s),
-          ),
-          // "Share result" image card arrives in M5.
-          CartoonButton(
-            label: s.playAgain,
-            icon: '🔁',
-            color: AppColors.green,
-            onPressed: ref.read(gameControllerProvider.notifier).restart,
-          ),
-          const SizedBox(height: 12),
-          CartoonButton(
-            label: s.backHome,
-            icon: '🏠',
-            height: 60,
+    final landscape = isLandscape(context);
+    return PhaseLayout(
+      header: [
+        Text(
+          s.finalResults,
+          style: const TextStyle(
             fontSize: 20,
-            color: AppColors.card,
-            onPressed: onHome,
+            color: AppColors.textMuted,
+            fontWeight: FontWeight.w700,
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 8),
+        BouncyEmoji(tie ? '🤝' : '🏆', size: landscape ? 60 : 90),
+        const SizedBox(height: 8),
+        PopIn(
+          child: Text(
+            tie ? s.itsATie : s.winnerIs(game.config.teamNames[leaders.first]),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: landscape ? 28 : 34,
+              fontWeight: FontWeight.w900,
+              color: tie ? AppColors.yellow : TeamStyle.of(leaders.first).color,
+              shadows: const [
+                Shadow(color: AppColors.outline, offset: Offset(0, 4)),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+      ],
+      body: _Standings(session: session, s: s),
+      actions: [
+        // "Share result" image card arrives in M5.
+        CartoonButton(
+          label: s.playAgain,
+          icon: '🔁',
+          height: landscape ? 60 : 72,
+          color: AppColors.green,
+          onPressed: ref.read(gameControllerProvider.notifier).restart,
+        ),
+        const SizedBox(height: 12),
+        CartoonButton(
+          label: s.backHome,
+          icon: '🏠',
+          height: 56,
+          fontSize: 20,
+          color: AppColors.card,
+          onPressed: onHome,
+        ),
+      ],
     );
   }
-}
-
-class _Banner extends StatelessWidget {
-  const _Banner({required this.text, required this.color});
-
-  final String text;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    width: double.infinity,
-    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-    decoration: BoxDecoration(
-      color: color,
-      borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: AppColors.outline, width: 3),
-    ),
-    child: Text(
-      text,
-      textAlign: TextAlign.center,
-      style: const TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.w900,
-        color: Colors.white,
-      ),
-    ),
-  );
 }

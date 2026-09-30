@@ -3,8 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pantomime/app.dart';
 import 'package:pantomime/core/providers.dart';
+import 'package:pantomime/features/game/application/feedback_service.dart';
 import 'package:pantomime/features/game/application/game_controller.dart';
+import 'package:pantomime/features/game/application/sound_service.dart';
+import 'package:pantomime/features/words/words_providers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../helpers/test_words.dart';
 
 /// Pumps a few frames (can't use pumpAndSettle: some emoji bounce forever).
 Future<void> settle(WidgetTester tester) async {
@@ -22,7 +27,11 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
     final container = ProviderContainer(
-      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        soundServiceProvider.overrideWithValue(const SilentSoundService()),
+        wordRepositoryProvider.overrideWithValue(FileWordRepository()),
+      ],
     );
     addTearDown(container.dispose);
 
@@ -31,10 +40,6 @@ void main() {
         container: container,
         child: const PantomimeApp(),
       ),
-    );
-    // Word pack loads from real assets outside the fake-async zone.
-    await tester.runAsync(
-      () => Future<void>.delayed(const Duration(milliseconds: 200)),
     );
     await tester.pump(const Duration(seconds: 2));
     await settle(tester);

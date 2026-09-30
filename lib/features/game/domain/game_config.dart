@@ -14,12 +14,26 @@ class GameConfig {
   });
 
   static const roundSecondsOptions = [30, 60, 90];
-  static const roundsPerTeamOptions = [3, 5, 7];
 
   /// `null` means unlimited.
   static const passLimitOptions = <int?>[0, 1, 2, 3, 4, 5, null];
-  static const minTeams = 2;
-  static const maxTeams = 4;
+
+  /// Teams (team mode) or players (forehead mode).
+  static int minTeams(GameMode mode) => mode == GameMode.teams ? 2 : 1;
+  static int maxTeams(GameMode mode) => mode == GameMode.teams ? 4 : 8;
+
+  static List<int> roundsOptions(GameMode mode) =>
+      mode == GameMode.teams ? const [3, 5, 7] : const [1, 2, 3];
+  static int defaultRounds(GameMode mode) => roundsOptions(mode).first;
+
+  /// Default config for [mode]. Forehead mode has unlimited passes (tilting
+  /// up must always work).
+  factory GameConfig.defaults(GameMode mode) => GameConfig(
+    mode: mode,
+    teamNames: const ['', ''],
+    roundsPerTeam: defaultRounds(mode),
+    passLimit: mode == GameMode.teams ? 3 : null,
+  );
 
   final List<String> teamNames;
   final GameMode mode;
@@ -63,28 +77,40 @@ class GameConfig {
   };
 
   /// Lenient parsing of a previously saved setup; invalid values fall back to
-  /// defaults.
+  /// the defaults of [mode].
   static GameConfig fromJson(
     Map<String, dynamic> json, {
-    required List<String> defaultTeamNames,
+    required GameMode mode,
   }) {
+    final d = GameConfig.defaults(mode);
     final names = (json['teamNames'] as List?)?.whereType<String>().toList();
     final seconds = json['roundSeconds'];
     final rounds = json['roundsPerTeam'];
     final pass = json['passLimit'];
     return GameConfig(
+      mode: mode,
       teamNames:
-          names != null && names.length >= minTeams && names.length <= maxTeams
+          names != null &&
+              names.length >= minTeams(mode) &&
+              names.length <= maxTeams(mode)
           ? names
-          : defaultTeamNames,
-      roundSeconds: roundSecondsOptions.contains(seconds) ? seconds as int : 60,
-      roundsPerTeam: roundsPerTeamOptions.contains(rounds) ? rounds as int : 3,
+          : d.teamNames,
+      roundSeconds: roundSecondsOptions.contains(seconds)
+          ? seconds as int
+          : d.roundSeconds,
+      roundsPerTeam: roundsOptions(mode).contains(rounds)
+          ? rounds as int
+          : d.roundsPerTeam,
       difficulty: DifficultyChoice.values.firstWhere(
         (d) => d.name == json['difficulty'],
         orElse: () => DifficultyChoice.mixed,
       ),
       categoryIds: {...?(json['categoryIds'] as List?)?.whereType<String>()},
-      passLimit: passLimitOptions.contains(pass) ? pass as int? : 3,
+      passLimit: mode == GameMode.forehead
+          ? null
+          : passLimitOptions.contains(pass)
+          ? pass as int?
+          : d.passLimit,
     );
   }
 }

@@ -23,7 +23,10 @@ class SetupScreen extends ConsumerStatefulWidget {
 }
 
 class _SetupScreenState extends ConsumerState<SetupScreen> {
-  static const _prefsKey = 'last_setup';
+  String get _prefsKey => 'last_setup_${widget.mode.name}';
+  bool get _forehead => widget.mode == GameMode.forehead;
+  int get _min => GameConfig.minTeams(widget.mode);
+  int get _max => GameConfig.maxTeams(widget.mode);
 
   late GameConfig _config;
   final List<TextEditingController> _names = [];
@@ -38,15 +41,14 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
   void initState() {
     super.initState();
     // Empty name = "use the default name in the current language" (hint).
-    const defaults = ['', ''];
-    _config = GameConfig(teamNames: defaults, mode: widget.mode);
+    _config = GameConfig.defaults(widget.mode);
     final raw = ref.read(sharedPreferencesProvider).getString(_prefsKey);
     if (raw != null) {
       try {
         _config = GameConfig.fromJson(
           jsonDecode(raw) as Map<String, dynamic>,
-          defaultTeamNames: defaults,
-        ).copyWith(mode: widget.mode);
+          mode: widget.mode,
+        );
         _savedCategoryIds = _config.categoryIds;
       } catch (_) {}
     }
@@ -63,20 +65,23 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     super.dispose();
   }
 
+  String _defaultName(AppStrings s, int i) =>
+      _forehead ? s.defaultPlayerName(i) : s.defaultTeamName(i);
+
   List<String> _teamNames() => [
     for (var i = 0; i < _names.length; i++)
       _names[i].text.trim().isEmpty
-          ? _s.defaultTeamName(i)
+          ? _defaultName(_s, i)
           : _names[i].text.trim(),
   ];
 
   void _addTeam() {
-    if (_names.length >= GameConfig.maxTeams) return;
+    if (_names.length >= _max) return;
     setState(() => _names.add(TextEditingController()));
   }
 
   void _removeTeam(int i) {
-    if (_names.length <= GameConfig.minTeams) return;
+    if (_names.length <= _min) return;
     setState(() => _names.removeAt(i).dispose());
   }
 
@@ -90,10 +95,9 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     // Remember setup; names equal to a default are stored empty so they
     // follow the UI language.
     final defaults = {
-      for (var i = 0; i < GameConfig.maxTeams; i++) ...[
-        AppStrings.forLanguage('fa').defaultTeamName(i),
-        AppStrings.forLanguage('en').defaultTeamName(i),
-      ],
+      for (var i = 0; i < _max; i++)
+        for (final lang in ['fa', 'en'])
+          _defaultName(AppStrings.forLanguage(lang), i),
     };
     final toSave = config.copyWith(
       teamNames: [
@@ -133,24 +137,24 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
                   children: [
-                    SectionTitle(s.teams),
+                    SectionTitle(_forehead ? s.players : s.teams),
                     for (var i = 0; i < _names.length; i++)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 10),
                         child: _TeamField(
                           index: i,
                           controller: _names[i],
-                          hint: s.defaultTeamName(i),
-                          onRemove: _names.length > GameConfig.minTeams
+                          hint: _defaultName(s, i),
+                          onRemove: _names.length > _min
                               ? () => _removeTeam(i)
                               : null,
                         ),
                       ),
-                    if (_names.length < GameConfig.maxTeams)
+                    if (_names.length < _max)
                       Align(
                         alignment: AlignmentDirectional.centerStart,
                         child: CartoonChip(
-                          label: '+ ${s.addTeam}',
+                          label: '+ ${_forehead ? s.addPlayer : s.addTeam}',
                           selected: false,
                           onTap: _addTeam,
                         ),
@@ -164,9 +168,11 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                         () => _config = _config.copyWith(roundSeconds: v),
                       ),
                     ),
-                    SectionTitle(s.roundsPerTeam),
+                    SectionTitle(
+                      _forehead ? s.turnsPerPlayer : s.roundsPerTeam,
+                    ),
                     _Options<int>(
-                      values: GameConfig.roundsPerTeamOptions,
+                      values: GameConfig.roundsOptions(widget.mode),
                       selected: _config.roundsPerTeam,
                       label: s.n,
                       onSelect: (v) => setState(
@@ -182,15 +188,18 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                         () => _config = _config.copyWith(difficulty: v),
                       ),
                     ),
-                    SectionTitle(s.passLimit),
-                    _Options<int?>(
-                      values: GameConfig.passLimitOptions,
-                      selected: _config.passLimit,
-                      label: (v) => v == null ? s.unlimited : s.n(v),
-                      onSelect: (v) => setState(
-                        () => _config = _config.copyWith(passLimit: () => v),
+                    // Forehead mode: passing (tilt up) is always allowed.
+                    if (!_forehead) ...[
+                      SectionTitle(s.passLimit),
+                      _Options<int?>(
+                        values: GameConfig.passLimitOptions,
+                        selected: _config.passLimit,
+                        label: (v) => v == null ? s.unlimited : s.n(v),
+                        onSelect: (v) => setState(
+                          () => _config = _config.copyWith(passLimit: () => v),
+                        ),
                       ),
-                    ),
+                    ],
                     SectionTitle(
                       s.categories,
                       trailing: categories.isEmpty

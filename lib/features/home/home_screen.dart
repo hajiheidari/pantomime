@@ -83,10 +83,12 @@ class HomeScreen extends ConsumerWidget {
                     height: 96,
                     fontSize: 28,
                     color: AppColors.pink,
-                    // Forehead mode arrives in M2.
-                    onPressed: () => ScaffoldMessenger.of(context)
-                      ..hideCurrentSnackBar()
-                      ..showSnackBar(SnackBar(content: Text(s.comingSoon))),
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            const SetupScreen(mode: GameMode.forehead),
+                      ),
+                    ),
                   ),
                 ),
                 const Spacer(),

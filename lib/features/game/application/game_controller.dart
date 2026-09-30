@@ -10,7 +10,18 @@ import '../domain/game_config.dart';
 import '../domain/game_state.dart';
 import 'feedback_service.dart';
 
-enum GamePhase { ready, countdown, playing, summary, scoreboard, finished }
+enum GamePhase {
+  ready,
+
+  /// Forehead mode only: waiting for the phone to be held still on the
+  /// forehead to record the neutral tilt.
+  calibrating,
+  countdown,
+  playing,
+  summary,
+  scoreboard,
+  finished,
+}
 
 /// Everything the game screens render: the pure [GameState] plus the live
 /// state of the turn being played.
@@ -24,6 +35,7 @@ class GameSession {
     this.results = const [],
     this.passesUsed = 0,
     this.paused = false,
+    this.tiltBaseline = 0,
   });
 
   final GameState game;
@@ -35,7 +47,11 @@ class GameSession {
   final int passesUsed;
   final bool paused;
 
+  /// Forehead mode: calibrated neutral pitch (degrees).
+  final double tiltBaseline;
+
   GameConfig get config => game.config;
+  bool get isForehead => config.mode == GameMode.forehead;
 
   /// Passes left this turn, `null` = unlimited.
   int? get passesLeft {
@@ -59,6 +75,7 @@ class GameSession {
     List<WordResult>? results,
     int? passesUsed,
     bool? paused,
+    double? tiltBaseline,
   }) => GameSession(
     game: game ?? this.game,
     phase: phase ?? this.phase,
@@ -68,6 +85,7 @@ class GameSession {
     results: results ?? this.results,
     passesUsed: passesUsed ?? this.passesUsed,
     paused: paused ?? this.paused,
+    tiltBaseline: tiltBaseline ?? this.tiltBaseline,
   );
 }
 
@@ -127,9 +145,33 @@ class GameController extends Notifier<GameSession?> {
 
   // ---- Turn flow -----------------------------------------------------------
 
-  void beginCountdown() {
+  /// "Start" on the ready screen: forehead mode calibrates first.
+  void startTurn() {
     final s = state;
     if (s == null || s.phase != GamePhase.ready) return;
+    if (s.isForehead) {
+      state = s.copyWith(phase: GamePhase.calibrating);
+    } else {
+      beginCountdown();
+    }
+  }
+
+  /// Forehead mode: the phone is on the forehead; remember the neutral tilt
+  /// and start the countdown.
+  void calibrated(double baseline) {
+    final s = state;
+    if (s == null || s.phase != GamePhase.calibrating) return;
+    state = s.copyWith(tiltBaseline: baseline);
+    beginCountdown();
+  }
+
+  /// 3-2-1 countdown, from the ready screen or after calibration.
+  void beginCountdown() {
+    final s = state;
+    if (s == null ||
+        (s.phase != GamePhase.ready && s.phase != GamePhase.calibrating)) {
+      return;
+    }
     state = s.copyWith(phase: GamePhase.countdown, countdown: 3);
     _feedback.countdown();
     _cancelTimer();
@@ -146,6 +188,7 @@ class GameController extends Notifier<GameSession?> {
       state = s.copyWith(countdown: s.countdown - 1);
       _feedback.countdown();
     } else {
+      _feedback.go();
       _startTurn();
     }
   }
@@ -247,6 +290,7 @@ class GameController extends Notifier<GameSession?> {
     final s = state;
     if (s == null || s.phase != GamePhase.scoreboard) return;
     final game = s.game.advance();
+    if (game.finished) _feedback.win();
     state = s.copyWith(
       game: game,
       phase: game.finished ? GamePhase.finished : GamePhase.ready,

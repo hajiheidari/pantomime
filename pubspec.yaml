@@ -37,6 +37,8 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   wakelock_plus: ^1.8.1
+  sensors_plus: ^7.1.0
+  audioplayers: ^6.8.1
 
 dev_dependencies:
   flutter_test:
@@ -62,6 +64,7 @@ flutter:
 
   assets:
     - assets/words/
+    - assets/sounds/
 
   fonts:
     - family: Vazirmatn

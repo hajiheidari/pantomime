@@ -107,7 +107,7 @@ void main() {
       categoryIds: {'animals'},
       passLimit: null,
     );
-    final back = GameConfig.fromJson(c.toJson(), defaultTeamNames: ['', '']);
+    final back = GameConfig.fromJson(c.toJson(), mode: GameMode.teams);
     expect(back.teamNames, ['x', 'y', 'z']);
     expect(back.roundSeconds, 90);
     expect(back.roundsPerTeam, 7);
@@ -115,20 +115,32 @@ void main() {
     expect(back.categoryIds, {'animals'});
     expect(back.passLimit, isNull);
 
-    final bad = GameConfig.fromJson(
-      {
-        'teamNames': ['only one'],
-        'roundSeconds': 45,
-        'roundsPerTeam': 'x',
-        'difficulty': 'insane',
-        'passLimit': 99,
-      },
-      defaultTeamNames: ['', ''],
-    );
+    final bad = GameConfig.fromJson({
+      'teamNames': ['only one'],
+      'roundSeconds': 45,
+      'roundsPerTeam': 'x',
+      'difficulty': 'insane',
+      'passLimit': 99,
+    }, mode: GameMode.teams);
     expect(bad.teamNames, ['', '']);
     expect(bad.roundSeconds, 60);
     expect(bad.roundsPerTeam, 3);
     expect(bad.difficulty, DifficultyChoice.mixed);
     expect(bad.passLimit, 3);
+
+    final forehead = GameConfig.fromJson({
+      'teamNames': ['solo'],
+      'roundsPerTeam': 2,
+      'passLimit': 1,
+    }, mode: GameMode.forehead);
+    expect(forehead.teamNames, ['solo']);
+    expect(forehead.roundsPerTeam, 2);
+    expect(forehead.passLimit, isNull);
+    expect(
+      GameConfig.fromJson({
+        'roundsPerTeam': 5,
+      }, mode: GameMode.forehead).roundsPerTeam,
+      1,
+    );
   });
 }
