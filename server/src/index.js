@@ -2,6 +2,7 @@
 // control bot.
 //
 //   GET  /config.json                  → current config (cached 5 min)
+//   GET  /privacy                      → privacy policy page (fa + en)
 //   POST /tg/<WEBHOOK_PATH>            → Telegram webhook (admin only)
 //
 // Bindings (see wrangler.toml / README):
@@ -14,6 +15,7 @@
 import { runCommand } from './commands.js';
 import { summary } from './config.js';
 import { mirrorEnabled, pushToMirror } from './mirror.js';
+import { privacyHtml } from './privacy.js';
 import { ConfigStore } from './store.js';
 
 const CONFIG_HEADERS = {
@@ -128,6 +130,14 @@ export default {
     }
     if (request.method === 'POST' && env.WEBHOOK_PATH && url.pathname === `/tg/${env.WEBHOOK_PATH}`) {
       return handleTelegram(request, env, ctx);
+    }
+    if (url.pathname === '/privacy') {
+      return new Response(privacyHtml(env.CONTACT_EMAIL), {
+        headers: {
+          'content-type': 'text/html; charset=utf-8',
+          'cache-control': 'public, max-age=3600',
+        },
+      });
     }
     if (url.pathname === '/') return new Response('pantomime config: ok');
     return new Response('not found', { status: 404 });

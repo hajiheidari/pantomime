@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <!-- Remote config (ads settings) and ads. Gameplay itself is offline. -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <!-- Optional forehead-mode recording (off by default; asked only when the
@@ -12,6 +13,9 @@
     <!-- Saving clips to the gallery on Android 9 and older (gal). -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28"/>
+    <!-- Implied by an old library's targetSdk; not needed (we only write). -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        tools:node="remove"/>
     <application
         android:label="پانتومیم"
         android:name="${applicationName}"

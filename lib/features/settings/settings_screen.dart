@@ -4,11 +4,26 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/cartoon.dart';
+import '../../core/store/store_service.dart';
+import '../ads/config/remote_config_service.dart';
 import '../recording/round_recorder.dart';
 import 'settings_controller.dart';
 
-/// Placeholder until the real policy page is hosted (see docs/store_notes.md).
-const privacyPolicyUrl = 'https://REPLACE_ME.example/privacy';
+/// Privacy policy page. Served by the config Worker at `/privacy`
+/// (server/src/privacy.js), so it defaults to the CONFIG_URL origin; override
+/// with --dart-define=PRIVACY_URL=….
+String get privacyPolicyUrl {
+  const explicit = String.fromEnvironment('PRIVACY_URL');
+  if (explicit.isNotEmpty) return explicit;
+  final config = Uri.tryParse(configPrimaryUrl);
+  if (config == null || !config.hasScheme) return '';
+  return Uri(
+    scheme: config.scheme,
+    host: config.host,
+    port: config.hasPort ? config.port : null,
+    path: '/privacy',
+  ).toString();
+}
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -92,9 +107,7 @@ class SettingsScreen extends ConsumerWidget {
                     _Row(
                       emoji: '⭐',
                       title: s.rateApp,
-                      // Store-specific deep link arrives with StoreService (M6).
-                      onTap: () => ScaffoldMessenger.of(context)
-                          .showSnackBar(SnackBar(content: Text(s.comingSoon))),
+                      onTap: () => ref.read(storeServiceProvider).openRating(),
                     ),
                     const _Divider(),
                     _Row(

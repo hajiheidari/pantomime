@@ -56,3 +56,8 @@ packages/*/.dart_tool/
 
 # Gradle output
 /android/build/
+
+# Store signing keys (never commit)
+/android/keys/
+*.jks
+*.keystore

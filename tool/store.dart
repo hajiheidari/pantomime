@@ -54,6 +54,20 @@ void main(List<String> args) {
     stderr.writeln('managed block not found in pubspec.yaml');
     exit(1);
   }
+  // Only ads_* packages may live in the managed block (it is rewritten).
+  final existing = text.substring(start, end);
+  final foreign = RegExp(r'^  ([a-z_]+):', multiLine: true)
+      .allMatches(existing)
+      .map((m) => m.group(1)!)
+      .where((name) => !name.startsWith('ads_'))
+      .toList();
+  if (foreign.isNotEmpty) {
+    stderr.writeln(
+      'pubspec.yaml: move ${foreign.join(', ')} out of the ad providers '
+      'block (above "# >>>" or below "# <<<") and run again.',
+    );
+    exit(1);
+  }
   final block = StringBuffer('$_begin\n')
     ..writeln('  # store: $store')
     ..writeln('  ads_core:')

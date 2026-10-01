@@ -12,7 +12,11 @@ Full product spec: [`docs/PROJECT_SPEC.md`](docs/PROJECT_SPEC.md).
 | M3 – Ads abstraction + remote config (see [docs/ads.md](docs/ads.md)) | ✅ done |
 | M4 – Cloudflare Worker + Telegram bot (see [server/README.md](server/README.md)) | ✅ done |
 | M5 – Recording & sharing (raw video + share-card images) | ✅ done |
-| M6 – Store flavors & release | ⏳ next |
+| M6 – Store flavors, icons, splash, release builds (see [docs/store_notes.md](docs/store_notes.md)) | ✅ done |
+| M7 – Web/PWA (phase 2) | waiting for your go |
+
+**Your remaining tasks (accounts, keys, device tests, decisions):
+[docs/OWNER_TODO.md](docs/OWNER_TODO.md).**
 
 ## Run
 
@@ -124,9 +128,20 @@ flutter build apk --dart-define=STORE=bazaar --dart-define-from-file=ad_keys.jso
 ```
 
 The committed profile is `dev` (Adivery + AdMob) so `flutter run` works.
-Never ship a `dev` build; switch to the store's profile first. Tapsell Plus
-is currently not buildable (see docs/ads.md). Run every check with
-`tool/check.sh`. Store flavors, signing and release checklists come in M6
-(`docs/store_notes.md`).
+Never ship a `dev` build: release with `tool/release.sh <play|bazaar|myket|ios>`,
+which selects the store's SDK profile, flavor and signing key. Tapsell Plus is
+currently not buildable (see docs/ads.md). Run every check with
+`tool/check.sh`. Release checklists, privacy forms and listing text:
+[docs/store_notes.md](docs/store_notes.md).
 
-Bundle/application ID placeholder: `com.REPLACE_ME.pantomime`.
+Android flavors: `play`, `bazaar`, `myket` (same applicationId). The flavor
+sets the app's store (`appFlavor`), which picks the ad config keys and the
+rate/update links (`lib/core/store/store_service.dart`). Bazaar/Myket
+manifests strip `AD_ID` and the AdMob app id.
+
+Icons / splash: `assets/branding/icon.svg` is the source. Render it with
+`node tool/render_branding.js`, then run `dart run flutter_launcher_icons`
+and `dart run flutter_native_splash:create`.
+
+Bundle/application ID placeholder: `com.REPLACE_ME.pantomime`. Set it with
+`python3 tool/set_package.py com.yourname.pantomime`.

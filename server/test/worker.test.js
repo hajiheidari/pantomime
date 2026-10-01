@@ -226,3 +226,18 @@ test('a change with the mirror configured pushes the new config', async () => {
   assert.equal(put.body.ads.interstitial_every_n_rounds, 4);
   assert.match(replies(f)[0], /mirror updated/);
 });
+
+test('GET /privacy serves the policy in Persian and English', async () => {
+  const res = await worker.fetch(
+    new Request('https://w.example/privacy'),
+    env(new FakeKV(), { CONTACT_EMAIL: 'me@example.com' }),
+    ctx,
+  );
+  assert.equal(res.status, 200);
+  assert.match(res.headers.get('content-type'), /text\/html/);
+  const html = await res.text();
+  assert.match(html, /حریم خصوصی/);
+  assert.match(html, /Privacy policy/);
+  assert.match(html, /never uploaded/);
+  assert.match(html, /me@example.com/);
+});

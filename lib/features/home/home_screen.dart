@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../core/providers.dart';
+import '../../core/store/store_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/cartoon.dart';
 import '../ads/ads_providers.dart';
@@ -128,7 +129,7 @@ class _Notice extends ConsumerWidget {
         compareVersions(version, config.minSupportedVersion) < 0;
     final text = config.message ?? (outdated ? s.updateAvailable : null);
     if (text == null) return const SizedBox.shrink();
-    return CartoonCard(
+    final card = CartoonCard(
       color: AppColors.yellow,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       child: Row(
@@ -147,6 +148,11 @@ class _Notice extends ConsumerWidget {
           ),
         ],
       ),
+    );
+    if (!outdated) return card;
+    return GestureDetector(
+      onTap: () => ref.read(storeServiceProvider).openDetails(),
+      child: card,
     );
   }
 }

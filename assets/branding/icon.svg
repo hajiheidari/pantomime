@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- App icon source. Regenerate PNGs with tool/render_branding.js -->
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="70%">
+      <stop offset="0" stop-color="#5A36C9"/>
+      <stop offset="0.6" stop-color="#2A1B5C"/>
+      <stop offset="1" stop-color="#1A0F3D"/>
+    </radialGradient>
+    <g id="masks">
+      <!-- Sad mask (back) -->
+      <g transform="translate(628 560) rotate(14)">
+        <path d="M -185 -225 Q 0 -295 185 -225 Q 215 45 0 255 Q -215 45 -185 -225 Z"
+              fill="#FF5C9A" stroke="#120A2B" stroke-width="30" stroke-linejoin="round"/>
+        <path d="M -125 -95 Q -82 -40 -40 -95" fill="none" stroke="#120A2B" stroke-width="30" stroke-linecap="round"/>
+        <path d="M 40 -95 Q 82 -40 125 -95" fill="none" stroke="#120A2B" stroke-width="30" stroke-linecap="round"/>
+        <path d="M 95 -20 Q 120 30 95 55 Q 70 30 95 -20 Z" fill="#3BCEF5" stroke="#120A2B" stroke-width="12"/>
+        <path d="M -105 150 Q 0 40 105 150 Q 0 100 -105 150 Z" fill="#120A2B" stroke="#120A2B" stroke-width="18" stroke-linejoin="round"/>
+      </g>
+      <!-- Happy mask (front) -->
+      <g transform="translate(404 476) rotate(-12)">
+        <path d="M -190 -230 Q 0 -300 190 -230 Q 220 45 0 262 Q -220 45 -190 -230 Z"
+              fill="#FFD23F" stroke="#120A2B" stroke-width="30" stroke-linejoin="round"/>
+        <path d="M -128 -60 Q -84 -120 -40 -60" fill="none" stroke="#120A2B" stroke-width="30" stroke-linecap="round"/>
+        <path d="M 40 -60 Q 84 -120 128 -60" fill="none" stroke="#120A2B" stroke-width="30" stroke-linecap="round"/>
+        <ellipse cx="-120" cy="25" rx="34" ry="22" fill="#FF8A3D" opacity="0.7"/>
+        <ellipse cx="120" cy="25" rx="34" ry="22" fill="#FF8A3D" opacity="0.7"/>
+        <path d="M -115 55 Q 0 205 115 55 Q 0 115 -115 55 Z" fill="#120A2B" stroke="#120A2B" stroke-width="18" stroke-linejoin="round"/>
+        <path d="M -55 120 Q 0 150 55 120 Q 0 175 -55 120 Z" fill="#FF4D5A"/>
+      </g>
+    </g>
+  </defs>
+  <g id="background">
+    <rect width="1024" height="1024" fill="url(#bg)"/>
+    <circle cx="160" cy="190" r="22" fill="#3DDC84"/>
+    <circle cx="870" cy="170" r="16" fill="#FFD23F"/>
+    <circle cx="880" cy="860" r="24" fill="#3BCEF5"/>
+    <circle cx="140" cy="840" r="14" fill="#FF8A3D"/>
+    <path d="M 820 330 l 14 -30 l 14 30 l 30 14 l -30 14 l -14 30 l -14 -30 l -30 -14 z" fill="#FFF8E7"/>
+    <path d="M 190 560 l 10 -22 l 10 22 l 22 10 l -22 10 l -10 22 l -10 -22 l -22 -10 z" fill="#FFF8E7"/>
+  </g>
+  <use href="#masks"/>
+</svg>
