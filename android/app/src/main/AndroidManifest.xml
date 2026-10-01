@@ -1,6 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Remote config (ads settings) and ads. Gameplay itself is offline. -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Optional forehead-mode recording (off by default; asked only when the
+         user turns recording on in Settings). -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-feature android:name="android.hardware.camera" android:required="false"/>
+    <uses-feature android:name="android.hardware.camera.front" android:required="false"/>
+    <uses-feature android:name="android.hardware.microphone" android:required="false"/>
+    <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="false"/>
+    <!-- Saving clips to the gallery on Android 9 and older (gal). -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28"/>
     <application
         android:label="پانتومیم"
         android:name="${applicationName}"

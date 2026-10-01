@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/cartoon.dart';
+import '../recording/round_recorder.dart';
 import 'settings_controller.dart';
 
 /// Placeholder until the real policy page is hosted (see docs/store_notes.md).
@@ -56,12 +57,11 @@ class SettingsScreen extends ConsumerWidget {
                       ctrl.setVibration,
                     ),
                     const _Divider(),
-                    // Recording is implemented in M5.
                     toggle(
                       '🎥',
                       s.recording,
-                      false,
-                      null,
+                      settings.recordingOn,
+                      (on) => _setRecording(context, ref, on),
                       subtitle: s.recordingHint,
                     ),
                   ],
@@ -122,6 +122,55 @@ class SettingsScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  /// Recording is off by default. Turning it on explains why camera and
+  /// microphone are needed, then lets the OS ask for permission.
+  Future<void> _setRecording(
+    BuildContext context,
+    WidgetRef ref,
+    bool on,
+  ) async {
+    final ctrl = ref.read(settingsProvider.notifier);
+    if (!on) {
+      ctrl.setRecording(false);
+      return;
+    }
+    final s = ref.read(stringsProvider);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(s.recordingExplainTitle),
+        content: Text(s.recordingExplainBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(s.cancel, style: const TextStyle(color: AppColors.ink)),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.green,
+              foregroundColor: AppColors.ink,
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(
+              s.allow,
+              style: const TextStyle(fontWeight: FontWeight.w900),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    // Opening the camera triggers the OS camera + microphone prompts.
+    final recorder = ref.read(roundRecorderFactoryProvider)();
+    final granted = await recorder.prepare();
+    await recorder.dispose();
+    ctrl.setRecording(granted);
+    if (!granted && context.mounted) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(s.recordingDenied)));
+    }
   }
 
   void _info(BuildContext context, String title, String body, String close) {

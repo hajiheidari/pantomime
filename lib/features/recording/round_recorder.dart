@@ -1,0 +1,104 @@
+import 'package:camera/camera.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+/// Records the front camera during a forehead-mode round.
+/// Videos stay on the device; nothing is ever uploaded.
+abstract interface class RoundRecorder {
+  /// Opens the camera (asks for camera + microphone permission the first
+  /// time). Returns false if permission is denied or no camera exists.
+  Future<bool> prepare();
+
+  Future<void> start();
+
+  /// Stops and returns the video file path, or null.
+  Future<String?> stop();
+
+  Future<void> dispose();
+
+  bool get isRecording;
+}
+
+class CameraRoundRecorder implements RoundRecorder {
+  CameraController? _controller;
+  bool _recording = false;
+
+  @override
+  bool get isRecording => _recording;
+
+  @override
+  Future<bool> prepare() async {
+    if (_controller?.value.isInitialized ?? false) return true;
+    try {
+      final cameras = await availableCameras();
+      if (cameras.isEmpty) return false;
+      final front = cameras.firstWhere(
+        (c) => c.lensDirection == CameraLensDirection.front,
+        orElse: () => cameras.first,
+      );
+      final c = CameraController(front, ResolutionPreset.medium);
+      await c.initialize();
+      await c.prepareForVideoRecording();
+      _controller = c;
+      return true;
+    } on CameraException catch (e) {
+      debugPrint('camera: ${e.code} ${e.description}');
+      return false;
+    } catch (e) {
+      debugPrint('camera: $e');
+      return false;
+    }
+  }
+
+  @override
+  Future<void> start() async {
+    final c = _controller;
+    if (c == null || _recording) return;
+    try {
+      await c.startVideoRecording();
+      _recording = true;
+    } catch (e) {
+      debugPrint('camera start: $e');
+    }
+  }
+
+  @override
+  Future<String?> stop() async {
+    final c = _controller;
+    if (c == null || !_recording) return null;
+    _recording = false;
+    try {
+      return (await c.stopVideoRecording()).path;
+    } catch (e) {
+      debugPrint('camera stop: $e');
+      return null;
+    }
+  }
+
+  @override
+  Future<void> dispose() async {
+    if (_recording) await stop();
+    final c = _controller;
+    _controller = null;
+    await c?.dispose();
+  }
+}
+
+/// A fresh recorder per game screen. Overridden in tests.
+final roundRecorderFactoryProvider = Provider<RoundRecorder Function()>(
+  (ref) => CameraRoundRecorder.new,
+);
+
+/// Video of each finished turn (turn index → file path) in the current game.
+final roundClipsProvider = NotifierProvider<RoundClips, Map<int, String>>(
+  RoundClips.new,
+);
+
+class RoundClips extends Notifier<Map<int, String>> {
+  @override
+  Map<int, String> build() => const {};
+
+  void add(int turn, String path) => state = {...state, turn: path};
+
+  void clear() => state = const {};
+}

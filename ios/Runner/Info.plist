@@ -8,6 +8,12 @@
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
 	<string>پانتومیم</string>
+	<key>NSCameraUsageDescription</key>
+	<string>در حالت «گوشی روی پیشونی» اگر ضبط را روشن کنی، دوربین جلو از ادای دوستانت فیلم می‌گیرد. ویدیو فقط روی گوشی خودت می‌ماند. — If you turn recording on, the front camera films your friends acting in forehead mode. Videos stay on your phone.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>برای ضبط صدای خنده‌ها همراه ویدیوی بازی. ویدیو فقط روی گوشی خودت می‌ماند. — To record the laughs with the game video. Videos stay on your phone.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>برای ذخیره ویدیوی بازی در گالری، فقط وقتی خودت بخواهی. — To save the game video to your Photos, only when you ask.</string>
 	<key>GADApplicationIdentifier</key>
 	<string>$(ADMOB_APP_ID)</string>
 	<key>SKAdNetworkItems</key>

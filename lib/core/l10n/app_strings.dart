@@ -83,6 +83,24 @@ abstract class AppStrings {
   String get unlockSkipped;
   String get updateAvailable;
 
+  // Recording & sharing
+  String get recordingExplainTitle;
+  String get recordingExplainBody;
+  String get allow;
+  String get recordingDenied;
+  String get rec;
+  String get saveVideo;
+  String get videoSaved;
+  String get videoSaveFailed;
+  String get shareVideo;
+  String get shareCard;
+  String get shareResult;
+  String get share;
+  String shareCaption(int points);
+  String get shareResultCaption;
+  String get cardCorrectWords;
+  String get downloadCta;
+
   // Summary / scores
   String get roundSummary;
   String get tapToFix;
@@ -263,6 +281,48 @@ class FaStrings extends AppStrings {
   String get updateAvailable => 'نسخه جدید بازی آمده؛ از فروشگاه به‌روز کن!';
 
   @override
+  String get recordingExplainTitle => 'ضبط ویدیوی خنده‌دار 🎥';
+  @override
+  String get recordingExplainBody =>
+      'در حالت «گوشی روی پیشونی»، دوربین جلو از ادا درآوردن دوستانت فیلم '
+      'می‌گیرد تا بعد ببینید و بخندید.\n\n'
+      'برای این کار به دوربین و میکروفون نیاز داریم. ویدیوها فقط روی گوشی '
+      'خودت می‌مانند و هرگز جایی آپلود نمی‌شوند؛ فقط اگر خودت بخواهی آن را '
+      'ذخیره یا برای کسی بفرستی.';
+  @override
+  String get allow => 'باشه، فعال کن';
+  @override
+  String get recordingDenied =>
+      'دسترسی به دوربین یا میکروفون داده نشد؛ ضبط خاموش ماند. '
+      'می‌توانی از تنظیمات گوشی اجازه بدهی.';
+  @override
+  String get rec => 'ضبط';
+  @override
+  String get saveVideo => 'ذخیره ویدیو';
+  @override
+  String get videoSaved => 'ویدیو در گالری ذخیره شد ✅';
+  @override
+  String get videoSaveFailed => 'ذخیره نشد؛ اجازه دسترسی به گالری را بررسی کن.';
+  @override
+  String get shareVideo => 'ارسال ویدیو';
+  @override
+  String get shareCard => 'کارت امتیاز';
+  @override
+  String get shareResult => 'اشتراک نتیجه';
+  @override
+  String get share => 'اشتراک‌گذاری';
+  @override
+  String shareCaption(int points) =>
+      'ما در «پانتومیم دورهمی» ${n(points)} امتیاز گرفتیم! 🎭 تو چند تا می‌گیری؟';
+  @override
+  String get shareResultCaption =>
+      'نتیجه بازی ما در «پانتومیم دورهمی» 🎭🏆 بیا با هم بازی کنیم!';
+  @override
+  String get cardCorrectWords => 'کلمه‌هایی که درست گفتیم';
+  @override
+  String get downloadCta => 'پانتومیم دورهمی را نصب کن و با دوستانت بازی کن!';
+
+  @override
   String get roundSummary => 'خلاصه نوبت';
   @override
   String get tapToFix => 'اگر اشتباه زدید، روی کلمه بزنید تا درست شود.';
@@ -307,7 +367,7 @@ class FaStrings extends AppStrings {
   @override
   String get recording => 'ضبط ویدیو در حالت پیشونی';
   @override
-  String get recordingHint => 'به‌زودی در نسخه‌های بعد';
+  String get recordingHint => 'فقط در حالت پیشونی، دوربین جلو';
   @override
   String get language => 'زبان';
   @override
@@ -480,6 +540,47 @@ class EnStrings extends AppStrings {
   String get updateAvailable => 'A new version is available in the store!';
 
   @override
+  String get recordingExplainTitle => 'Record the fun 🎥';
+  @override
+  String get recordingExplainBody =>
+      'In forehead mode the front camera films your friends acting, so you '
+      'can watch and laugh afterwards.\n\n'
+      'This needs the camera and microphone. Videos stay on your phone and '
+      'are never uploaded — only saved or shared if you choose to.';
+  @override
+  String get allow => 'OK, turn it on';
+  @override
+  String get recordingDenied =>
+      'Camera or microphone access was not granted; recording stays off. '
+      'You can allow it in the phone settings.';
+  @override
+  String get rec => 'REC';
+  @override
+  String get saveVideo => 'Save video';
+  @override
+  String get videoSaved => 'Video saved to gallery ✅';
+  @override
+  String get videoSaveFailed => 'Could not save; check gallery permission.';
+  @override
+  String get shareVideo => 'Share video';
+  @override
+  String get shareCard => 'Score card';
+  @override
+  String get shareResult => 'Share result';
+  @override
+  String get share => 'Share';
+  @override
+  String shareCaption(int points) =>
+      'We scored $points in Pantomime Party! 🎭 Can you beat us?';
+  @override
+  String get shareResultCaption =>
+      'Our Pantomime Party results 🎭🏆 Come play with us!';
+  @override
+  String get cardCorrectWords => 'Words we got';
+  @override
+  String get downloadCta => 'Get Pantomime Party and play with friends!';
+
+  @override
   String get roundSummary => 'Turn summary';
   @override
   String get tapToFix => 'Tapped the wrong button? Tap a word to fix it.';
@@ -524,7 +625,7 @@ class EnStrings extends AppStrings {
   @override
   String get recording => 'Record video in forehead mode';
   @override
-  String get recordingHint => 'Coming in a future version';
+  String get recordingHint => 'Forehead mode only, front camera';
   @override
   String get language => 'Language';
   @override

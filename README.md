@@ -11,8 +11,8 @@ Full product spec: [`docs/PROJECT_SPEC.md`](docs/PROJECT_SPEC.md).
 | M2 – Forehead mode (sensors, calibration, sounds, haptics) | ✅ done |
 | M3 – Ads abstraction + remote config (see [docs/ads.md](docs/ads.md)) | ✅ done |
 | M4 – Cloudflare Worker + Telegram bot (see [server/README.md](server/README.md)) | ✅ done |
-| M5 – Recording & sharing | ⏳ next |
-| M6 – Store flavors & release | — |
+| M5 – Recording & sharing (raw video + share-card images) | ✅ done |
+| M6 – Store flavors & release | ⏳ next |
 
 ## Run
 
@@ -68,6 +68,20 @@ falls back to on-screen Correct/Pass buttons. Tune thresholds in
 
 Game rules live in `GameState` (immutable, no timers/I/O) so they are fully
 unit-tested; `GameController` only adds the clock and word picking.
+
+## Recording & sharing
+
+- Recording is **off by default**. Turning it on in Settings first shows a
+  Persian explanation, then the OS asks for camera + microphone.
+- In forehead mode the front camera (facing the group) records each round.
+  The summary then offers 💾 save to gallery and 🎬 share. Clips are never
+  uploaded.
+- Every summary has a 🖼️ score-card image, and the final result has a
+  📤 share-result card. Both carry the app name and a "get the game" line.
+- **Watermark path taken: (a) raw video + (b) share-card image.** Burning a
+  watermark into the video needs FFmpeg. The official `ffmpeg_kit_flutter` is
+  discontinued, and the community fork adds tens of MB per ABI, which goes
+  against "keep the app small". Revisit with a platform-native encoder later.
 
 ## Adding a word category
 

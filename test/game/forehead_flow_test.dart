@@ -10,6 +10,7 @@ import 'package:pantomime/features/game/application/game_controller.dart';
 import 'package:pantomime/features/game/application/motion.dart';
 import 'package:pantomime/features/game/application/sound_service.dart';
 import 'package:pantomime/features/game/domain/game_state.dart';
+import 'package:pantomime/features/recording/round_recorder.dart';
 import 'package:pantomime/features/words/words_providers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -42,11 +43,15 @@ void main() {
     }
   }
 
-  Future<void> boot(WidgetTester tester) async {
+  Future<void> boot(
+    WidgetTester tester, {
+    Map<String, Object> prefsValues = const {},
+    FakeRecorder? recorder,
+  }) async {
     tester.view.physicalSize = const Size(1080, 2340);
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues(prefsValues);
     final prefs = await SharedPreferences.getInstance();
     motion = StreamController<MotionSample>.broadcast();
     clock = Duration.zero;
@@ -56,6 +61,8 @@ void main() {
         soundServiceProvider.overrideWithValue(const SilentSoundService()),
         wordRepositoryProvider.overrideWithValue(FileWordRepository()),
         accelerometerProvider.overrideWithValue(motion.stream),
+        if (recorder != null)
+          roundRecorderFactoryProvider.overrideWithValue(() => recorder),
       ],
     );
     addTearDown(container.dispose);
@@ -143,4 +150,63 @@ void main() {
     await motion.close();
     await tester.pump(const Duration(seconds: 1));
   });
+
+  testWidgets('recording on: round is filmed, clip offered on summary', (
+    tester,
+  ) async {
+    final recorder = FakeRecorder();
+    await boot(
+      tester,
+      prefsValues: {'settings.recording': true},
+      recorder: recorder,
+    );
+    await hold(tester, 'upright', 2400);
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(session().phase, GamePhase.playing);
+    await tester.pump(const Duration(milliseconds: 50));
+    expect(recorder.started, 1);
+    expect(find.text('ضبط'), findsOneWidget); // REC badge
+
+    await tester.pump(const Duration(seconds: 61));
+    await settle(tester);
+    expect(session().phase, GamePhase.summary);
+    expect(recorder.stopped, 1);
+    expect(container.read(roundClipsProvider), {0: '/tmp/clip.mp4'});
+    expect(find.text('ذخیره ویدیو'), findsOneWidget);
+    expect(find.text('ارسال ویدیو'), findsOneWidget);
+    expect(find.text('کارت امتیاز'), findsOneWidget);
+
+    container.read(gameControllerProvider.notifier).quit();
+    await motion.close();
+    await tester.pump(const Duration(seconds: 1));
+  });
+}
+
+class FakeRecorder implements RoundRecorder {
+  int started = 0;
+  int stopped = 0;
+  bool _on = false;
+
+  @override
+  bool get isRecording => _on;
+
+  @override
+  Future<bool> prepare() async => true;
+
+  @override
+  Future<void> start() async {
+    started++;
+    _on = true;
+  }
+
+  @override
+  Future<String?> stop() async {
+    stopped++;
+    _on = false;
+    return '/tmp/clip.mp4';
+  }
+
+  @override
+  Future<void> dispose() async {}
 }

@@ -8,6 +8,10 @@ import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/cartoon.dart';
 import '../../ads/ads_providers.dart';
+import '../../recording/round_recorder.dart';
+import '../../settings/settings_controller.dart';
+import '../../share/share_cards.dart';
+import '../../share/share_sheet.dart';
 import '../application/game_controller.dart';
 import '../domain/game_config.dart';
 import '../domain/game_state.dart';
@@ -27,6 +31,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   late final AppLifecycleListener _lifecycle;
   late final bool _forehead;
 
+  /// Front-camera recorder (forehead mode with recording enabled only).
+  RoundRecorder? _recorder;
+  bool _recording = false;
+
   @override
   void initState() {
     super.initState();
@@ -39,6 +47,12 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       ]);
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     }
+    // Not during build: providers can't change while the tree builds.
+    Future.microtask(() => ref.read(roundClipsProvider.notifier).clear());
+    if (_forehead && ref.read(settingsProvider).recordingOn) {
+      _recorder = ref.read(roundRecorderFactoryProvider)();
+      _recorder!.prepare(); // opens the camera early; start() is then instant
+    }
     WakelockPlus.enable().catchError((_) {});
     _lifecycle = AppLifecycleListener(
       onInactive: () =>
@@ -46,8 +60,31 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     );
   }
 
+  /// Starts recording when a round starts, stops it when the round ends.
+  Future<void> _onPhase(GamePhase? prev, GameSession next) async {
+    final recorder = _recorder;
+    if (recorder == null) return;
+    if (next.phase == GamePhase.ready && next.game.turnIndex == 0) {
+      ref.read(roundClipsProvider.notifier).clear(); // "play again"
+    }
+    if (next.phase == GamePhase.playing && prev != GamePhase.playing) {
+      if (await recorder.prepare()) {
+        await recorder.start();
+        if (mounted) setState(() => _recording = recorder.isRecording);
+      }
+    } else if (prev == GamePhase.playing && next.phase != GamePhase.playing) {
+      final turn = next.game.turns.length - 1;
+      final path = await recorder.stop();
+      if (mounted) setState(() => _recording = false);
+      if (path != null && turn >= 0) {
+        ref.read(roundClipsProvider.notifier).add(turn, path);
+      }
+    }
+  }
+
   @override
   void dispose() {
+    _recorder?.dispose();
     _lifecycle.dispose();
     WakelockPlus.disable().catchError((_) {});
     if (_forehead) {
@@ -106,6 +143,11 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   Widget build(BuildContext context) {
     final session = ref.watch(gameControllerProvider);
     final s = ref.watch(stringsProvider);
+    ref.listen(gameControllerProvider, (prev, next) {
+      if (next != null && prev?.phase != next.phase) {
+        _onPhase(prev?.phase, next);
+      }
+    });
     if (session == null) return const Scaffold(body: SizedBox.shrink());
 
     final Widget view = switch (session.phase) {
@@ -151,6 +193,12 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                     ),
                   ),
                 ),
+                if (_recording && session.phase == GamePhase.playing)
+                  PositionedDirectional(
+                    bottom: 8,
+                    start: 12,
+                    child: _RecBadge(label: s.rec),
+                  ),
                 if (showClose)
                   PositionedDirectional(
                     top: 4,
@@ -168,6 +216,52 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       ),
     );
   }
+}
+
+class _RecBadge extends StatefulWidget {
+  const _RecBadge({required this.label});
+
+  final String label;
+
+  @override
+  State<_RecBadge> createState() => _RecBadgeState();
+}
+
+class _RecBadgeState extends State<_RecBadge>
+    with SingleTickerProviderStateMixin {
+  late final _blink = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 700),
+  )..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _blink.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+    decoration: BoxDecoration(
+      color: Colors.black54,
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        FadeTransition(
+          opacity: _blink,
+          child: const Icon(Icons.circle, color: AppColors.red, size: 12),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          widget.label,
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
+        ),
+      ],
+    ),
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -492,11 +586,77 @@ class _SummaryView extends ConsumerWidget {
               ),
             ),
       actions: [
+        _TurnShareRow(session: session, s: s, turn: turn),
+        const SizedBox(height: 10),
         CartoonButton(
           label: s.continueLabel,
           color: AppColors.yellow,
           onPressed: ctrl.confirmSummary,
         ),
+      ],
+    );
+  }
+}
+
+/// Score-card image for every turn, plus save/share of the recorded clip
+/// when forehead-mode recording is on.
+class _TurnShareRow extends ConsumerWidget {
+  const _TurnShareRow({
+    required this.session,
+    required this.s,
+    required this.turn,
+  });
+
+  final GameSession session;
+  final AppStrings s;
+  final TurnRecord turn;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final clip = ref.watch(roundClipsProvider)[session.game.turns.length - 1];
+    Widget small(String label, String icon, Color color, VoidCallback onTap) =>
+        Expanded(
+          child: CartoonButton(
+            label: label,
+            icon: icon,
+            height: 52,
+            fontSize: 15,
+            color: color,
+            onPressed: onTap,
+          ),
+        );
+    return Row(
+      children: [
+        small(s.shareCard, '🖼️', AppColors.cyan, () {
+          showShareCardSheet(
+            context,
+            s: s,
+            caption: s.shareCaption(turn.score),
+            card: RoundShareCard(
+              s: s,
+              name: session.config.teamNames[turn.teamIndex],
+              teamIndex: turn.teamIndex,
+              turn: turn,
+            ),
+          );
+        }),
+        if (clip != null) ...[
+          const SizedBox(width: 8),
+          small(s.saveVideo, '💾', AppColors.card, () async {
+            final ok = await saveVideoToGallery(clip);
+            if (!context.mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(ok ? s.videoSaved : s.videoSaveFailed)),
+            );
+          }),
+          const SizedBox(width: 8),
+          small(
+            s.shareVideo,
+            '🎬',
+            AppColors.pink,
+            () => shareVideo(clip, s.shareCaption(turn.score)),
+          ),
+        ],
       ],
     );
   }
@@ -757,7 +917,20 @@ class _FinishedView extends ConsumerWidget {
       ],
       body: _Standings(session: session, s: s),
       actions: [
-        // "Share result" image card arrives in M5.
+        CartoonButton(
+          label: s.shareResult,
+          icon: '📤',
+          height: landscape ? 52 : 60,
+          fontSize: 20,
+          color: AppColors.cyan,
+          onPressed: () => showShareCardSheet(
+            context,
+            s: s,
+            caption: s.shareResultCaption,
+            card: ResultShareCard(s: s, game: game),
+          ),
+        ),
+        const SizedBox(height: 12),
         CartoonButton(
           label: s.playAgain,
           icon: '🔁',
