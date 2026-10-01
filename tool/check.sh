@@ -9,3 +9,5 @@ for p in packages/*/; do
   echo "== $p"
   (cd "$p" && flutter pub get >/dev/null && flutter analyze)
 done
+echo "== server"
+(cd server && npm test)

@@ -1,0 +1,14 @@
+{
+  "name": "pantomime-config-worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test \"test/**/*.test.js\"",
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "fixtures": "node scripts/write-fixtures.js"
+  },
+  "devDependencies": {
+    "wrangler": "^4.45.0"
+  }
+}

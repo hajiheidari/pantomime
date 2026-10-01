@@ -10,8 +10,8 @@ Full product spec: [`docs/PROJECT_SPEC.md`](docs/PROJECT_SPEC.md).
 | M1 – Core offline team game (home, setup, team mode, scoring, words, summary/scoreboard, cartoon theme, RTL) | ✅ done |
 | M2 – Forehead mode (sensors, calibration, sounds, haptics) | ✅ done |
 | M3 – Ads abstraction + remote config (see [docs/ads.md](docs/ads.md)) | ✅ done |
-| M4 – Cloudflare Worker + Telegram bot | ⏳ next |
-| M5 – Recording & sharing | — |
+| M4 – Cloudflare Worker + Telegram bot (see [server/README.md](server/README.md)) | ✅ done |
+| M5 – Recording & sharing | ⏳ next |
 | M6 – Store flavors & release | — |
 
 ## Run

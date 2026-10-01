@@ -1,0 +1,16 @@
+# Cloudflare Worker for the pantomime remote config + Telegram bot.
+# Free plan only. See README.md for step-by-step setup.
+name = "pantomime-config"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+
+# Create with: npx wrangler kv namespace create CONFIG
+# then paste the printed id here.
+[[kv_namespaces]]
+binding = "CONFIG"
+id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+
+# Secrets are NOT stored here. Set them with `npx wrangler secret put <NAME>`:
+#   TELEGRAM_BOT_TOKEN, TG_SECRET_TOKEN, WEBHOOK_PATH, ADMIN_TELEGRAM_ID
+#   optional mirror: MIRROR_ENDPOINT, MIRROR_BUCKET, MIRROR_KEY, MIRROR_REGION,
+#                    MIRROR_ACCESS_KEY_ID, MIRROR_SECRET_ACCESS_KEY
