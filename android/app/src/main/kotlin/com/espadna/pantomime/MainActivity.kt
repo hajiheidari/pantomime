@@ -1,4 +1,4 @@
-package com.REPLACE_ME.pantomime
+package com.espadna.pantomime
 
 import android.content.ActivityNotFoundException
 import android.content.Intent

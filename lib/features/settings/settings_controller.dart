@@ -2,14 +2,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/providers.dart';
 
-enum AppLanguage { system, fa, en }
+enum AppLanguage { fa, en }
 
 class AppSettings {
   const AppSettings({
     this.soundOn = true,
     this.vibrationOn = true,
     this.recordingOn = false,
-    this.language = AppLanguage.system,
+    this.language = AppLanguage.fa,
   });
 
   final bool soundOn;
@@ -49,7 +49,7 @@ class SettingsController extends Notifier<AppSettings> {
       recordingOn: p.getBool(_kRecording) ?? false,
       language: AppLanguage.values.firstWhere(
         (l) => l.name == p.getString(_kLanguage),
-        orElse: () => AppLanguage.system,
+        orElse: () => AppLanguage.fa,
       ),
     );
   }

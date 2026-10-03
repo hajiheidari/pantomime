@@ -1,7 +1,7 @@
 # Store notes: release checklists, privacy forms, listing text
 
-Package / bundle id placeholder: `com.REPLACE_ME.pantomime`. Set the real
-one everywhere with `python3 tool/set_package.py com.yourname.pantomime`.
+Package / bundle id: `com.espadna.pantomime` (same in every store and on
+iOS). Change it everywhere with `python3 tool/set_package.py <new id>`.
 Everything only you can do is listed in [OWNER_TODO.md](OWNER_TODO.md).
 
 ## Build per store

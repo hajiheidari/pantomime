@@ -90,7 +90,6 @@ class SettingsScreen extends ConsumerWidget {
                   for (final l in AppLanguage.values)
                     CartoonChip(
                       label: switch (l) {
-                        AppLanguage.system => s.languageSystem,
                         AppLanguage.fa => 'فارسی',
                         AppLanguage.en => 'English',
                       },

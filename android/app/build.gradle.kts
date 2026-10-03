@@ -23,8 +23,7 @@ fun keyProps(store: String): Properties? {
 }
 
 android {
-    // REPLACE_ME: set your real package name here and in applicationId.
-    namespace = "com.REPLACE_ME.pantomime"
+    namespace = "com.espadna.pantomime"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -35,7 +34,7 @@ android {
 
     defaultConfig {
         // Same applicationId in every store (Bazaar and Myket allow it).
-        applicationId = "com.REPLACE_ME.pantomime"
+        applicationId = "com.espadna.pantomime"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

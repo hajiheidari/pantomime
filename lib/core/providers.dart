@@ -9,17 +9,10 @@ final sharedPreferencesProvider = Provider<SharedPreferences>(
   (ref) => throw UnimplementedError('sharedPreferencesProvider not overridden'),
 );
 
-/// Device language code, overridden in `main()` (e.g. from
-/// `PlatformDispatcher.locales`).
-final deviceLanguageProvider = Provider<String>((ref) => 'fa');
-
-/// Effective UI/word-pack language: the user's choice, or the device language
-/// when it is set to "system". Persian unless the device prefers English.
-final languageCodeProvider = Provider<String>((ref) {
-  final choice = ref.watch(settingsProvider.select((s) => s.language));
-  if (choice != AppLanguage.system) return choice.name;
-  return ref.watch(deviceLanguageProvider) == 'en' ? 'en' : 'fa';
-});
+/// UI/word-pack language: Persian unless the user picked English in settings.
+final languageCodeProvider = Provider<String>(
+  (ref) => ref.watch(settingsProvider.select((s) => s.language)).name,
+);
 
 final stringsProvider = Provider<AppStrings>(
   (ref) => AppStrings.forLanguage(ref.watch(languageCodeProvider)),

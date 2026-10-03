@@ -129,7 +129,6 @@ abstract class AppStrings {
   String get recording;
   String get recordingHint;
   String get language;
-  String get languageSystem;
   String get about;
   String get aboutBody;
   String get privacyPolicy;
@@ -371,7 +370,6 @@ class FaStrings extends AppStrings {
   @override
   String get language => 'زبان';
   @override
-  String get languageSystem => 'زبان گوشی';
   @override
   String get about => 'درباره بازی';
   @override
@@ -629,7 +627,6 @@ class EnStrings extends AppStrings {
   @override
   String get language => 'Language';
   @override
-  String get languageSystem => 'Device language';
   @override
   String get about => 'About';
   @override

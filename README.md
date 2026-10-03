@@ -143,5 +143,5 @@ Icons / splash: `assets/branding/icon.svg` is the source. Render it with
 `node tool/render_branding.js`, then run `dart run flutter_launcher_icons`
 and `dart run flutter_native_splash:create`.
 
-Bundle/application ID placeholder: `com.REPLACE_ME.pantomime`. Set it with
-`python3 tool/set_package.py com.yourname.pantomime`.
+Bundle/application ID: `com.espadna.pantomime` (Android and iOS). To change
+it everywhere: `python3 tool/set_package.py com.other.name`.

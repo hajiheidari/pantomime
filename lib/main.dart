@@ -14,16 +14,9 @@ Future<void> main() async {
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   final prefs = await SharedPreferences.getInstance();
 
-  // Persian if any preferred device language is Persian, otherwise the first.
-  final locales = WidgetsBinding.instance.platformDispatcher.locales;
-  final deviceLanguage = locales.any((l) => l.languageCode == 'fa')
-      ? 'fa'
-      : (locales.isEmpty ? 'fa' : locales.first.languageCode);
-
   final container = ProviderContainer(
     overrides: [
       sharedPreferencesProvider.overrideWithValue(prefs),
-      deviceLanguageProvider.overrideWithValue(deviceLanguage),
     ],
   );
   runApp(
