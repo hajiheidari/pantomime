@@ -18,6 +18,33 @@ You need: a computer with **Node.js 20+** (`node -v`) and a Telegram account.
 
 ---
 
+## ⚡ Automatic setup (recommended)
+
+You only do the parts that need your own login:
+
+1. Create a free Cloudflare account (step 1 below; no card, no domain).
+2. Create an API token: dashboard → **My Profile → API Tokens → Create
+   Token → template "Edit Cloudflare Workers"** → *Account Resources*: your
+   account → *Continue* → *Create Token* → copy it.
+3. Create the bot with @BotFather and get your numeric id from
+   @userinfobot (step 4 below).
+4. Store them as environment variables, **not in any chat or file in git**:
+   `CLOUDFLARE_API_TOKEN`, `TELEGRAM_BOT_TOKEN`, `ADMIN_TELEGRAM_ID`
+   (optional: `CLOUDFLARE_ACCOUNT_ID`, `CONTACT_EMAIL`, `MIRROR_*`).
+
+Then one command does everything else: workers.dev subdomain, KV namespace,
+deploy, secrets (random webhook path + secret token), smoke test,
+Telegram webhook + command menu, a test message to you, and `CONFIG_URL` in
+`../ad_keys.json`:
+
+```bash
+cd server && npm ci && node scripts/setup.mjs
+# behind an HTTP(S) proxy:  NODE_USE_ENV_PROXY=1 node scripts/setup.mjs
+```
+
+It is safe to run again (it reuses the KV namespace and rotates the webhook
+secret). The manual steps below do the same thing by hand.
+
 ## 1. Create a free Cloudflare account
 
 1. Go to <https://dash.cloudflare.com/sign-up>, enter an email and a

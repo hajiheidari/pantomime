@@ -22,21 +22,19 @@
       `python3 tool/set_package.py com.yourname.pantomime`
       روی iOS زیرخط (_) مجاز نیست.
 
-## ۲. سرور تنظیمات و ربات تلگرام (حدود ۱۵ دقیقه)
+## ۲. سرور تنظیمات و ربات تلگرام (کارهای شما حدود ۵ دقیقه)
 
-همه‌ی مراحل قدم‌به‌قدم در [server/README.md](../server/README.md) آمده است.
-- [ ] حساب رایگان Cloudflare و زیردامنه‌ی `workers.dev`.
-- [ ] `npx wrangler login`، ساخت KV و گذاشتن id آن در `server/wrangler.toml`.
+بقیه‌ی کارها را اسکریپت `server/scripts/setup.mjs` خودکار انجام می‌دهد (توضیح
+در بخش «Automatic setup» در [server/README.md](../server/README.md)).
+- [ ] ساخت حساب رایگان Cloudflare (ایمیل و تأیید ایمیل؛ کارت بانکی یا دامنه
+      لازم نیست).
+- [ ] ساخت API Token با قالب **«Edit Cloudflare Workers»**.
 - [ ] ساخت ربات با @BotFather و گرفتن آیدی عددی خودتان از @userinfobot.
-- [ ] `wrangler secret put` برای `TELEGRAM_BOT_TOKEN`، `ADMIN_TELEGRAM_ID`،
-      `WEBHOOK_PATH` و `TG_SECRET_TOKEN`. اختیاری: متغیر `CONTACT_EMAIL` برای
-      صفحه‌ی حریم خصوصی.
-- [ ] `npx wrangler deploy` و بعد `setWebhook` (دستورش در README هست).
-- [ ] **آینه داخل ایران (پیشنهادی):** باکت عمومی در ابرآروان و `wrangler secret
-      put` برای `MIRROR_*`. بعد `/every 3` را به ربات بفرستید؛ جواب باید
-      «🪞 mirror updated» داشته باشد.
-- [ ] هر دو آدرس `config.json` را از داخل ایران و **بدون VPN** باز کنید.
-      اگر یکی باز نشد خبر بدهید.
+- [ ] گذاشتن `CLOUDFLARE_API_TOKEN`، `TELEGRAM_BOT_TOKEN` و `ADMIN_TELEGRAM_ID`
+      به‌عنوان متغیر محیطی در تنظیمات محیط. **آن‌ها را در چت نفرستید.**
+- [ ] بعد از اجرای اسکریپت: هر دو آدرس را از داخل ایران و بدون VPN باز کنید.
+- [ ] (پیشنهادی) آینه‌ی ابرآروان: کلیدهای `MIRROR_*` را هم به متغیرهای
+      محیطی اضافه کنید تا اسکریپت خودش آن را هم تنظیم کند.
 
 ## ۳. حساب‌های تبلیغاتی
 
