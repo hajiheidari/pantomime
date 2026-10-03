@@ -14,6 +14,7 @@ abstract interface class RoundRecorder {
   /// Stops and returns the video file path, or null.
   Future<String?> stop();
 
+  /// Releases the camera. [prepare] may be called again afterwards.
   Future<void> dispose();
 
   bool get isRecording;

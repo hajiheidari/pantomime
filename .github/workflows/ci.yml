@@ -1,0 +1,61 @@
+# Checks every push and builds installable test APKs.
+# Download them from the run page → "Artifacts" → pantomime-test-apks.
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.5
+          channel: stable
+          cache: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+      - name: Ad packages (standalone analysis)
+        run: |
+          for p in packages/*/; do
+            (cd "$p" && flutter pub get && flutter analyze)
+          done
+      - name: Server tests
+        working-directory: server
+        run: npm ci && npm test
+
+  test-apk:
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.5
+          channel: stable
+          cache: true
+      # Bazaar profile: no Google Play Services, installs on any Android 7+.
+      # Debug-signed: for testing only, never for store upload.
+      - run: dart run tool/store.dart bazaar && flutter pub get
+      - run: flutter build apk --flavor bazaar --release --split-per-abi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pantomime-test-apks
+          path: build/app/outputs/flutter-apk/app-*-bazaar-release.apk
+          retention-days: 30

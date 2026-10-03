@@ -175,7 +175,7 @@ forehead mode.
 > درمی‌آورد و هم‌تیمی‌ها حدس می‌زنند.
 > 🤳 **گوشی روی پیشونی:** گوشی را روی پیشانی بگذار؛ دوستانت ادا درمی‌آورند،
 > سرت را پایین بیاور = درست، بالا = پاس.
-> 📚 بیش از ۴۰۰ کلمه در ۱۳ دسته: فیلم و سریال، غذای ایرانی، حیوانات،
+> 📚 بیش از ۹۰۰ کلمه در ۱۳ دسته: فیلم و سریال، غذای ایرانی، حیوانات،
 > ضرب‌المثل، خاطرات دهه ۶۰ و ۷۰ و …
 > 🎥 ضبط ویدیوی خنده‌دار از بازی (اختیاری) و ارسال کارت امتیاز برای دوستان.
 > ✅ کاملاً آفلاین، بدون ثبت‌نام، مناسب همه سنین. در حین بازی هیچ تبلیغی نمایش
@@ -184,6 +184,6 @@ forehead mode.
 **English (for reviewers / en-US listing):**
 > Pantomime Party: a charades game for family and friends. Team mode
 > (2–4 teams) and forehead mode (tilt down = correct, tilt up = pass).
-> 430+ Persian words in 13 categories, optional video recording of the fun
+> 900+ Persian words in 13 categories, optional video recording of the fun
 > (kept on your device), shareable score cards. Fully offline, no sign-up,
 > no ads during a round.

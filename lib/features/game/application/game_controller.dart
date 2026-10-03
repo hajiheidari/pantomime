@@ -243,9 +243,18 @@ class GameController extends Notifier<GameSession?> {
     );
   }
 
+  /// Pauses the running turn. During the 3-2-1 countdown (e.g. the app goes
+  /// to the background) the countdown is cancelled and the team is back on
+  /// the ready screen, so a turn never starts unseen.
   void setPaused(bool paused) {
     final s = state;
-    if (s == null || s.phase != GamePhase.playing || s.paused == paused) return;
+    if (s == null) return;
+    if (paused && s.phase == GamePhase.countdown) {
+      _cancelTimer();
+      state = s.copyWith(phase: GamePhase.ready);
+      return;
+    }
+    if (s.phase != GamePhase.playing || s.paused == paused) return;
     state = s.copyWith(paused: paused);
   }
 

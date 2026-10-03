@@ -51,7 +51,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     Future.microtask(() => ref.read(roundClipsProvider.notifier).clear());
     if (_forehead && ref.read(settingsProvider).recordingOn) {
       _recorder = ref.read(roundRecorderFactoryProvider)();
-      _recorder!.prepare(); // opens the camera early; start() is then instant
     }
     WakelockPlus.enable().catchError((_) {});
     _lifecycle = AppLifecycleListener(
@@ -67,7 +66,13 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     if (next.phase == GamePhase.ready && next.game.turnIndex == 0) {
       ref.read(roundClipsProvider.notifier).clear(); // "play again"
     }
-    if (next.phase == GamePhase.playing && prev != GamePhase.playing) {
+    // The camera is on only from calibration to the end of the round (no
+    // privacy indicator during summaries or the scoreboard).
+    if (next.phase == GamePhase.calibrating) {
+      await recorder.prepare(); // ready before the countdown ends
+    } else if (next.phase == GamePhase.ready && prev != null) {
+      await recorder.dispose(); // e.g. countdown cancelled
+    } else if (next.phase == GamePhase.playing && prev != GamePhase.playing) {
       if (await recorder.prepare()) {
         await recorder.start();
         if (mounted) setState(() => _recording = recorder.isRecording);
@@ -75,6 +80,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     } else if (prev == GamePhase.playing && next.phase != GamePhase.playing) {
       final turn = next.game.turns.length - 1;
       final path = await recorder.stop();
+      await recorder.dispose(); // release the camera until the next round
       if (mounted) setState(() => _recording = false);
       if (path != null && turn >= 0) {
         ref.read(roundClipsProvider.notifier).add(turn, path);
