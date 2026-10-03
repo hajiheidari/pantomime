@@ -74,19 +74,28 @@ function wrangler(args, input) {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-// 1. Token + account
+// 1. Token + account. Both kinds of API token work: user tokens (My Profile →
+// API Tokens) and account-owned tokens (Manage Account → Account API Tokens),
+// which are verified under /accounts/<id>/tokens/verify instead.
 step('Checking the Cloudflare API token');
-const verify = await cf('/user/tokens/verify');
-if (!verify.success) die(`token rejected: ${JSON.stringify(verify.errors ?? verify)}`);
-ok('token is valid');
-
 if (!env.CLOUDFLARE_ACCOUNT_ID) {
   const accounts = await cf('/accounts?per_page=5');
   const first = accounts.result?.[0];
-  if (!first) die('no Cloudflare account visible to this token');
-  env.CLOUDFLARE_ACCOUNT_ID = first.id;
+  if (first) env.CLOUDFLARE_ACCOUNT_ID = first.id;
 }
 const account = env.CLOUDFLARE_ACCOUNT_ID;
+const userVerify = await cf('/user/tokens/verify');
+let tokenOk = userVerify.success === true;
+let accountVerify = null;
+if (!tokenOk && account) {
+  accountVerify = await cf(`/accounts/${account}/tokens/verify`);
+  tokenOk = accountVerify.success === true;
+}
+if (!tokenOk) {
+  die(`token rejected: ${JSON.stringify((accountVerify ?? userVerify).errors ?? userVerify)}`);
+}
+if (!account) die('no Cloudflare account visible to this token (set CLOUDFLARE_ACCOUNT_ID)');
+ok(`token is valid (${userVerify.success ? 'user' : 'account'} token)`);
 ok(`account ${account}`);
 
 // 2. workers.dev subdomain
