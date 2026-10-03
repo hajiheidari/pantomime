@@ -196,6 +196,16 @@ Tapsell can be configured, but the app currently ships without it (see
 primary URL, then the mirror, then its cached copy, so a mirror inside Iran
 keeps control working. Test both URLs from Iran without a VPN.
 
+### Option 0, simplest: one PHP file on an Iranian host
+
+`mirror/pantomime-config.php`: upload this single file to any PHP host
+(PHP 7+, no database, nothing to configure, no keys). It re-fetches the
+Worker's `config.json` at most every 5 minutes. If the Worker is unreachable
+it keeps serving the last good copy, or the bundled default. It never accepts
+a lower `config_version` and rejects anything that isn't a valid config.
+Then use `https://<your-host>/pantomime-config.php` as `CONFIG_MIRROR_URL`.
+Tested in `test/mirror_php.test.js` (runs when PHP is installed).
+
 ### Option A, automatic (recommended): S3-compatible bucket in Iran
 
 With the `MIRROR_*` secrets set, the Worker uploads `config.json` to the
