@@ -10,7 +10,11 @@ import 'remote_config.dart';
 /// Config endpoints. Override per build with
 /// `--dart-define=CONFIG_URL=… --dart-define=CONFIG_MIRROR_URL=…`
 /// (set up in M4: Cloudflare Worker + a second mirror reachable from Iran).
-const configPrimaryUrl = String.fromEnvironment('CONFIG_URL');
+const configPrimaryUrl = String.fromEnvironment(
+  'CONFIG_URL',
+  defaultValue:
+      'https://pantomime-config.sepanta-hesaban.workers.dev/config.json',
+);
 const configMirrorUrl = String.fromEnvironment('CONFIG_MIRROR_URL');
 
 /// Loads the ad config: cached (last good) → bundled default, then refreshes
