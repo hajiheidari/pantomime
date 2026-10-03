@@ -9,7 +9,7 @@ workers_dev = true
 # then paste the printed id here.
 [[kv_namespaces]]
 binding = "CONFIG"
-id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+id = "2a9510fca63e45238e1502c8b7968ef6"
 
 # Secrets are NOT stored here. Set them with `npx wrangler secret put <NAME>`:
 #   TELEGRAM_BOT_TOKEN, TG_SECRET_TOKEN, WEBHOOK_PATH, ADMIN_TELEGRAM_ID
