@@ -15,7 +15,12 @@ const configPrimaryUrl = String.fromEnvironment(
   defaultValue:
       'https://pantomime-config.sepanta-hesaban.workers.dev/config.json',
 );
-const configMirrorUrl = String.fromEnvironment('CONFIG_MIRROR_URL');
+
+/// Mirror on an Iranian host (server/mirror/pantomime-config.php).
+const configMirrorUrl = String.fromEnvironment(
+  'CONFIG_MIRROR_URL',
+  defaultValue: 'https://gabia.ir/pantomime-config.php',
+);
 
 /// Loads the ad config: cached (last good) → bundled default, then refreshes
 /// from the network in the background. Never blocks app start and never
