@@ -25,15 +25,7 @@
 ## ۳. حساب‌های تبلیغاتی
 
 - ✅ حساب Adivery ساخته شد.
-- [ ] در پنل Adivery برنامه‌ی اندروید با پکیج `com.espadna.pantomime` را
-      ثبت کنید و سه placement بسازید: تمام‌صفحه (Interstitial)، جایزه‌دار
-      (Rewarded) و بنر (Banner).
-- [ ] چهار شناسه را با ربات وارد کنید:
-      `/keys adivery app_id …`،
-      `/keys adivery interstitial_placement …`،
-      `/keys adivery rewarded_placement …`،
-      `/keys adivery banner_placement …`
-      (یا فقط `/keys` و قدم‌به‌قدم).
+- ✅ برنامه و سه placement در Adivery ساخته شد و شناسه‌ها روی سرور هستند (نسخه‌ی ۷).
 - [ ] **AdMob** (فقط برای Google Play و iOS): ساخت اپ و واحدهای تبلیغ.
       شناسه‌ی اپ (App ID) باید داخل خود برنامه باشد:
       - اندروید: `ADMOB_APP_ID=ca-app-pub-…~… tool/release.sh play`
