@@ -12,6 +12,8 @@ const hasPhp = spawnSync('php', ['-v']).status === 0;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 let source = { status: 503, body: "down" }; // what the fake source returns
+let wordsSource = { status: 503, body: 'down' }; // …for /words_fa.json
+const seen = [];
 let sourceServer;
 let php;
 let dir;
@@ -20,8 +22,10 @@ let base;
 before(async () => {
   if (!hasPhp) return;
   sourceServer = createServer((req, res) => {
-    res.writeHead(source.status, { 'content-type': 'application/json' });
-    res.end(source.body);
+    seen.push(req.url);
+    const s = req.url === '/words_fa.json' ? wordsSource : source;
+    res.writeHead(s.status, { 'content-type': 'application/json' });
+    res.end(s.body);
   });
   await new Promise((r) => sourceServer.listen(0, '127.0.0.1', r));
   const srcUrl = `http://127.0.0.1:${sourceServer.address().port}/config.json`;
@@ -94,4 +98,35 @@ test('PHP mirror: default, fetch, keep last good, never downgrade', { skip: !has
 
   // Only GET/HEAD.
   assert.equal((await fetch(base, { method: 'POST', body: 'x' })).status, 405);
+});
+
+const words = (v, extra = {}) =>
+  JSON.stringify({ version: v, language: 'fa', categories: [{}, {}, {}], ...extra });
+
+test('PHP mirror: word list via ?file=words_fa.json', { skip: !hasPhp }, async () => {
+  const url = `${base}?file=words_fa.json`;
+  // Nothing mirrored yet → 404 (the app keeps its own words).
+  wordsSource = { status: 503, body: 'down' };
+  assert.equal((await fetch(url)).status, 404);
+
+  wordsSource = { status: 200, body: words(4) };
+  await sleep(1100);
+  let res = await fetch(url);
+  assert.equal(res.status, 200);
+  assert.equal((await res.json()).version, 4);
+  assert.ok(seen.includes('/words_fa.json'));
+
+  // Older, wrong language or broken → last good copy.
+  for (const body of [words(2), words(9, { language: 'en' }), words(9, { categories: [] }), 'x']) {
+    wordsSource = { status: 200, body };
+    await sleep(1100);
+    assert.equal((await (await fetch(url)).json()).version, 4, body);
+  }
+  wordsSource = { status: 200, body: words(5) };
+  await sleep(1100);
+  assert.equal((await (await fetch(url)).json()).version, 5);
+
+  // Config is unaffected; unknown files → 404.
+  assert.equal((await (await fetch(base)).json()).ads.enabled, true);
+  assert.equal((await fetch(`${base}?file=../../etc/passwd`)).status, 404);
 });

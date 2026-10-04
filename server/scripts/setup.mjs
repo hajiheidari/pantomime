@@ -191,7 +191,9 @@ await tg('setMyCommands', {
     ['fallback', '<store> a,b,c'], ['ads', 'on|off'], ['every', 'N turns'],
     ['rewarded', 'on|off'], ['banner', 'on|off'], ['notice', '<text> | off'],
     ['minversion', 'x.y.z'], ['keys', 'Set ad ids'], ['rollback', 'Previous version'],
-    ['cancel', 'Stop /keys'],
+    ['cancel', 'Stop /keys'], ['words', 'Word list: counts + help'],
+    ['addword', '<category> [level] w1، w2'], ['delword', 'w1، w2'],
+    ['findword', 'word'], ['wordsfile', 'Download the list'], ['wordsundo', 'Undo last word change'],
   ].map(([command, description]) => ({ command, description })),
 });
 const hello = await tg('sendMessage', {

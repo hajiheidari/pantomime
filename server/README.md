@@ -180,6 +180,30 @@ and build with `--dart-define-from-file=ad_keys.json`.
 | `/show` | full JSON, ids masked |
 | `/rollback` | republishes the previous version under a new number |
 
+### Word list
+
+| Command | Example |
+|---|---|
+| `/words` | categories (id, emoji, title) and word counts |
+| `/addword <category> [easy\|medium\|hard] w1، w2` | `/addword movies_series آسان شرک، پایتخت` |
+| `/delword w1، w2` | removes the words from every category |
+| `/findword <word>` | which category and level a word is in |
+| `/wordsfile` | the whole list as a `.json` file; send an edited file back to replace the list |
+| `/wordsundo` | back to the list before the last change |
+
+The category can be its id, its emoji or its title; the level defaults to
+`medium`, and Persian names (آسان، متوسط، سخت) work too. Several words can be
+separated with «،» or written one per line. Duplicates are skipped (same
+Persian normalization as the app). Every change is checked with the app's
+rules (≥3 categories, ≥100 words, valid JSON) and published as a new
+`version` at `GET /words_fa.json`. Apps download it in the background (at
+most every 6 hours, primary then mirror) and use it from the next game on,
+never mid-game. Offline, they keep the last downloaded list or the bundled
+one.
+
+Before each app release, copy the live list into the app so new installs
+start with it: `node scripts/pull-words.mjs`.
+
 Rules the bot enforces (same as the app): known networks only, AdMob never on
 `bazaar`/`myket`, splits sum to 100, `every` between 1 and 10, notice up to 500
 characters. When you send an id, the bot deletes your message and only ever
@@ -204,6 +228,8 @@ Worker's `config.json` at most every 5 minutes. If the Worker is unreachable
 it keeps serving the last good copy, or the bundled default. It never accepts
 a lower `config_version` and rejects anything that isn't a valid config.
 Then use `https://<your-host>/pantomime-config.php` as `CONFIG_MIRROR_URL`.
+The same file mirrors the word list at `pantomime-config.php?file=words_fa.json`
+(same rules; 404 until the first good download).
 Tested in `test/mirror_php.test.js` (runs when PHP is installed).
 
 ### Option A, automatic (recommended): S3-compatible bucket in Iran

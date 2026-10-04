@@ -32,7 +32,9 @@ export const HELP = `🎭 Pantomime ads bot
 /minversion 1.2.0
 /keys – set ad ids step by step
 /rollback – back to the previous version
-/cancel – stop /keys`;
+/cancel – stop /keys
+
+📚 /words – word list commands`;
 
 /**
  * Result of a command.

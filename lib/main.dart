@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'app.dart';
 import 'core/providers.dart';
 import 'features/ads/ads_providers.dart';
+import 'features/words/words_providers.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,9 +16,7 @@ Future<void> main() async {
   final prefs = await SharedPreferences.getInstance();
 
   final container = ProviderContainer(
-    overrides: [
-      sharedPreferencesProvider.overrideWithValue(prefs),
-    ],
+    overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
   );
   runApp(
     UncontrolledProviderScope(
@@ -27,4 +26,11 @@ Future<void> main() async {
   );
   // Remote config + ad SDKs: background only, never blocks start.
   unawaited(startAds(container));
+  // A newer word list, if one was published (background, offline-safe).
+  unawaited(
+    Future<void>.delayed(
+      const Duration(seconds: 3),
+      () => refreshWordPack(container),
+    ),
+  );
 }

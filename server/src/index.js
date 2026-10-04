@@ -2,6 +2,7 @@
 // control bot.
 //
 //   GET  /config.json                  → current config (cached 5 min)
+//   GET  /words_fa.json                → current word list (cached 5 min)
 //   GET  /privacy                      → privacy policy page (fa + en)
 //   POST /tg/<WEBHOOK_PATH>            → Telegram webhook (admin only)
 //
@@ -16,7 +17,8 @@ import { runCommand } from './commands.js';
 import { summary } from './config.js';
 import { mirrorEnabled, pushToMirror } from './mirror.js';
 import { privacyHtml } from './privacy.js';
-import { ConfigStore } from './store.js';
+import { ConfigStore, WordStore } from './store.js';
+import { runWordsCommand, validatePack, WordsError } from './words.js';
 
 const CONFIG_HEADERS = {
   'content-type': 'application/json; charset=utf-8',
@@ -24,19 +26,24 @@ const CONFIG_HEADERS = {
   'access-control-allow-origin': '*',
 };
 
-const cacheKey = (url) => new Request(new URL('/config.json', url).toString());
+const cacheKey = (url, path = '/config.json') => new Request(new URL(path, url).toString());
 
-async function serveConfig(request, env, ctx) {
+async function serveCached(request, ctx, path, load) {
   const cache = typeof caches !== 'undefined' ? caches.default : null;
   if (cache) {
-    const hit = await cache.match(cacheKey(request.url));
+    const hit = await cache.match(cacheKey(request.url, path));
     if (hit) return hit;
   }
-  const config = await new ConfigStore(env.CONFIG).current();
-  const res = new Response(JSON.stringify(config), { headers: CONFIG_HEADERS });
-  if (cache) ctx.waitUntil(cache.put(cacheKey(request.url), res.clone()));
+  const res = new Response(JSON.stringify(await load()), { headers: CONFIG_HEADERS });
+  if (cache) ctx.waitUntil(cache.put(cacheKey(request.url, path), res.clone()));
   return res;
 }
+
+const serveConfig = (request, env, ctx) =>
+  serveCached(request, ctx, '/config.json', () => new ConfigStore(env.CONFIG).current());
+
+const serveWords = (request, env, ctx) =>
+  serveCached(request, ctx, '/words_fa.json', () => new WordStore(env.CONFIG).current());
 
 /** Constant-time string comparison for secrets. */
 function safeEqual(a, b) {
@@ -48,7 +55,7 @@ function safeEqual(a, b) {
 
 async function telegram(env, method, payload, fetchFn) {
   try {
-    await fetchFn(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/${method}`, {
+    return await fetchFn(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/${method}`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(payload),
@@ -63,6 +70,86 @@ async function reply(env, chatId, text, fetchFn) {
   for (let i = 0; i < text.length; i += 4000) {
     await telegram(env, 'sendMessage', { chat_id: chatId, text: text.slice(i, i + 4000) }, fetchFn);
   }
+}
+
+/** Sends the current word list to the admin as a .json file. */
+async function sendWordsFile(env, chatId, pack, fetchFn) {
+  const form = new FormData();
+  form.append('chat_id', String(chatId));
+  form.append('caption', `words v${pack.version}. Edit and send the file back to replace the list.`);
+  form.append(
+    'document',
+    new Blob([JSON.stringify(pack, null, 2)], { type: 'application/json' }),
+    `words_fa_v${pack.version}.json`,
+  );
+  try {
+    await fetchFn(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendDocument`, {
+      method: 'POST',
+      body: form,
+    });
+  } catch {
+    // Telegram unreachable.
+  }
+}
+
+/** Downloads a .json file the admin sent and checks it. */
+async function receiveWordsFile(env, doc, fetchFn) {
+  if (!/\.json$/i.test(doc.file_name ?? '')) throw new WordsError('send a .json file');
+  if ((doc.file_size ?? 0) > 2 * 1024 * 1024) throw new WordsError('file too big (max 2 MB)');
+  const info = await (await telegram(env, 'getFile', { file_id: doc.file_id }, fetchFn))?.json();
+  const path = info?.result?.file_path;
+  if (!path) throw new WordsError('could not download the file from Telegram');
+  const res = await fetchFn(`https://api.telegram.org/file/bot${env.TELEGRAM_BOT_TOKEN}/${path}`);
+  let pack;
+  try {
+    pack = JSON.parse((await res.text()).replace(/^\uFEFF/, ''));
+  } catch {
+    throw new WordsError('the file is not valid JSON');
+  }
+  pack.language ??= 'fa';
+  pack.version = Number.isInteger(pack.version) ? pack.version : 1;
+  validatePack(pack);
+  return pack;
+}
+
+async function handleWords(env, ctx, request, msg, cmd, restText, fetchFn) {
+  const chatId = msg.chat.id;
+  const words = new WordStore(env.CONFIG);
+  const actor = msg.from.username ?? String(msg.from.id);
+  let published = null;
+  let text;
+  try {
+    if (msg.document) {
+      published = await words.publish(await receiveWordsFile(env, msg.document, fetchFn), {
+        actor,
+        command: `words file ${msg.document.file_name}`,
+      });
+      text = '📥 Word list replaced from your file.';
+    } else {
+      const current = await words.current();
+      const result = runWordsCommand(cmd, restText, current);
+      text = result.reply;
+      if (result.sendFile) {
+        await sendWordsFile(env, chatId, current, fetchFn);
+        return;
+      }
+      if (result.undo) {
+        published = await words.undo({ actor });
+        text = published ? '↩️ Word list restored.' : '⚠️ Nothing to undo.';
+      } else if (result.pack) {
+        published = await words.publish(result.pack, { actor, command: msg.text.slice(0, 200) });
+      }
+    }
+  } catch (e) {
+    if (!(e instanceof WordsError)) throw e;
+    text = `⚠️ ${e.message}. The word list was not changed.`;
+  }
+  if (published) {
+    const cache = typeof caches !== 'undefined' ? caches.default : null;
+    if (cache) ctx.waitUntil(cache.delete(cacheKey(request.url, '/words_fa.json')));
+    text += `\n\n📚 words v${published.version} published. Phones get it within a few hours.`;
+  }
+  await reply(env, chatId, text, fetchFn);
 }
 
 async function afterChange(env, ctx, request, config, fetchFn) {
@@ -85,10 +172,17 @@ export async function handleTelegram(request, env, ctx, fetchFn = fetch) {
   }
   const msg = update.message ?? update.edited_message;
   // Allow-list: everyone except the admin is ignored silently.
-  if (!msg?.text || String(msg.from?.id) !== String(env.ADMIN_TELEGRAM_ID)) {
+  if (!(msg?.text || msg?.document) || String(msg.from?.id) !== String(env.ADMIN_TELEGRAM_ID)) {
     return new Response('ok');
   }
   const chatId = msg.chat.id;
+  const [head = ''] = (msg.text ?? '').trim().split(/\s+/);
+  const cmd = head.split('@')[0].toLowerCase();
+  if (msg.document || ['/words', '/wordsfile', '/wordsundo', '/addword', '/delword', '/findword'].includes(cmd)) {
+    const restText = (msg.text ?? '').trim().slice(head.length).trim();
+    await handleWords(env, ctx, request, msg, cmd, restText, fetchFn);
+    return new Response('ok');
+  }
   const store = new ConfigStore(env.CONFIG);
   const actor = msg.from.username ?? String(msg.from.id);
   const current = await store.current();
@@ -127,6 +221,9 @@ export default {
     const url = new URL(request.url);
     if ((request.method === 'GET' || request.method === 'HEAD') && url.pathname === '/config.json') {
       return serveConfig(request, env, ctx);
+    }
+    if ((request.method === 'GET' || request.method === 'HEAD') && url.pathname === '/words_fa.json') {
+      return serveWords(request, env, ctx);
     }
     if (request.method === 'POST' && env.WEBHOOK_PATH && url.pathname === `/tg/${env.WEBHOOK_PATH}`) {
       return handleTelegram(request, env, ctx);
