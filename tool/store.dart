@@ -25,6 +25,7 @@ List<String> _profile(String store, bool withTapsell) => switch (store) {
   'play' => ['adivery', if (withTapsell) 'tapsell', 'admob'],
   'bazaar' || 'myket' => ['adivery', if (withTapsell) 'tapsell'],
   'ios' => ['admob'],
+  'web' => [], // no ad SDKs in the browser yet (docs/web.md)
   _ => throw ArgumentError('unknown store "$store"'),
 };
 
@@ -36,7 +37,7 @@ void main(List<String> args) {
   final positional = args.where((a) => !a.startsWith('--')).toList();
   if (positional.length != 1) {
     stderr.writeln(
-      'usage: dart run tool/store.dart <dev|play|bazaar|myket|ios> '
+      'usage: dart run tool/store.dart <dev|play|bazaar|myket|ios|web> '
       '[--with-tapsell]',
     );
     exit(64);

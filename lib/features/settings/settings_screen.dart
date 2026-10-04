@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -64,21 +65,25 @@ class SettingsScreen extends ConsumerWidget {
                 child: Column(
                   children: [
                     toggle('🔊', s.sound, settings.soundOn, ctrl.setSound),
-                    const _Divider(),
-                    toggle(
-                      '📳',
-                      s.vibration,
-                      settings.vibrationOn,
-                      ctrl.setVibration,
-                    ),
-                    const _Divider(),
-                    toggle(
-                      '🎥',
-                      s.recording,
-                      settings.recordingOn,
-                      (on) => _setRecording(context, ref, on),
-                      subtitle: s.recordingHint,
-                    ),
+                    // Browsers: no haptics through Flutter, and recording
+                    // is unreliable (spec 9c), so both are app-only.
+                    if (!kIsWeb) ...[
+                      const _Divider(),
+                      toggle(
+                        '📳',
+                        s.vibration,
+                        settings.vibrationOn,
+                        ctrl.setVibration,
+                      ),
+                      const _Divider(),
+                      toggle(
+                        '🎥',
+                        s.recording,
+                        settings.recordingOn,
+                        (on) => _setRecording(context, ref, on),
+                        subtitle: s.recordingHint,
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -103,12 +108,15 @@ class SettingsScreen extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(vertical: 6),
                 child: Column(
                   children: [
-                    _Row(
-                      emoji: '⭐',
-                      title: s.rateApp,
-                      onTap: () => ref.read(storeServiceProvider).openRating(),
-                    ),
-                    const _Divider(),
+                    if (!kIsWeb) ...[
+                      _Row(
+                        emoji: '⭐',
+                        title: s.rateApp,
+                        onTap: () =>
+                            ref.read(storeServiceProvider).openRating(),
+                      ),
+                      const _Divider(),
+                    ],
                     _Row(
                       emoji: '🔒',
                       title: s.privacyPolicy,

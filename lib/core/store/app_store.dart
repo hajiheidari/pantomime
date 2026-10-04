@@ -7,7 +7,10 @@ enum AppStore {
   play,
   bazaar,
   myket,
-  ios;
+  ios,
+
+  /// Browser / PWA build (no ad SDKs yet; see docs/web.md).
+  web;
 
   /// Bazaar / Myket builds must not use Google Play Services or AdMob.
   bool get allowsGooglePlayServices => this == play || this == ios;
@@ -22,6 +25,7 @@ enum AppStore {
   /// Android: product flavor (`--flavor bazaar`) or `--dart-define=STORE=…`,
   /// defaulting to `play`. iOS: always `ios`.
   static AppStore detect() {
+    if (kIsWeb) return AppStore.web;
     if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
       return AppStore.ios;
     }

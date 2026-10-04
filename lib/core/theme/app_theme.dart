@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// Cheerful cartoon palette. Dark, saturated background for high contrast in
@@ -45,11 +46,18 @@ class TeamStyle {
 
 const appFontFamily = 'Vazirmatn';
 
+/// Web only: Flutter draws text itself there and would download emoji fonts
+/// from fonts.gstatic.com (offline: none; Iran: maybe blocked). The bundled
+/// subset (tool/subset_emoji.py) covers every emoji the app uses. Native
+/// builds keep the system's emoji.
+const appFontFallback = kIsWeb ? ['EmojiSubset'] : null;
+
 ThemeData buildAppTheme() {
   final base = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
     fontFamily: appFontFamily,
+    fontFamilyFallback: appFontFallback,
     colorScheme: ColorScheme.fromSeed(
       seedColor: AppColors.purple,
       brightness: Brightness.dark,
@@ -64,6 +72,7 @@ ThemeData buildAppTheme() {
   return base.copyWith(
     textTheme: base.textTheme.apply(
       fontFamily: appFontFamily,
+      fontFamilyFallback: appFontFallback,
       bodyColor: AppColors.text,
       displayColor: AppColors.text,
     ),

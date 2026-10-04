@@ -1,6 +1,6 @@
 # پانتومیم دورهمی (Pantomime Dorehami)
 
-Offline Persian charades party game for iOS + Android, built with Flutter.
+Offline Persian charades party game for iOS, Android and the web (PWA), built with Flutter.
 Full product spec: [`docs/PROJECT_SPEC.md`](docs/PROJECT_SPEC.md).
 
 ## Status
@@ -13,7 +13,8 @@ Full product spec: [`docs/PROJECT_SPEC.md`](docs/PROJECT_SPEC.md).
 | M4 – Cloudflare Worker + Telegram bot (see [server/README.md](server/README.md)) | ✅ done |
 | M5 – Recording & sharing (raw video + share-card images) | ✅ done |
 | M6 – Store flavors, icons, splash, release builds (see [docs/store_notes.md](docs/store_notes.md)) | ✅ done |
-| M7 – Web/PWA (phase 2) | waiting for your go |
+| M7 – Web/PWA, live at https://pantomime.sepanta-hesaban.workers.dev (see [docs/web.md](docs/web.md)) | ✅ done |
+| Online word-list updates, edited with the bot (`/words`, see [server/README.md](server/README.md)) | ✅ done |
 
 **Your remaining tasks (accounts, keys, device tests, decisions):
 [docs/OWNER_TODO.md](docs/OWNER_TODO.md).**

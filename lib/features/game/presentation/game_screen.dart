@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,6 +14,7 @@ import '../../settings/settings_controller.dart';
 import '../../share/share_cards.dart';
 import '../../share/share_sheet.dart';
 import '../application/game_controller.dart';
+import '../application/motion.dart';
 import '../domain/game_config.dart';
 import '../domain/game_state.dart';
 import 'forehead_views.dart';
@@ -49,7 +51,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     }
     // Not during build: providers can't change while the tree builds.
     Future.microtask(() => ref.read(roundClipsProvider.notifier).clear());
-    if (_forehead && ref.read(settingsProvider).recordingOn) {
+    if (_forehead && !kIsWeb && ref.read(settingsProvider).recordingOn) {
       _recorder = ref.read(roundRecorderFactoryProvider)();
     }
     WakelockPlus.enable().catchError((_) {});
@@ -337,7 +339,12 @@ class _ReadyView extends ConsumerWidget {
       height: landscape ? 76 : 90,
       fontSize: 32,
       color: style.color,
-      onPressed: ref.read(gameControllerProvider.notifier).startTurn,
+      onPressed: () async {
+        final ctrl = ref.read(gameControllerProvider.notifier);
+        // iPhone browsers ask for motion access; it must start from a tap.
+        if (session.isForehead) await requestMotionPermission();
+        ctrl.startTurn();
+      },
     );
 
     if (landscape) {

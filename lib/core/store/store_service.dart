@@ -58,6 +58,10 @@ class StoreLinks {
       uri: 'itms-apps://itunes.apple.com/app/id$iosAppId?action=write-review',
       web: 'https://apps.apple.com/app/id$iosAppId?action=write-review',
     ),
+    AppStore.web => StoreLink(
+      uri: 'https://cafebazaar.ir/app/$packageName',
+      web: 'https://cafebazaar.ir/app/$packageName',
+    ),
   };
 
   StoreLink get details => switch (store) {
@@ -80,6 +84,10 @@ class StoreLinks {
       uri: 'itms-apps://itunes.apple.com/app/id$iosAppId',
       web: 'https://apps.apple.com/app/id$iosAppId',
     ),
+    AppStore.web => StoreLink(
+      uri: 'https://cafebazaar.ir/app/$packageName',
+      web: 'https://cafebazaar.ir/app/$packageName',
+    ),
   };
 }
 
@@ -96,8 +104,13 @@ class DefaultStoreService implements StoreService {
   final AppStore store;
   static const _channel = MethodChannel('pantomime/store');
 
-  Future<StoreLinks> _links() async =>
-      StoreLinks(store, (await PackageInfo.fromPlatform()).packageName);
+  /// The web build has no package name of its own: link to the Android app.
+  static const _androidPackage = 'com.espadna.pantomime';
+
+  Future<StoreLinks> _links() async => StoreLinks(
+    store,
+    kIsWeb ? _androidPackage : (await PackageInfo.fromPlatform()).packageName,
+  );
 
   Future<void> _open(StoreLink link) async {
     try {

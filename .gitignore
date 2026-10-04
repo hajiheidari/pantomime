@@ -61,3 +61,4 @@ packages/*/.dart_tool/
 /android/keys/
 *.jks
 *.keystore
+.wrangler/

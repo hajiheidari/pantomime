@@ -50,5 +50,32 @@ const bigMasks = svg
       <div dir="rtl" style="color:#FFD23F;font-size:96px;font-weight:900;line-height:1.25;text-shadow:0 6px 0 #120A2B">پانتومیم<br>دورهمی</div>
      </div>`,
     1024, 500, 'feature_graphic_1024x500.png', '#1A0F3D');
+  // Web / PWA (web/ and web_site/).
+  const web = path.join(__dirname, '..', 'web');
+  const site = path.join(__dirname, '..', 'web_site');
+  const maskable = svg.replace('<use href="#masks"/>',
+    '<g transform="translate(512 512) scale(0.62) translate(-512 -512)"><use href="#masks"/></g>');
+  const shotTo = async (body, w, h, file, bg) => {
+    await page.setViewportSize({ width: w, height: h });
+    await page.setContent(html(body, w, h, bg));
+    await page.screenshot({ path: file, omitBackground: !bg });
+    console.log('wrote', path.relative(path.join(__dirname, '..'), file));
+  };
+  for (const n of [192, 512]) {
+    await shotTo(sized(svg, n, n), n, n, path.join(web, 'icons', `Icon-${n}.png`));
+    await shotTo(sized(maskable, n, n), n, n, path.join(web, 'icons', `Icon-maskable-${n}.png`));
+  }
+  await shotTo(sized(svg, 64, 64), 64, 64, path.join(web, 'favicon.png'));
+  await shotTo(sized(svg, 180, 180), 180, 180, path.join(site, 'apple-touch-icon.png'));
+  await shotTo(sized(svg, 64, 64), 64, 64, path.join(site, 'favicon.png'));
+  // Link preview (Telegram / WhatsApp / X): 1200×630.
+  await shotTo(
+    `<div style="width:1200px;height:630px;display:flex;align-items:center;justify-content:center;gap:40px;
+      background:radial-gradient(circle at 30% 40%,#5A36C9,#2A1B5C 60%,#1A0F3D);font-family:Vazirmatn,Tahoma,sans-serif">
+      ${sized(bigMasks, 500, 500)}
+      <div dir="rtl" style="color:#FFD23F;font-size:110px;font-weight:900;line-height:1.25;text-shadow:0 6px 0 #120A2B">پانتومیم<br>دورهمی
+        <div style="color:#fff;font-size:44px;font-weight:900;text-shadow:none;margin-top:10px">بی‌صدا بازی کن، بلند بخند!</div></div>
+     </div>`,
+    1200, 630, path.join(site, 'og.png'), '#1A0F3D');
   await browser.close();
 })();

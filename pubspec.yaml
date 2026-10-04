@@ -56,6 +56,7 @@ dependencies:
   share_plus: ^13.3.0
   path_provider: ^2.1.6
   url_launcher: ^6.3.2
+  web: ^1.1.1
 
 dev_dependencies:
   flutter_test:
@@ -94,6 +95,10 @@ flutter:
           weight: 700
         - asset: assets/fonts/Vazirmatn-Black.ttf
           weight: 900
+    # Web only (see appFontFallback); built by tool/subset_emoji.py.
+    - family: EmojiSubset
+      fonts:
+        - asset: assets/fonts/EmojiSubset.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:
