@@ -32,7 +32,7 @@ writeFileSync(indexPath, readFileSync(indexPath, 'utf8').replace(/<base href="[^
 // Service worker: precache the shell, not the big CanvasKit variants.
 const files = walk(play)
   .map((f) => relative(play, f).split('\\').join('/'))
-  .filter((f) => !f.startsWith('canvaskit/') && f !== 'sw.js')
+  .filter((f) => !f.startsWith('canvaskit/') && f !== 'sw.js' && f !== 'speed.html')
   .sort();
 const hash = createHash('sha256');
 for (const f of files) hash.update(f).update(readFileSync(join(play, f)));
@@ -45,6 +45,7 @@ writeFileSync(join(play, 'sw.js'), sw);
 // Cloudflare static-asset headers and redirects for the game.
 writeFileSync(join(play, '_headers'), `/*
   X-Content-Type-Options: nosniff
+  Access-Control-Allow-Origin: *
   Referrer-Policy: strict-origin-when-cross-origin
 /sw.js
   Cache-Control: no-cache
