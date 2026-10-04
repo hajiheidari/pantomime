@@ -3,6 +3,8 @@
 import {
   ConfigError,
   ID_FIELDS,
+  cleanId,
+  isValidId,
   PROVIDERS,
   SPLIT_STORES,
   STORES,
@@ -64,6 +66,9 @@ function change(config, mutate, okText) {
   return { config: next, reply: okText };
 }
 
+const ID_HINT =
+  '⚠️ An id is one word of letters, digits and - _ . : ~ / (no spaces, no quotes needed). Try again or /cancel.';
+
 const KEY_TARGETS = Object.keys(ID_FIELDS); // adivery, tapsell, admob_android, admob_ios
 
 function setId(cfg, target, field, value) {
@@ -101,9 +106,9 @@ function continueKeys(text, config, session) {
     };
   }
   if (session.step === 'value') {
-    const v = value === '-' ? '' : value;
-    if (v.length > 200 || /\s/.test(v)) {
-      return { reply: '⚠️ Ids are a single word under 200 characters. Try again or /cancel.', session };
+    const v = value === '-' ? '' : cleanId(value);
+    if (v !== '' && !isValidId(v)) {
+      return { reply: ID_HINT, session };
     }
     const r = change(
       config,
@@ -245,7 +250,8 @@ export function runCommand(text, config, session = null) {
         if (!KEY_TARGETS.includes(target) || !ID_FIELDS[target].includes(field)) {
           return err(`unknown target/field. Targets: ${KEY_TARGETS.join(', ')}`);
         }
-        const v = value === '-' ? '' : value;
+        const v = value === '-' ? '' : cleanId(value);
+        if (v !== '' && !isValidId(v)) return { reply: ID_HINT, deleteMessage: true };
         const r = change(config, (c) => setId(c, target, field, v), `✅ ${target}.${field} = ${mask(v)}`);
         return { ...r, deleteMessage: true, session: null };
       }

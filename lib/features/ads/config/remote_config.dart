@@ -226,6 +226,15 @@ AdsConfig _parseAds(Map<String, dynamic> ads) {
   );
 }
 
+/// Strips whitespace, wrapping quotes and invisible characters that a
+/// pasted id can carry (same rule as `cleanId` in the server).
+String cleanAdId(String value) => value.replaceAll(_idJunk, '');
+
+final _idJunk = RegExp(
+  '^[\\s"\'`«»“”„‘’‹›<>\u200b-\u200f\u202a-\u202e\u2066-\u2069\ufeff]+'
+  '|[\\s"\'`«»“”„‘’‹›<>\u200b-\u200f\u202a-\u202e\u2066-\u2069\ufeff]+\$',
+);
+
 Map<String, String> _ids(
   Map<String, dynamic> fields,
   String provider,
@@ -236,7 +245,8 @@ Map<String, String> _ids(
     final v = fields[k.key];
     if (v == null) continue;
     if (v is! String || v.length > 200) _fail('$provider.${k.key}');
-    if (v.trim().isNotEmpty) out[k.value] = v.trim();
+    final id = cleanAdId(v);
+    if (id.isNotEmpty) out[k.value] = id;
   }
   return out;
 }

@@ -18,6 +18,17 @@ export const ID_FIELDS = {
   admob_ios: ['interstitial', 'rewarded', 'banner'],
 };
 
+/** Characters a pasted id can carry by accident: quotes of every kind and
+ * invisible direction marks / zero-width characters. */
+const ID_JUNK = /^[\s"'`«»“”„‘’‹›<>\u200b-\u200f\u202a-\u202e\u2066-\u2069\ufeff]+|[\s"'`«»“”„‘’‹›<>\u200b-\u200f\u202a-\u202e\u2066-\u2069\ufeff]+$/g;
+
+/** Cleans a pasted ad id: trims whitespace, wrapping quotes and invisible
+ * characters (same rule as `cleanAdId` in the app). */
+export const cleanId = (value) => String(value ?? '').replace(ID_JUNK, '');
+
+/** Ad ids are plain tokens: letters, digits and `-_.:~/`. */
+export const isValidId = (value) => /^[A-Za-z0-9._:~\/-]{1,200}$/.test(value);
+
 export class ConfigError extends Error {}
 
 const fail = (msg) => {

@@ -81,6 +81,17 @@ void main() {
     expect(c.message, isNull);
   });
 
+  test('pasted ids lose wrapping quotes and invisible characters', () {
+    expect(cleanAdId('"0b1c-2d3e"'), '0b1c-2d3e');
+    expect(cleanAdId(' «abc» '), 'abc');
+    expect(cleanAdId('\u200f“ca-app-pub-1/2”\u200e'), 'ca-app-pub-1/2');
+    expect(cleanAdId('a"b'), 'a"b');
+    final c = RemoteConfig.parse(
+      mutate((a) => a['providers']['adivery']['app_id'] = '"A"'),
+    );
+    expect(c.ads.providerIds['adivery']!['app_id'], 'A');
+  });
+
   test('bundled default config is valid', () {
     final raw = File('assets/config/default_config.json').readAsStringSync();
     final c = RemoteConfig.parse(jsonDecode(raw));

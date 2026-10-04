@@ -83,6 +83,22 @@ test('/keys one-shot form and /cancel', () => {
   assert.equal(cleared.config.ads.providers.adivery.app_id, '');
 });
 
+test('/keys strips quotes and invisible characters, rejects junk', () => {
+  const id = '0b1c2d3e-aaaa-bbbb-cccc-0123456789ab';
+  for (const pasted of [`"${id}"`, `«${id}»`, `\u200f“${id}”`, `'${id}'`]) {
+    const r = runCommand(`/keys adivery app_id ${pasted}`, cfg());
+    assert.equal(r.config.ads.providers.adivery.app_id, id, pasted);
+  }
+  const s = runCommand(`"${id}"`, cfg(), { step: 'value', target: 'adivery', field: 'banner_placement' });
+  assert.equal(s.config.ads.providers.adivery.banner_placement, id);
+  const bad = runCommand('/keys adivery app_id a"b', cfg());
+  assert.equal(bad.config, undefined);
+  assert.match(bad.reply, /one word/);
+  const badSession = runCommand('a,b', cfg(), { step: 'value', target: 'adivery', field: 'app_id' });
+  assert.equal(badSession.config, undefined);
+  assert.equal(badSession.session.step, 'value');
+});
+
 test('/status, /show, /help, unknown', () => {
   assert.match(runCommand('/status', cfg()).reply, /config v0/);
   const c = runCommand('/keys tapsell app_key super-secret-key-42', cfg()).config;
