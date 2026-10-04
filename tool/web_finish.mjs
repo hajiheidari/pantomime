@@ -1,9 +1,8 @@
-// Post-processes `flutter build web` into build/site:
+// Post-processes `flutter build web`:
 //   build/game/            the game (→ pantomime.espadna.com), relative base
 //                          href, offline service worker, _headers/_redirects
-//   build/espadna/         espadna.com: studio home + /pantomime-app/ landing
-//                          pages (site/)
 //   build/pantomime-web.zip  build/game for a mirror host (upload + unzip)
+// The landing pages on espadna.com live in hajiheidari/espadna-site.
 import { createHash } from 'node:crypto';
 import { cpSync, existsSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
@@ -11,15 +10,9 @@ import { join, relative } from 'node:path';
 
 const root = new URL('..', import.meta.url).pathname;
 const web = join(root, 'build/web');
-const site = join(root, 'build/espadna');
 const play = join(root, 'build/game');
-const gameUrl = (process.env.GAME_URL || 'https://pantomime.espadna.com').replace(/\/$/, '');
-const siteUrl = (process.env.SITE_URL || 'https://espadna.com/pantomime-app').replace(/\/$/, '');
 
-rmSync(site, { recursive: true, force: true });
 rmSync(play, { recursive: true, force: true });
-cpSync(join(root, 'site'), site, { recursive: true });
-cpSync(join(root, 'assets/fonts/Vazirmatn-Bold.ttf'), join(site, 'Vazirmatn-Bold.ttf'));
 cpSync(web, play, { recursive: true });
 
 const walk = (dir) => readdirSync(dir).flatMap((f) => {
@@ -35,13 +28,6 @@ for (const f of walk(play)) {
 // Relative base href: works at /play/ and at /<any>/play/ on a mirror.
 const indexPath = join(play, 'index.html');
 writeFileSync(indexPath, readFileSync(indexPath, 'utf8').replace(/<base href="[^"]*">/, '<base href="./">'));
-
-// Site placeholders.
-for (const f of walk(site).filter((f) => f.endsWith('.html'))) {
-  writeFileSync(f, readFileSync(f, 'utf8')
-    .replaceAll('__SITE_URL__', siteUrl)
-    .replaceAll('__GAME_URL__', gameUrl));
-}
 
 // Service worker: precache the shell, not the big CanvasKit variants.
 const files = walk(play)
@@ -86,4 +72,4 @@ if (existsSync('/usr/bin/zip')) {
   execFileSync('zip', ['-qr', zip, '.', '-x', '_headers', '_redirects'], { cwd: play });
 }
 const size = walk(play).reduce((n, f) => n + statSync(f).size, 0);
-console.log(`build/game: ${files.length} precached files, sw ${version}, ${(size / 1e6).toFixed(1)} MB; build/espadna: ${walk(site).length} files`);
+console.log(`build/game: ${files.length} precached files, sw ${version}, ${(size / 1e6).toFixed(1)} MB`);

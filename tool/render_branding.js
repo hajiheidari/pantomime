@@ -50,9 +50,10 @@ const bigMasks = svg
       <div dir="rtl" style="color:#FFD23F;font-size:96px;font-weight:900;line-height:1.25;text-shadow:0 6px 0 #120A2B">پانتومیم<br>دورهمی</div>
      </div>`,
     1024, 500, 'feature_graphic_1024x500.png', '#1A0F3D');
-  // Web / PWA (web/) and the landing pages (site/pantomime-app/).
+  // Web / PWA (web/) and the landing page assets (assets/branding/landing/).
   const web = path.join(__dirname, '..', 'web');
-  const site = path.join(__dirname, '..', 'site', 'pantomime-app');
+  // Landing page assets: copy them to espadna-site/public/pantomime-app/.
+const site = path.join(__dirname, '..', 'assets', 'branding', 'landing');
   const maskable = svg.replace('<use href="#masks"/>',
     '<g transform="translate(512 512) scale(0.62) translate(-512 -512)"><use href="#masks"/></g>');
   const shotTo = async (body, w, h, file, bg) => {
@@ -86,22 +87,5 @@ const bigMasks = svg
      </div>`, w, h, file, '#1A0F3D');
   await enBanner(1200, 630, 480, 120, 44, path.join(site, 'og_en.png'));
   await enBanner(1024, 500, 400, 100, 36, path.join(dir, 'feature_graphic_en_1024x500.png'));
-  // Studio brand (espadna.com): site/brand/logo.svg → PNGs + link preview.
-  const brand = path.join(__dirname, '..', 'site', 'brand');
-  const logo = fs.readFileSync(path.join(brand, 'logo.svg'), 'utf8');
-  const logoAt = (n) => logo.replace('width="512" height="512"', `width="${n}" height="${n}"`);
-  for (const n of [512, 192, 180, 64]) {
-    await shotTo(logoAt(n), n, n, path.join(brand, `logo-${n}.png`));
-  }
-  const studioOg = (word, sub, file, dir = 'ltr') => shotTo(
-    `<div dir="${dir}" style="width:1200px;height:630px;display:flex;align-items:center;justify-content:center;gap:56px;
-      background:#0B1F3A;font-family:Vazirmatn,Tahoma,sans-serif">
-      ${logoAt(300)}
-      <div style="color:#fff;font-size:118px;font-weight:900;line-height:1.25">${word}
-        <div style="color:#9FB3CC;font-size:40px;font-weight:700">${sub}</div></div>
-     </div>`, 1200, 630, path.join(brand, file), '#0B1F3A');
-  await studioOg('اسپادنا', 'اپ‌ها و بازی‌های ساده و کاربردی', 'og.png', 'rtl');
-  await studioOg('Espadna', 'Simple, useful apps &amp; games', 'og_en.png');
-  await studioOg('إسبادنا', 'تطبيقات وألعاب بسيطة ومفيدة', 'og_ar.png', 'rtl');
   await browser.close();
 })();

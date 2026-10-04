@@ -1,15 +1,15 @@
 # Web / PWA version
 
-| Address | What | Source | Deploy config |
-|---|---|---|---|
-| https://pantomime.espadna.com | the game (also the old `pantomime.sepanta-hesaban.workers.dev`) | Flutter `web/` build → `build/game` | `web_deploy/` |
-| https://espadna.com | studio home: en `/`, `/fa/`, `/ar/` (generated: edit `site/products.json`, run `python3 tool/site_home.py`) | `site/` → `build/espadna` | `site_deploy/` |
-| https://espadna.com/pantomime-app/ | landing page en (`/fa/`, `/ar/`), `privacy` → api | `site/pantomime-app/` | `site_deploy/` |
-| https://espadna.com/tiaro-app/ | Tiaro landing page: **not in this repo.** A Worker route (`espadna.com/tiaro-app*`) sends it to Tiaro's own Worker (`hajiheidari/crowns-app`, `web/tiaro-app/`). Here only its product card in `site/products.json`. | — | — |
-| https://api.espadna.com | config, word list, privacy, bot | `server/` | `server/wrangler.toml` |
+| Address | What | Where |
+|---|---|---|
+| https://pantomime.espadna.com | the game (also the old `pantomime.sepanta-hesaban.workers.dev`) | this repo: Flutter `web/` → `build/game`, deploy `web_deploy/` |
+| https://api.espadna.com | config, word list, privacy, bot | this repo: `server/` |
+| https://espadna.com, `/pantomime-app/` (+ `fa/`, `ar/`) | studio home and landing pages | **hajiheidari/espadna-site** (deployed by its GitHub Actions) |
+| https://espadna.com/tiaro-app/, tiaro.espadna.com | Tiaro (another app) | hajiheidari/crowns-app (its own Worker route), not this repo |
 
-Every web app gets its own subdomain (`<app>.espadna.com`) and its landing page
-in a folder `espadna.com/<app>-app/` (English; `fa/` and `ar/` subfolders).
+Landing page images (icon, og images) are rendered here by
+`node tool/render_branding.js` into `assets/branding/landing/`; copy them to
+`espadna-site/public/pantomime-app/`.
 
 ## What it is
 
@@ -39,14 +39,13 @@ in a folder `espadna.com/<app>-app/` (English; `fa/` and `ar/` subfolders).
 ## Build and deploy
 
 ```bash
-tool/build_web.sh            # → build/game, build/espadna, build/pantomime-web.zip
-tool/build_web.sh --deploy   # + upload both to Cloudflare (needs CLOUDFLARE_API_TOKEN)
+tool/build_web.sh            # → build/game, build/pantomime-web.zip
+tool/build_web.sh --deploy   # + upload to Cloudflare (needs CLOUDFLARE_API_TOKEN)
 ```
 
-Both are Cloudflare Workers static assets (free, unlimited requests) with
-custom domains. Cache rules and old-link redirects for the game are generated
-into `build/game/_headers` and `_redirects`; the site's redirects are in
-`site/_redirects`. Every CI run also uploads `pantomime-web.zip` as an
+The game is Cloudflare Workers static assets (free, unlimited requests) with
+a custom domain. Cache rules and old-link redirects are generated into
+`build/game/_headers` and `_redirects`. Every CI run also uploads `pantomime-web.zip` as an
 artifact.
 
 ## Mirror on an Iranian host

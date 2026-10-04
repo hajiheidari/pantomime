@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
-# Web / PWA build:
-#   build/game     → https://pantomime.espadna.com   (web_deploy/)
-#   build/espadna  → https://espadna.com             (site_deploy/, studio
-#                    home + /pantomime-app/ landing pages from site/)
+# Web / PWA build: build/game → https://pantomime.espadna.com (web_deploy/).
+# (The landing pages on espadna.com are in the hajiheidari/espadna-site repo.)
 #
 #   tool/build_web.sh            # build only
-#   tool/build_web.sh --deploy   # + upload both to Cloudflare
+#   tool/build_web.sh --deploy   # + upload to Cloudflare
 #
 # build/game also works inside any folder of another host (mirror): all game
 # paths are relative. See docs/web.md.
@@ -29,5 +27,4 @@ node tool/web_finish.mjs
 
 if [[ "${1:-}" == "--deploy" ]]; then
   (cd web_deploy && ../server/node_modules/.bin/wrangler deploy)
-  (cd site_deploy && ../server/node_modules/.bin/wrangler deploy)
 fi
