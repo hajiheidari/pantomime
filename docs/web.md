@@ -4,11 +4,11 @@
 |---|---|---|---|
 | https://pantomime.espadna.com | the game (also the old `pantomime.sepanta-hesaban.workers.dev`) | Flutter `web/` build → `build/game` | `web_deploy/` |
 | https://espadna.com | studio home: en `/`, `/fa/`, `/ar/` (generated: edit `site/products.json`, run `python3 tool/site_home.py`) | `site/` → `build/espadna` | `site_deploy/` |
-| https://espadna.com/pantomime-app/ | landing page fa (`/en/` English), `privacy` → api | `site/pantomime-app/` | `site_deploy/` |
+| https://espadna.com/pantomime-app/ | landing page en (`/fa/`, `/ar/`), `privacy` → api | `site/pantomime-app/` | `site_deploy/` |
 | https://api.espadna.com | config, word list, privacy, bot | `server/` | `server/wrangler.toml` |
 
 Every web app gets its own subdomain (`<app>.espadna.com`) and its landing page
-in a folder `espadna.com/<app>-app/`.
+in a folder `espadna.com/<app>-app/` (English; `fa/` and `ar/` subfolders).
 
 ## What it is
 

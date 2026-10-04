@@ -31,7 +31,7 @@
 ## ۲.۵ نسخه‌ی وب ✅ (منتشر شد)
 
 - بازی آنلاین: **https://pantomime.espadna.com**
-- صفحه‌ی معرفی: **https://espadna.com/pantomime-app/** (انگلیسی: `/en/`)
+- صفحه‌ی معرفی: **https://espadna.com/pantomime-app/** (انگلیسی؛ فارسی: `/fa/`، عربی: `/ar/`)
 - سایت استودیو: **https://espadna.com** (فارسی: `/fa/`، عربی: `/ar/`)
 
 - بدون نصب، و بعد از اولین بار بدون اینترنت.

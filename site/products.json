@@ -11,7 +11,7 @@
         "en": "The charades party game: play in teams or with the phone on your forehead. English and Persian, works offline.",
         "ar": "لعبة التمثيل الصامت وتخمين الكلمات للتجمعات، ضمن فرق أو مع وضع الهاتف على الجبين. بالإنجليزية والفارسية، تعمل دون إنترنت."
       },
-      "page": {"fa": "/pantomime-app/", "en": "/pantomime-app/en/", "ar": "/pantomime-app/en/"},
+      "page": {"fa": "/pantomime-app/fa/", "en": "/pantomime-app/", "ar": "/pantomime-app/ar/"},
       "web": {"fa": "https://pantomime.espadna.com/?lang=fa", "en": "https://pantomime.espadna.com/?lang=en", "ar": "https://pantomime.espadna.com/?lang=en"}
     }
   ]
