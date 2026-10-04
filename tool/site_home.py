@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Writes the espadna.com home pages (fa at /, en at /en/, ar at /ar/) from
+"""Writes the espadna.com home pages (en at /, fa at /fa/, ar at /ar/) from
 site/products.json. Run after adding or changing a product:
 
     python3 tool/site_home.py
@@ -13,17 +13,7 @@ SITE = ROOT / 'site'
 PRODUCTS = json.loads((SITE / 'products.json').read_text(encoding='utf-8'))['products']
 
 LANGS = {
-    'fa': dict(path='', dir='rtl', name='اسپادنا', locale='fa_IR', label='فارسی',
-               title='اسپادنا | اپ‌ها و بازی‌های ساده و کاربردی',
-               desc='اسپادنا اپ‌ها و بازی‌های ساده، کاربردی و قابل اعتماد می‌سازد؛ برای اندروید، آیفون و وب.',
-               hero='اپ‌ها و بازی‌های ساده، کاربردی و قابل اعتماد',
-               lead='ما محصولاتی می‌سازیم که بدون دردسر کار می‌کنند: سریع، سبک، دوزبانه و حتی بدون اینترنت.',
-               products='محصولات', details='معرفی و دانلود', web='نسخه‌ی وب',
-               about='درباره‌ی ما',
-               about_text='اسپادنا یک استودیوی کوچک نرم‌افزار است. روی کیفیت، حریم خصوصی کاربر و دسترسی‌پذیری در شرایط اینترنت ایران تمرکز داریم.',
-               points=['حریم خصوصی: بدون ثبت‌نام و بدون جمع‌آوری اطلاعات شخصی', 'کار بدون اینترنت و در شرایط اینترنت محدود', 'فارسی، انگلیسی و عربی'],
-               menu=['محصولات', 'درباره‌ی ما']),
-    'en': dict(path='en/', dir='ltr', name='Espadna', locale='en_US', label='English',
+    'en': dict(path='', dir='ltr', name='Espadna', locale='en_US', label='English',
                title='Espadna | Simple, useful apps & games',
                desc='Espadna builds simple, useful and reliable apps and games for Android, iPhone and the web.',
                hero='Simple, useful and reliable apps & games',
@@ -33,6 +23,16 @@ LANGS = {
                about_text='Espadna is a small software studio focused on quality, user privacy, and staying reachable on unreliable networks.',
                points=['Privacy first: no sign-up, no personal data collected', 'Works offline and on limited networks', 'English, Persian and Arabic'],
                menu=['Products', 'About']),
+    'fa': dict(path='fa/', dir='rtl', name='اسپادنا', locale='fa_IR', label='فارسی',
+               title='اسپادنا | اپ‌ها و بازی‌های ساده و کاربردی',
+               desc='اسپادنا اپ‌ها و بازی‌های ساده، کاربردی و قابل اعتماد می‌سازد؛ برای اندروید، آیفون و وب.',
+               hero='اپ‌ها و بازی‌های ساده، کاربردی و قابل اعتماد',
+               lead='ما محصولاتی می‌سازیم که بدون دردسر کار می‌کنند: سریع، سبک، دوزبانه و حتی بدون اینترنت.',
+               products='محصولات', details='معرفی و دانلود', web='نسخه‌ی وب',
+               about='درباره‌ی ما',
+               about_text='اسپادنا یک استودیوی کوچک نرم‌افزار است. روی کیفیت، حریم خصوصی کاربر و دسترسی‌پذیری در شرایط اینترنت ایران تمرکز داریم.',
+               points=['حریم خصوصی: بدون ثبت‌نام و بدون جمع‌آوری اطلاعات شخصی', 'کار بدون اینترنت و در شرایط اینترنت محدود', 'فارسی، انگلیسی و عربی'],
+               menu=['محصولات', 'درباره‌ی ما']),
     'ar': dict(path='ar/', dir='rtl', name='إسبادنا', locale='ar_AR', label='العربية',
                title='إسبادنا | تطبيقات وألعاب بسيطة ومفيدة',
                desc='تصمم إسبادنا تطبيقات وألعابًا بسيطة ومفيدة وموثوقة لأندرويد وآيفون والويب.',
@@ -98,7 +98,7 @@ def page(code):
     og = {'fa': 'og.png', 'en': 'og_en.png', 'ar': 'og_ar.png'}[code]
     alternates = '\n'.join(
         f'  <link rel="alternate" hreflang="{c}" href="https://espadna.com/{v["path"]}">' for c, v in LANGS.items()
-    ) + '\n  <link rel="alternate" hreflang="x-default" href="https://espadna.com/en/">'
+    ) + '\n  <link rel="alternate" hreflang="x-default" href="https://espadna.com/">'
     current = ' aria-current="page"'
     langs = ''.join(
         f'<a href="/{v["path"]}" hreflang="{c}" lang="{c}"{current if c == code else ""}>{v["label"]}</a>'

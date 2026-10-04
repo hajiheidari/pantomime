@@ -2,3 +2,5 @@
 /pantomime-app/privacy  https://api.espadna.com/privacy  302
 /pantomime              /pantomime-app/  301
 /pantomime/             /pantomime-app/  301
+/en                     /                301
+/en/                    /                301

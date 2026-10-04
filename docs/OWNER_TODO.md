@@ -32,7 +32,7 @@
 
 - بازی آنلاین: **https://pantomime.espadna.com**
 - صفحه‌ی معرفی: **https://espadna.com/pantomime-app/** (انگلیسی: `/en/`)
-- سایت استودیو: **https://espadna.com**
+- سایت استودیو: **https://espadna.com** (فارسی: `/fa/`، عربی: `/ar/`)
 
 - بدون نصب، و بعد از اولین بار بدون اینترنت.
 - [ ] روی آیفون (Safari) و یک گوشی اندروید (Chrome) باز کنید: یک دور بازی تیمی،
