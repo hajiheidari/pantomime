@@ -1,1 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#2A1B5C"/><text x="32" y="46" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-size="40" font-weight="900" fill="#FFD23F">E</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Espadna / اسپادنا mark: a playful "E" of three game-coloured bars on the
+       studio's purple tile. Rendered to PNGs by tool/render_branding.js. -->
+  <defs>
+    <radialGradient id="bg" cx="40%" cy="30%" r="80%">
+      <stop offset="0" stop-color="#6A45DE"/>
+      <stop offset="0.55" stop-color="#2A1B5C"/>
+      <stop offset="1" stop-color="#1A0F3D"/>
+    </radialGradient>
+  </defs>
+  <rect x="16" y="16" width="480" height="480" rx="120" fill="url(#bg)"/>
+  <g stroke="#120A2B" stroke-width="18" stroke-linejoin="round">
+    <rect x="132" y="110" width="250" height="74" rx="37" fill="#FFD23F"/>
+    <rect x="132" y="219" width="196" height="74" rx="37" fill="#FF5C9A"/>
+    <rect x="132" y="328" width="250" height="74" rx="37" fill="#3DDC84"/>
+    <rect x="132" y="110" width="74" height="292" rx="37" fill="#FFF7E6"/>
+  </g>
+  <path d="M398 236 l10 24 24 10 -24 10 -10 24 -10 -24 -24 -10 24 -10z" fill="#FFD23F"/>
+  <circle cx="420" cy="140" r="12" fill="#3BCEF5"/>
+</svg>
