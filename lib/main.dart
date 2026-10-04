@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +10,7 @@ import 'app.dart';
 import 'core/l10n/default_language.dart';
 import 'core/providers.dart';
 import 'features/ads/ads_providers.dart';
+import 'features/settings/settings_controller.dart';
 import 'features/words/words_providers.dart';
 
 Future<void> main() async {
@@ -22,6 +24,12 @@ Future<void> main() async {
         [l.languageCode, ?l.countryCode].join('_'),
     ],
     utcOffset: DateTime.now().timeZoneOffset,
+    // Web links from the landing pages carry ?lang=fa|en.
+    requested: kIsWeb
+        ? AppLanguage.values
+              .where((l) => l.name == Uri.base.queryParameters['lang'])
+              .firstOrNull
+        : null,
   );
 
   final container = ProviderContainer(

@@ -33,4 +33,16 @@ void main() {
       expect(defaultLanguage(store, tehranEnglish), AppLanguage.fa);
     }
   });
+
+  test('a ?lang= link wins on the web', () {
+    const enLink = DeviceLocale(locales: ['fa_IR'], requested: AppLanguage.en);
+    expect(defaultLanguage(AppStore.web, enLink), AppLanguage.en);
+    expect(
+      defaultLanguage(
+        AppStore.web,
+        const DeviceLocale(locales: ['en_US'], requested: AppLanguage.fa),
+      ),
+      AppLanguage.fa,
+    );
+  });
 }

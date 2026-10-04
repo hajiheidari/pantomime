@@ -18,9 +18,22 @@ void main() {
     expect(cats.map((c) => c.id).toSet().length, cats.length);
   });
 
-  test('English pack parses', () {
+  test('English pack: 11 regular categories + bonus, no duplicates', () {
     final raw = File('assets/words/words_en.json').readAsStringSync();
-    expect(parseWordPack(raw), isNotEmpty);
+    final cats = parseWordPack(raw);
+    expect(cats.where((c) => !c.bonus), hasLength(11));
+    expect(cats.where((c) => c.bonus), isNotEmpty);
+    final all = [
+      for (final c in cats) ...c.wordsFor(Difficulty.values.toSet()),
+    ];
+    expect(all.length, greaterThanOrEqualTo(800));
+    for (final c in cats) {
+      for (final d in Difficulty.values) {
+        expect(c.words[d], isNotEmpty, reason: '${c.id}.${d.name}');
+      }
+    }
+    final keys = all.map((w) => w.key.replaceAll(RegExp("[-']"), ''));
+    expect(keys.toSet().length, all.length, reason: 'same word twice');
   });
 
   test('parser drops normalized duplicates and bad entries', () {

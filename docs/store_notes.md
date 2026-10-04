@@ -181,9 +181,27 @@ forehead mode.
 > ✅ کاملاً آفلاین، بدون ثبت‌نام، مناسب همه سنین. در حین بازی هیچ تبلیغی نمایش
 > داده نمی‌شود.
 
-**English (for reviewers / en-US listing):**
-> Pantomime Party: a charades game for family and friends. Team mode
-> (2–4 teams) and forehead mode (tilt down = correct, tilt up = pass).
-> 900+ Persian words in 13 categories, optional video recording of the fun
-> (kept on your device), shareable score cards. Fully offline, no sign-up,
-> no ads during a round.
+**English listing (Google Play en-US, App Store English):**
+
+**Title:** Pantomime Party: Charades · **Short name:** Pantomime
+
+**Short description (≤80):**
+Charades for parties: act it out in teams or with the phone on your forehead!
+
+**Long description:**
+> Turn any get-together into a laugh-out-loud game night with Pantomime Party! 🎭
+>
+> 👥 **Team game:** 2–4 teams, pick the turn length and number of rounds. One
+> player acts out the word without speaking, teammates shout their guesses.
+> 🤳 **Forehead mode:** put the phone on your forehead while your friends act
+> it out. Tilt down = correct, tilt up = pass.
+> 📚 800+ words in 11 categories: movies, food, animals, jobs, idioms,
+> sports, places, actions, throwback 80s & 90s, funny situations… plus
+> bonus packs.
+> 🎥 Optional video of the fun (kept on your device) and shareable score cards.
+> ✅ Works fully offline, no sign-up, family-friendly. No ads ever interrupt a
+> round. Also plays in Persian.
+
+The app opens in English on non-Persian devices and in Persian on Persian
+ones (or Iranian region/time zone); players can switch in Settings.
+English screenshots: `store/screenshots/en/`.

@@ -77,5 +77,14 @@ const bigMasks = svg
         <div style="color:#fff;font-size:44px;font-weight:900;text-shadow:none;margin-top:10px">بی‌صدا بازی کن، بلند بخند!</div></div>
      </div>`,
     1200, 630, path.join(site, 'og.png'), '#1A0F3D');
+  const enBanner = (w, h, mask, title, sub, file) => shotTo(
+    `<div style="width:${w}px;height:${h}px;display:flex;align-items:center;justify-content:center;gap:40px;
+      background:radial-gradient(circle at 30% 40%,#5A36C9,#2A1B5C 60%,#1A0F3D);font-family:Vazirmatn,Tahoma,sans-serif">
+      ${sized(bigMasks, mask, mask)}
+      <div style="color:#FFD23F;font-size:${title}px;font-weight:900;line-height:1.1;text-shadow:0 6px 0 #120A2B">Pantomime<br>Party
+        <div style="color:#fff;font-size:${sub}px;font-weight:900;text-shadow:none;margin-top:16px">Act it out, laugh out loud!</div></div>
+     </div>`, w, h, file, '#1A0F3D');
+  await enBanner(1200, 630, 480, 120, 44, path.join(site, 'og_en.png'));
+  await enBanner(1024, 500, 400, 100, 36, path.join(dir, 'feature_graphic_en_1024x500.png'));
   await browser.close();
 })();
