@@ -1,15 +1,17 @@
 import '../../features/words/domain/word_models.dart';
 import '../utils/persian_text.dart';
 
-/// All user-visible strings. Persian is primary; English exists so store
-/// reviewers on English devices see a localized app.
+/// All user-visible strings: Persian (primary), English and Arabic.
 ///
-/// Plain Dart instead of ARB/codegen: two languages, easy to review.
+/// Plain Dart instead of ARB/codegen: few languages, easy to review.
 abstract class AppStrings {
   const AppStrings();
 
-  static AppStrings forLanguage(String code) =>
-      code == 'en' ? const EnStrings() : const FaStrings();
+  static AppStrings forLanguage(String code) => switch (code) {
+    'en' => const EnStrings(),
+    'ar' => const ArStrings(),
+    _ => const FaStrings(),
+  };
 
   String get languageCode;
   bool get isRtl;
@@ -370,7 +372,6 @@ class FaStrings extends AppStrings {
   @override
   String get language => 'زبان';
   @override
-  @override
   String get about => 'درباره بازی';
   @override
   String get aboutBody =>
@@ -627,7 +628,6 @@ class EnStrings extends AppStrings {
   @override
   String get language => 'Language';
   @override
-  @override
   String get about => 'About';
   @override
   String get aboutBody =>
@@ -650,4 +650,263 @@ class EnStrings extends AppStrings {
   String get rateApp => 'Rate the app';
   @override
   String get close => 'Close';
+}
+
+const _arabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+
+class ArStrings extends AppStrings {
+  const ArStrings();
+
+  @override
+  String get languageCode => 'ar';
+  @override
+  bool get isRtl => true;
+  @override
+  String n(int value) => '$value'.split('').map((c) {
+    final d = c.codeUnitAt(0) - 0x30;
+    return d >= 0 && d < 10 ? _arabicDigits[d] : c;
+  }).join();
+
+  @override
+  String get appName => 'بانتومايم الحفلات';
+  @override
+  String get tagline => 'مثّل بصمت، واضحك بصوت عالٍ!';
+  @override
+  String get teamGame => 'لعب جماعي';
+  @override
+  String get teamGameHint => 'الفرق تمثّل بالتناوب';
+  @override
+  String get foreheadMode => 'الهاتف على الجبين';
+  @override
+  String get foreheadModeHint => 'ضع الهاتف على جبينك!';
+  @override
+  String get comingSoon => 'قريبًا!';
+  @override
+  String get settings => 'الإعدادات';
+
+  @override
+  String get setupTitle => 'إعداد اللعبة';
+  @override
+  String get teams => 'الفرق';
+  @override
+  String defaultTeamName(int index) => 'الفريق ${n(index + 1)}';
+  @override
+  String get addTeam => 'فريق جديد';
+  @override
+  String get roundDuration => 'مدة الدور';
+  @override
+  String seconds(int s) => '${n(s)} ثانية';
+  @override
+  String get roundsPerTeam => 'عدد الأدوار لكل فريق';
+  @override
+  String get difficulty => 'الصعوبة';
+  @override
+  String difficultyName(DifficultyChoice d) => switch (d) {
+    DifficultyChoice.easy => 'سهل',
+    DifficultyChoice.medium => 'متوسط',
+    DifficultyChoice.hard => 'صعب',
+    DifficultyChoice.mixed => 'مختلط',
+  };
+  @override
+  String get categories => 'الفئات';
+  @override
+  String get selectAll => 'الكل';
+  @override
+  String get clearAll => 'لا شيء';
+  @override
+  String get passLimit => 'عدد مرات التخطي في كل دور';
+  @override
+  String get unlimited => 'بلا حدود';
+  @override
+  String get startGame => 'هيا بنا!';
+  @override
+  String get pickCategory => 'اختر فئة واحدة على الأقل';
+  @override
+  String wordsCount(int count) => '${n(count)} كلمة';
+
+  @override
+  String turnOf(String team) => 'دور $team';
+  @override
+  String roundOf(int round, int total) => 'الجولة ${n(round)} من ${n(total)}';
+  @override
+  String get suddenDeath => 'جولة الحسم!';
+  @override
+  String get suddenDeathHint => 'تعادل، جولة إضافية!';
+  @override
+  String get howToPlay =>
+      'يمثّل لاعب الكلمة دون أن يتكلم، ويخمّن زملاؤه.\n'
+      'يمسك لاعب من الفريق الآخر الهاتف ويضغط «صحيح» أو «تخطٍّ».';
+  @override
+  String get start => 'ابدأ';
+  @override
+  String get go => 'انطلق!';
+  @override
+  String get correct => 'صحيح';
+  @override
+  String get pass => 'تخطٍّ';
+  @override
+  String passesLeft(int? left) =>
+      left == null ? 'التخطي: بلا حدود' : 'مرات التخطي المتبقية: ${n(left)}';
+  @override
+  String get noPassLeft => 'لم يبقَ تخطٍّ';
+  @override
+  String get timeUp => 'انتهى الوقت!';
+  @override
+  String get paused => 'متوقف مؤقتًا';
+  @override
+  String get resume => 'متابعة';
+
+  @override
+  String get players => 'اللاعبون';
+  @override
+  String defaultPlayerName(int index) => 'اللاعب ${n(index + 1)}';
+  @override
+  String get addPlayer => 'لاعب جديد';
+  @override
+  String get turnsPerPlayer => 'عدد الأدوار لكل لاعب';
+  @override
+  String get foreheadHowTo =>
+      'ضع الهاتف أفقيًا على جبينك والشاشة نحو الأصدقاء.\n'
+      'يمثّل أصدقاؤك الكلمة بصمت، وأنت تخمّن.\n'
+      'إمالة للأسفل = صحيح  •  إمالة للأعلى = تخطٍّ';
+  @override
+  String get putOnForehead => 'ضع الهاتف على جبينك';
+  @override
+  String get holdStill => 'الشاشة نحو الأصدقاء، ثبّت الهاتف…';
+  @override
+  String get tiltDownCorrect => 'إمالة للأسفل = صحيح';
+  @override
+  String get tiltUpPass => 'إمالة للأعلى = تخطٍّ';
+  @override
+  String get sensorUnavailable =>
+      'لم يُعثر على مستشعر الحركة؛ ليضغط شخص آخر على الأزرار.';
+  @override
+  String get startWithButtons => 'ابدأ بالأزرار';
+
+  @override
+  String get bonusBadge => '🎁 مكافأة';
+  @override
+  String get unlockTitle => 'افتح الفئة الإضافية';
+  @override
+  String get unlockBody =>
+      'شاهد إعلانًا قصيرًا لفتح هذه الفئة حتى تغلق التطبيق.';
+  @override
+  String get watchAd => 'شاهد الإعلان';
+  @override
+  String get cancel => 'إلغاء';
+  @override
+  String get unlockSkipped => 'شاهد الإعلان حتى النهاية لفتح الفئة.';
+  @override
+  String get updateAvailable => 'يتوفر إصدار جديد في المتجر!';
+
+  @override
+  String get recordingExplainTitle => 'سجّل اللحظات المضحكة 🎥';
+  @override
+  String get recordingExplainBody =>
+      'في وضع الجبين تصوّر الكاميرا الأمامية أصدقاءك وهم يمثّلون، لتشاهدوا '
+      'وتضحكوا بعد ذلك.\n\n'
+      'يحتاج ذلك إلى الكاميرا والميكروفون. تبقى المقاطع على هاتفك ولا تُرفع '
+      'أبدًا، ولا تُحفظ أو تُشارك إلا إذا اخترت ذلك.';
+  @override
+  String get allow => 'حسنًا، فعّله';
+  @override
+  String get recordingDenied =>
+      'لم يُسمح بالوصول إلى الكاميرا أو الميكروفون، لذا يبقى التسجيل متوقفًا. '
+      'يمكنك السماح بذلك من إعدادات الهاتف.';
+  @override
+  String get rec => 'تسجيل';
+  @override
+  String get saveVideo => 'حفظ الفيديو';
+  @override
+  String get videoSaved => 'حُفظ الفيديو في المعرض ✅';
+  @override
+  String get videoSaveFailed => 'تعذّر الحفظ؛ تحقق من إذن المعرض.';
+  @override
+  String get shareVideo => 'مشاركة الفيديو';
+  @override
+  String get shareCard => 'بطاقة النتيجة';
+  @override
+  String get shareResult => 'مشاركة النتيجة';
+  @override
+  String get share => 'مشاركة';
+  @override
+  String shareCaption(int points) =>
+      'حصلنا على ${n(points)} نقطة في بانتومايم الحفلات! 🎭 هل تتفوقون علينا؟';
+  @override
+  String get shareResultCaption =>
+      'نتيجتنا في بانتومايم الحفلات 🎭🏆 تعالوا العبوا معنا!';
+  @override
+  String get cardCorrectWords => 'الكلمات التي خمّناها';
+  @override
+  String get downloadCta => 'حمّل بانتومايم الحفلات والعب مع أصدقائك!';
+
+  @override
+  String get roundSummary => 'ملخص الدور';
+  @override
+  String get tapToFix => 'ضغطت الزر الخطأ؟ اضغط على الكلمة لتصحيحها.';
+  @override
+  String score(int points) => '${n(points)} نقطة';
+  @override
+  String get timedOutWord => 'انتهى الوقت';
+  @override
+  String get noWordsPlayed => 'لم تُلعب أي كلمة!';
+  @override
+  String get continueLabel => 'متابعة';
+  @override
+  String get scoreboard => 'لوحة النتائج';
+  @override
+  String nextTurn(String team) => 'الدور التالي: $team';
+  @override
+  String get seeResults => 'عرض النتيجة';
+  @override
+  String get finalResults => 'النتيجة النهائية';
+  @override
+  String winnerIs(String team) => 'فاز $team!';
+  @override
+  String get itsATie => 'تعادل!';
+  @override
+  String get playAgain => 'لنلعب مرة أخرى';
+  @override
+  String get backHome => 'الصفحة الرئيسية';
+
+  @override
+  String get exitGameTitle => 'الخروج من اللعبة؟';
+  @override
+  String get exitGameBody => 'ستضيع نتائج هذه اللعبة.';
+  @override
+  String get exit => 'خروج';
+  @override
+  String get stay => 'متابعة اللعب';
+
+  @override
+  String get sound => 'الصوت';
+  @override
+  String get vibration => 'الاهتزاز';
+  @override
+  String get recording => 'تسجيل فيديو في وضع الجبين';
+  @override
+  String get recordingHint => 'في وضع الجبين فقط، بالكاميرا الأمامية';
+  @override
+  String get language => 'اللغة';
+  @override
+  String get about => 'حول اللعبة';
+  @override
+  String get aboutBody =>
+      'بانتومايم الحفلات: لعبة التمثيل الصامت للعائلة والأصدقاء.\n'
+      'تعمل دون إنترنت ودون تسجيل.\n'
+      'الخط: Vazirmatn (رخصة OFL).';
+  @override
+  String get privacyPolicy => 'سياسة الخصوصية';
+  @override
+  String get privacyBody =>
+      'لا تحتوي هذه اللعبة على حسابات ولا تجمع بيانات شخصية.\n'
+      'تُحفظ الإعدادات وسجل الكلمات على جهازك فقط.\n'
+      'تبقى مقاطع الفيديو المسجلة (إن فُعّلت) على جهازك ولا تُرفع أبدًا.\n'
+      'تعرض اللعبة إعلانات؛ وقد تجمع شبكات الإعلانات (Adivery أو Tapsell أو '
+      'AdMob) معرّف الإعلانات وبيانات تقنية عن الجهاز لعرض الإعلانات. عند '
+      'التشغيل تنزّل اللعبة ملف إعدادات صغيرًا ولا ترسل أي شيء عنك.';
+  @override
+  String get rateApp => 'قيّم التطبيق';
+  @override
+  String get close => 'إغلاق';
 }

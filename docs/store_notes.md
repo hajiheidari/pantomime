@@ -202,6 +202,8 @@ Charades for parties: act it out in teams or with the phone on your forehead!
 > ✅ Works fully offline, no sign-up, family-friendly. No ads ever interrupt a
 > round. Also plays in Persian.
 
-The app opens in English on non-Persian devices and in Persian on Persian
-ones (or Iranian region/time zone); players can switch in Settings.
+The app opens in Persian on Persian devices (or Iranian region/time zone), in
+Arabic on Arabic devices, and in English otherwise; Bazaar/Myket builds always
+open in Persian. Players can switch in Settings (فارسی / English / العربية).
+Arabic screenshots: `store/screenshots/ar/`.
 English screenshots: `store/screenshots/en/`.

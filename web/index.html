@@ -39,18 +39,19 @@
   </div>
   <noscript>برای بازی، جاوااسکریپت مرورگر را روشن کنید.</noscript>
   <script>
-    // Same rule as the app's default language (lib/core/l10n/default_language.dart).
+    // Roughly the app's default language rule (lib/core/l10n/default_language.dart).
     (function () {
       var q = new URLSearchParams(location.search).get('lang');
       var langs = (navigator.languages || [navigator.language || '']).join(',').toLowerCase();
       var off = -new Date().getTimezoneOffset();
-      var fa = q ? q === 'fa' : /(^|,)(fa|prs)|[-_](ir|af)(,|$)/.test(langs) || off === 210 || off === 270;
-      if (!fa) {
-        document.documentElement.lang = 'en';
-        document.documentElement.dir = 'ltr';
-        document.title = 'Pantomime Party';
-        document.getElementById('loading-title').textContent = 'Pantomime Party';
-      }
+      var lang = q === 'fa' || q === 'en' || q === 'ar' ? q
+        : /(^|,)(fa|prs)|[-_](ir|af)(,|$)/.test(langs) || off === 210 || off === 270 ? 'fa'
+        : /(^|,)ar/.test(langs) ? 'ar' : 'en';
+      var name = { fa: 'پانتومیم دورهمی', en: 'Pantomime Party', ar: 'بانتومايم الحفلات' }[lang];
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === 'en' ? 'ltr' : 'rtl';
+      document.title = name;
+      document.getElementById('loading-title').textContent = name;
     })();
   </script>
   <script src="flutter_bootstrap.js" async></script>

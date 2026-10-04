@@ -17,7 +17,7 @@ class PantomimeApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(),
       locale: Locale(strings.languageCode),
-      supportedLocales: const [Locale('fa'), Locale('en')],
+      supportedLocales: const [Locale('fa'), Locale('en'), Locale('ar')],
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,

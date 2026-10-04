@@ -1,6 +1,6 @@
 # پانتومیم دورهمی (Pantomime Dorehami)
 
-Offline Persian charades party game for iOS, Android and the web (PWA), built with Flutter.
+Offline charades party game (Persian, English, Arabic) for iOS, Android and the web (PWA), built with Flutter.
 Full product spec: [`docs/PROJECT_SPEC.md`](docs/PROJECT_SPEC.md).
 
 ## Status

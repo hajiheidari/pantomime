@@ -34,6 +34,24 @@ void main() {
     }
   });
 
+  test('Arabic devices get Arabic outside Bazaar/Myket', () {
+    const cairo = DeviceLocale(
+      locales: ['ar_EG'],
+      utcOffset: Duration(hours: 2),
+    );
+    expect(defaultLanguage(AppStore.play, cairo), AppLanguage.ar);
+    expect(defaultLanguage(AppStore.web, cairo), AppLanguage.ar);
+    expect(defaultLanguage(AppStore.bazaar, cairo), AppLanguage.fa);
+    // Persian listed first wins over Arabic.
+    expect(
+      defaultLanguage(
+        AppStore.play,
+        const DeviceLocale(locales: ['fa_IR', 'ar']),
+      ),
+      AppLanguage.fa,
+    );
+  });
+
   test('a ?lang= link wins on the web', () {
     const enLink = DeviceLocale(locales: ['fa_IR'], requested: AppLanguage.en);
     expect(defaultLanguage(AppStore.web, enLink), AppLanguage.en);

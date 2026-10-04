@@ -87,6 +87,7 @@ class SettingsScreen extends ConsumerWidget {
                       label: switch (l) {
                         AppLanguage.fa => 'فارسی',
                         AppLanguage.en => 'English',
+                        AppLanguage.ar => 'العربية',
                       },
                       selected: ref.watch(languageCodeProvider) == l.name,
                       onTap: () => ctrl.setLanguage(l),
