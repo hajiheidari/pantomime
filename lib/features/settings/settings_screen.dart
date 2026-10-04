@@ -98,7 +98,7 @@ class SettingsScreen extends ConsumerWidget {
                         AppLanguage.fa => 'فارسی',
                         AppLanguage.en => 'English',
                       },
-                      selected: settings.language == l,
+                      selected: ref.watch(languageCodeProvider) == l.name,
                       onTap: () => ctrl.setLanguage(l),
                     ),
                 ],

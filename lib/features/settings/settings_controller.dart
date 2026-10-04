@@ -9,13 +9,15 @@ class AppSettings {
     this.soundOn = true,
     this.vibrationOn = true,
     this.recordingOn = false,
-    this.language = AppLanguage.fa,
+    this.language,
   });
 
   final bool soundOn;
   final bool vibrationOn;
   final bool recordingOn;
-  final AppLanguage language;
+
+  /// The player's choice; null = automatic (see defaultLanguage).
+  final AppLanguage? language;
 
   AppSettings copyWith({
     bool? soundOn,
@@ -47,10 +49,9 @@ class SettingsController extends Notifier<AppSettings> {
       soundOn: p.getBool(_kSound) ?? true,
       vibrationOn: p.getBool(_kVibration) ?? true,
       recordingOn: p.getBool(_kRecording) ?? false,
-      language: AppLanguage.values.firstWhere(
-        (l) => l.name == p.getString(_kLanguage),
-        orElse: () => AppLanguage.fa,
-      ),
+      language: AppLanguage.values
+          .where((l) => l.name == p.getString(_kLanguage))
+          .firstOrNull,
     );
   }
 
