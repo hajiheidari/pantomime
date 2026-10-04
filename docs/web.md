@@ -3,7 +3,7 @@
 | Address | What | Source | Deploy config |
 |---|---|---|---|
 | https://pantomime.espadna.com | the game (also the old `pantomime.sepanta-hesaban.workers.dev`) | Flutter `web/` build → `build/game` | `web_deploy/` |
-| https://espadna.com | studio home (fa, `/en/`) | `site/` → `build/espadna` | `site_deploy/` |
+| https://espadna.com | studio home: fa `/`, `/en/`, `/ar/` (generated: edit `site/products.json`, run `python3 tool/site_home.py`) | `site/` → `build/espadna` | `site_deploy/` |
 | https://espadna.com/pantomime-app/ | landing page fa (`/en/` English), `privacy` → api | `site/pantomime-app/` | `site_deploy/` |
 | https://api.espadna.com | config, word list, privacy, bot | `server/` | `server/wrangler.toml` |
 

@@ -93,14 +93,15 @@ const bigMasks = svg
   for (const n of [512, 192, 180, 64]) {
     await shotTo(logoAt(n), n, n, path.join(brand, `logo-${n}.png`));
   }
-  const studioOg = (word, sub, file) => shotTo(
-    `<div style="width:1200px;height:630px;display:flex;align-items:center;justify-content:center;gap:56px;
-      background:radial-gradient(circle at 30% 40%,#5A36C9,#2A1B5C 60%,#1A0F3D);font-family:Vazirmatn,Tahoma,sans-serif">
-      ${logoAt(360)}
-      <div style="color:#FFD23F;font-size:130px;font-weight:900;line-height:1.2;text-shadow:0 7px 0 #120A2B">${word}
-        <div style="color:#fff;font-size:44px;font-weight:900;text-shadow:none">${sub}</div></div>
-     </div>`, 1200, 630, path.join(brand, file), '#1A0F3D');
-  await studioOg('<span dir="rtl">اسپادنا</span>', '<span dir="rtl">بازی‌ها و اپ‌هایی برای دورهمی‌های شاد</span>', 'og.png');
-  await studioOg('Espadna', 'Games &amp; apps for happy get-togethers', 'og_en.png');
+  const studioOg = (word, sub, file, dir = 'ltr') => shotTo(
+    `<div dir="${dir}" style="width:1200px;height:630px;display:flex;align-items:center;justify-content:center;gap:56px;
+      background:#0B1F3A;font-family:Vazirmatn,Tahoma,sans-serif">
+      ${logoAt(300)}
+      <div style="color:#fff;font-size:118px;font-weight:900;line-height:1.25">${word}
+        <div style="color:#9FB3CC;font-size:40px;font-weight:700">${sub}</div></div>
+     </div>`, 1200, 630, path.join(brand, file), '#0B1F3A');
+  await studioOg('اسپادنا', 'اپ‌ها و بازی‌های ساده و کاربردی', 'og.png', 'rtl');
+  await studioOg('Espadna', 'Simple, useful apps &amp; games', 'og_en.png');
+  await studioOg('إسبادنا', 'تطبيقات وألعاب بسيطة ومفيدة', 'og_ar.png', 'rtl');
   await browser.close();
 })();
