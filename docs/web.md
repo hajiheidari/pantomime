@@ -5,6 +5,7 @@
 | https://pantomime.espadna.com | the game (also the old `pantomime.sepanta-hesaban.workers.dev`) | Flutter `web/` build → `build/game` | `web_deploy/` |
 | https://espadna.com | studio home: en `/`, `/fa/`, `/ar/` (generated: edit `site/products.json`, run `python3 tool/site_home.py`) | `site/` → `build/espadna` | `site_deploy/` |
 | https://espadna.com/pantomime-app/ | landing page en (`/fa/`, `/ar/`), `privacy` → api | `site/pantomime-app/` | `site_deploy/` |
+| https://espadna.com/tiaro-app/ | Tiaro landing page: **not in this repo.** A Worker route (`espadna.com/tiaro-app*`) sends it to Tiaro's own Worker (`hajiheidari/crowns-app`, `web/tiaro-app/`). Here only its product card in `site/products.json`. | — | — |
 | https://api.espadna.com | config, word list, privacy, bot | `server/` | `server/wrangler.toml` |
 
 Every web app gets its own subdomain (`<app>.espadna.com`) and its landing page
