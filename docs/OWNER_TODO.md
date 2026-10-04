@@ -17,8 +17,8 @@
 
 ## ۲. سرور تنظیمات و ربات تلگرام ✅ (راه‌اندازی شد)
 
-- سرور: `https://pantomime-config.sepanta-hesaban.workers.dev/config.json`
-- حریم خصوصی: `https://pantomime-config.sepanta-hesaban.workers.dev/privacy`
+- سرور: `https://api.espadna.com/config.json` (آدرس قبلی workers.dev هم پشتیبان است)
+- حریم خصوصی: `https://espadna.com/pantomime-app/privacy`
 - ✅ ربات به `/status` جواب می‌دهد.
 - ✅ آدرس‌ها از داخل ایران باز می‌شوند.
 - ✅ آینه‌ی ایرانی: `https://gabia.ir/pantomime-config.php` (در برنامه تنظیم شد).
@@ -30,10 +30,11 @@
 
 ## ۲.۵ نسخه‌ی وب ✅ (منتشر شد)
 
-- انگلیسی: **https://pantomime.sepanta-hesaban.workers.dev/en/** (۸۷۶ کلمه‌ی انگلیسی).
+- بازی آنلاین: **https://pantomime.espadna.com**
+- صفحه‌ی معرفی: **https://espadna.com/pantomime-app/** (انگلیسی: `/en/`)
+- سایت استودیو: **https://espadna.com**
 
-- آدرس: **https://pantomime.sepanta-hesaban.workers.dev** (صفحه‌ی معرفی، و
-  بازی در `/play/`). بدون نصب، و بعد از اولین بار بدون اینترنت.
+- بدون نصب، و بعد از اولین بار بدون اینترنت.
 - [ ] روی آیفون (Safari) و یک گوشی اندروید (Chrome) باز کنید: یک دور بازی تیمی،
       و یک دور «گوشی روی پیشونی» (آیفون یک بار اجازه‌ی «حرکت» می‌خواهد).
 - ✅ پیش‌نمایش لینک در تلگرام درست است.
@@ -43,8 +44,7 @@
 
 ## ۲.۶ دامنه و هاست ایران (برای همه‌ی بازی‌ها و اپ‌ها)
 
-- [ ] **دامنه از Cloudflare** (مثلاً `.com`). اسمش را بگویید تا وصلش کنم. پرداخت
-      در Cloudflare با کارت بین‌المللی است.
+- ✅ دامنه‌ی espadna.com ثبت و وصل شد.
 - [ ] **هاست ایران** با این مشخصات:
       - سرور داخل ایران، لینوکس با cPanel یا DirectAdmin
       - PHP 8 با curl، و **اجازه‌ی اتصال PHP به سایت‌های خارجی** (از پشتیبانی بپرسید)
@@ -109,7 +109,7 @@
 - [ ] فرم‌های حریم خصوصی، رده‌ی سنی و متن معرفی برنامه. جواب‌های پیشنهادی
       در store_notes آماده است.
 - ✅ آدرس سیاست حریم خصوصی:
-      `https://pantomime-config.sepanta-hesaban.workers.dev/privacy`
+      `https://espadna.com/pantomime-app/privacy`
 
 ## ۷. محتوا
 

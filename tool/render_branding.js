@@ -50,9 +50,9 @@ const bigMasks = svg
       <div dir="rtl" style="color:#FFD23F;font-size:96px;font-weight:900;line-height:1.25;text-shadow:0 6px 0 #120A2B">پانتومیم<br>دورهمی</div>
      </div>`,
     1024, 500, 'feature_graphic_1024x500.png', '#1A0F3D');
-  // Web / PWA (web/ and web_site/).
+  // Web / PWA (web/) and the landing pages (site/pantomime-app/).
   const web = path.join(__dirname, '..', 'web');
-  const site = path.join(__dirname, '..', 'web_site');
+  const site = path.join(__dirname, '..', 'site', 'pantomime-app');
   const maskable = svg.replace('<use href="#masks"/>',
     '<g transform="translate(512 512) scale(0.62) translate(-512 -512)"><use href="#masks"/></g>');
   const shotTo = async (body, w, h, file, bg) => {
@@ -66,7 +66,7 @@ const bigMasks = svg
     await shotTo(sized(maskable, n, n), n, n, path.join(web, 'icons', `Icon-maskable-${n}.png`));
   }
   await shotTo(sized(svg, 64, 64), 64, 64, path.join(web, 'favicon.png'));
-  await shotTo(sized(svg, 180, 180), 180, 180, path.join(site, 'apple-touch-icon.png'));
+  await shotTo(sized(svg, 180, 180), 180, 180, path.join(site, 'icon.png'));
   await shotTo(sized(svg, 64, 64), 64, 64, path.join(site, 'favicon.png'));
   // Link preview (Telegram / WhatsApp / X): 1200×630.
   await shotTo(

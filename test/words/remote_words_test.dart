@@ -59,10 +59,12 @@ void main() {
     expect(
       wordPackUrls(
         'fa',
-        primary: 'https://w.example.dev/config.json',
+        primary: 'https://api.example.com/config.json',
+        fallback: 'https://w.example.dev/config.json',
         mirror: 'https://host.ir/pantomime-config.php',
       ),
       [
+        'https://api.example.com/words_fa.json',
         'https://w.example.dev/words_fa.json',
         'https://host.ir/pantomime-config.php?file=words_fa.json',
       ],

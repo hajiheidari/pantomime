@@ -65,7 +65,7 @@ Bazaar/Myket key means you can't update the app there.
 - [ ] Store listing: icon `assets/branding/icon_512.png`, feature graphic
       `assets/branding/feature_graphic_1024x500.png`, 4–8 phone
       screenshots (see below).
-- [ ] App content: privacy policy URL (`https://<worker>/privacy`), ads =
+- [ ] App content: privacy policy URL (`https://espadna.com/pantomime-app/privacy`), ads =
       **Yes**, Data safety (below), content rating questionnaire (below),
       target audience 13+ (avoid the Families policy because of ad SDKs),
       news app = no.

@@ -12,6 +12,13 @@ import 'remote_config.dart';
 /// (set up in M4: Cloudflare Worker + a second mirror reachable from Iran).
 const configPrimaryUrl = String.fromEnvironment(
   'CONFIG_URL',
+  defaultValue: 'https://api.espadna.com/config.json',
+);
+
+/// The same Worker under its original workers.dev address: a second way in
+/// if espadna.com is ever filtered.
+const configFallbackUrl = String.fromEnvironment(
+  'CONFIG_FALLBACK_URL',
   defaultValue:
       'https://pantomime-config.sepanta-hesaban.workers.dev/config.json',
 );
@@ -35,9 +42,11 @@ class RemoteConfigService {
     this.minRefreshInterval = const Duration(hours: 1),
     DateTime Function()? now,
   }) : _client = client ?? http.Client(),
-       _urls = (urls ?? const [configPrimaryUrl, configMirrorUrl])
-           .where((u) => u.isNotEmpty)
-           .toList(),
+       _urls =
+           (urls ??
+                   const [configPrimaryUrl, configFallbackUrl, configMirrorUrl])
+               .where((u) => u.isNotEmpty)
+               .toList(),
        _now = now ?? DateTime.now;
 
   static const _kCache = 'remote_config.cache';
@@ -88,7 +97,8 @@ class RemoteConfigService {
     return current;
   }
 
-  /// Fetches primary, then mirror (each with [timeout]). Applies the result
+  /// Fetches primary, then the fallback, then the mirror (each with
+  /// [timeout]). Applies the result
   /// only if it is valid and not older than the current config.
   /// Returns true when a new config was applied.
   Future<bool> refresh({bool force = false}) async {

@@ -1,8 +1,9 @@
 // Post-processes `flutter build web` into build/site:
-//   build/site/            landing page (web_site/)
-//   build/site/play/       the game, relative base href, offline service worker
-//   build/site/_headers    cache rules for Cloudflare static assets
-//   build/pantomime-web.zip  the same folder for a mirror host (upload + unzip)
+//   build/game/            the game (→ pantomime.espadna.com), relative base
+//                          href, offline service worker, _headers/_redirects
+//   build/espadna/         espadna.com: studio home + /pantomime-app/ landing
+//                          pages (site/)
+//   build/pantomime-web.zip  build/game for a mirror host (upload + unzip)
 import { createHash } from 'node:crypto';
 import { cpSync, existsSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
@@ -10,19 +11,14 @@ import { join, relative } from 'node:path';
 
 const root = new URL('..', import.meta.url).pathname;
 const web = join(root, 'build/web');
-const site = join(root, 'build/site');
-const play = join(site, 'play');
-const siteUrl = (process.env.SITE_URL || 'https://pantomime.sepanta-hesaban.workers.dev').replace(/\/$/, '');
-const configUrl = (() => {
-  try {
-    return JSON.parse(readFileSync(join(root, 'ad_keys.json'), 'utf8')).CONFIG_URL;
-  } catch {
-    return 'https://pantomime-config.sepanta-hesaban.workers.dev/config.json';
-  }
-})();
+const site = join(root, 'build/espadna');
+const play = join(root, 'build/game');
+const gameUrl = (process.env.GAME_URL || 'https://pantomime.espadna.com').replace(/\/$/, '');
+const siteUrl = (process.env.SITE_URL || 'https://espadna.com/pantomime-app').replace(/\/$/, '');
 
 rmSync(site, { recursive: true, force: true });
-cpSync(join(root, 'web_site'), site, { recursive: true });
+rmSync(play, { recursive: true, force: true });
+cpSync(join(root, 'site'), site, { recursive: true });
 cpSync(join(root, 'assets/fonts/Vazirmatn-Bold.ttf'), join(site, 'Vazirmatn-Bold.ttf'));
 cpSync(web, play, { recursive: true });
 
@@ -40,11 +36,12 @@ for (const f of walk(play)) {
 const indexPath = join(play, 'index.html');
 writeFileSync(indexPath, readFileSync(indexPath, 'utf8').replace(/<base href="[^"]*">/, '<base href="./">'));
 
-// Landing page placeholders.
-const landing = join(site, 'index.html');
-writeFileSync(landing, readFileSync(landing, 'utf8')
-  .replaceAll('__SITE_URL__', siteUrl)
-  .replaceAll('__CONFIG_ORIGIN__', new URL(configUrl).origin));
+// Site placeholders.
+for (const f of walk(site).filter((f) => f.endsWith('.html'))) {
+  writeFileSync(f, readFileSync(f, 'utf8')
+    .replaceAll('__SITE_URL__', siteUrl)
+    .replaceAll('__GAME_URL__', gameUrl));
+}
 
 // Service worker: precache the shell, not the big CanvasKit variants.
 const files = walk(play)
@@ -59,29 +56,34 @@ const sw = readFileSync(join(root, 'web/sw.template.js'), 'utf8')
   .replace('__PRECACHE__', JSON.stringify(['./', ...files.filter((f) => f !== 'index.html')], null, 2));
 writeFileSync(join(play, 'sw.js'), sw);
 
-// Cloudflare static-asset headers.
-writeFileSync(join(site, '_headers'), `/*
+// Cloudflare static-asset headers and redirects for the game.
+writeFileSync(join(play, '_headers'), `/*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
-/play/sw.js
+/sw.js
   Cache-Control: no-cache
-/play/index.html
+/index.html
   Cache-Control: no-cache
-/play/main.dart.js
+/main.dart.js
   Cache-Control: no-cache
-/play/flutter_bootstrap.js
+/flutter_bootstrap.js
   Cache-Control: no-cache
-/play/canvaskit/*
+/canvaskit/*
   Cache-Control: public, max-age=604800
-/play/assets/*
+/assets/*
   Cache-Control: public, max-age=3600
+`);
+// Old links (the first web release had the game at /play/ and the landing
+// pages on the same host).
+writeFileSync(join(play, '_redirects'), `/play/* /:splat 301
+/en/ https://espadna.com/pantomime-app/en/ 301
 `);
 
 // Zip for a mirror host.
 const zip = join(root, 'build/pantomime-web.zip');
 rmSync(zip, { force: true });
 if (existsSync('/usr/bin/zip')) {
-  execFileSync('zip', ['-qr', zip, '.', '-x', '_headers'], { cwd: site });
+  execFileSync('zip', ['-qr', zip, '.', '-x', '_headers', '_redirects'], { cwd: play });
 }
-const size = walk(site).reduce((n, f) => n + statSync(f).size, 0);
-console.log(`build/site: ${files.length} precached files, sw ${version}, ${(size / 1e6).toFixed(1)} MB total`);
+const size = walk(play).reduce((n, f) => n + statSync(f).size, 0);
+console.log(`build/game: ${files.length} precached files, sw ${version}, ${(size / 1e6).toFixed(1)} MB; build/espadna: ${walk(site).length} files`);

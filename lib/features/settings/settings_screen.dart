@@ -6,25 +6,15 @@ import '../../core/providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/cartoon.dart';
 import '../../core/store/store_service.dart';
-import '../ads/config/remote_config_service.dart';
 import '../recording/round_recorder.dart';
 import 'settings_controller.dart';
 
-/// Privacy policy page. Served by the config Worker at `/privacy`
-/// (server/src/privacy.js), so it defaults to the CONFIG_URL origin; override
-/// with --dart-define=PRIVACY_URL=….
-String get privacyPolicyUrl {
-  const explicit = String.fromEnvironment('PRIVACY_URL');
-  if (explicit.isNotEmpty) return explicit;
-  final config = Uri.tryParse(configPrimaryUrl);
-  if (config == null || !config.hasScheme) return '';
-  return Uri(
-    scheme: config.scheme,
-    host: config.host,
-    port: config.hasPort ? config.port : null,
-    path: '/privacy',
-  ).toString();
-}
+/// Privacy policy page (espadna.com redirects it to the config Worker's
+/// `/privacy`, server/src/privacy.js). Override with --dart-define=PRIVACY_URL=….
+const privacyPolicyUrl = String.fromEnvironment(
+  'PRIVACY_URL',
+  defaultValue: 'https://espadna.com/pantomime-app/privacy',
+);
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});

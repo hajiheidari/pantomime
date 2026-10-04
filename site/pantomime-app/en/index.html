@@ -11,8 +11,8 @@
   <link rel="alternate" hreflang="fa" href="__SITE_URL__/">
   <link rel="alternate" hreflang="en" href="__SITE_URL__/en/">
   <link rel="alternate" hreflang="x-default" href="__SITE_URL__/en/">
-  <link rel="icon" type="image/png" href="../favicon.png">
-  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/pantomime-app/favicon.png">
+  <link rel="apple-touch-icon" href="/pantomime-app/icon.png">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="en_US">
   <meta property="og:site_name" content="Pantomime Party">
@@ -41,7 +41,7 @@
   }
   </script>
   <style>
-    @font-face { font-family: Vazirmatn; font-weight: 700 900; font-display: swap; src: url(../Vazirmatn-Bold.ttf) format("truetype"); }
+    @font-face { font-family: Vazirmatn; font-weight: 700 900; font-display: swap; src: url(/Vazirmatn-Bold.ttf) format("truetype"); }
     :root {
       --bg: #1A0F3D; --bg2: #2A1B5C; --card: #FFF7E6; --ink: #120A2B;
       --yellow: #FFD23F; --pink: #FF5C9A; --green: #3DDC84; --blue: #3BCEF5; --muted: #C9BFF2;
@@ -90,11 +90,10 @@
 <main>
   <nav class="lang"><a href="../" hreflang="fa" lang="fa">فارسی</a></nav>
   <section class="hero">
-    <img src="../apple-touch-icon.png" alt="Pantomime Party logo" width="132" height="132">
+    <img src="/pantomime-app/icon.png" alt="Pantomime Party logo" width="132" height="132">
     <h1>Pantomime Party</h1>
     <p class="tag">Act it out, laugh out loud! 🎭</p>
-    <a class="play" href="../play/?lang=en">▶️ Play now<small>No install, right here in your browser</small></a>
-    <button id="install" type="button">📲 Install on your phone</button>
+    <a class="play" href="__GAME_URL__/?lang=en">▶️ Play now<small>No install, right here in your browser</small></a>
     <div class="stores" id="stores"><!-- store links, shown when published --></div>
   </section>
 
@@ -132,28 +131,8 @@
   </div>
 
   <footer>
-    <a href="__CONFIG_ORIGIN__/privacy">Privacy</a> · Made with ❤️ for game nights
+    <a href="/pantomime-app/privacy">Privacy</a> · Made with ❤️ for game nights
   </footer>
 </main>
-<script>
-  // Android Chrome: offer a real install button.
-  let deferred;
-  addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferred = e;
-    document.getElementById('install').style.display = 'block';
-  });
-  document.getElementById('install').addEventListener('click', async () => {
-    if (!deferred) return;
-    deferred.prompt();
-    await deferred.userChoice;
-    deferred = null;
-    document.getElementById('install').style.display = 'none';
-  });
-  // Warm the game files while the visitor reads (faster "play").
-  addEventListener('load', () => {
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('../play/sw.js', { scope: '../play/' }).catch(() => {});
-  });
-</script>
 </body>
 </html>

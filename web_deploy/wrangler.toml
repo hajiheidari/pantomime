@@ -1,10 +1,11 @@
-# Static hosting of build/site (landing page + /play/ game) on Cloudflare
-# Workers static assets (free, unlimited asset requests).
+# The web game (build/game) on Cloudflare Workers static assets (free).
 #   tool/build_web.sh --deploy
 name = "pantomime"
 compatibility_date = "2025-09-01"
+# Keep the first address (pantomime.sepanta-hesaban.workers.dev) for old links.
+workers_dev = true
+routes = [{ pattern = "pantomime.espadna.com", custom_domain = true }]
 
 [assets]
-directory = "../build/site"
-html_handling = "auto-trailing-slash"
-not_found_handling = "404-page"
+directory = "../build/game"
+not_found_handling = "single-page-application"

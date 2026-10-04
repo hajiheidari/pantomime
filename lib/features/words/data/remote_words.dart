@@ -10,16 +10,17 @@ import '../domain/word_models.dart';
 import 'word_repository.dart';
 
 /// Where a word pack for [languageCode] can be downloaded: next to the
-/// config on the primary server, and through the mirror
-/// (`pantomime-config.php?file=words_fa.json`).
+/// config on the primary server and its fallback address, and through the
+/// mirror (`pantomime-config.php?file=words_fa.json`).
 List<String> wordPackUrls(
   String languageCode, {
   String primary = configPrimaryUrl,
+  String fallback = configFallbackUrl,
   String mirror = configMirrorUrl,
 }) {
   final file = 'words_$languageCode.json';
   return [
-    for (final base in [primary, mirror])
+    for (final base in [primary, fallback, mirror])
       if (base.isNotEmpty)
         Uri.parse(base).path.endsWith('.php')
             ? Uri.parse(base)

@@ -1,7 +1,14 @@
 # Web / PWA version
 
-Live: **https://pantomime.sepanta-hesaban.workers.dev**
-(landing page at `/`, the game at `/play/`).
+| Address | What | Source | Deploy config |
+|---|---|---|---|
+| https://pantomime.espadna.com | the game (also the old `pantomime.sepanta-hesaban.workers.dev`) | Flutter `web/` build → `build/game` | `web_deploy/` |
+| https://espadna.com | studio home (fa, `/en/`) | `site/` → `build/espadna` | `site_deploy/` |
+| https://espadna.com/pantomime-app/ | landing page fa (`/en/` English), `privacy` → api | `site/pantomime-app/` | `site_deploy/` |
+| https://api.espadna.com | config, word list, privacy, bot | `server/` | `server/wrangler.toml` |
+
+Every web app gets its own subdomain (`<app>.espadna.com`) and its landing page
+in a folder `espadna.com/<app>-app/`.
 
 ## What it is
 
@@ -31,20 +38,21 @@ Live: **https://pantomime.sepanta-hesaban.workers.dev**
 ## Build and deploy
 
 ```bash
-tool/build_web.sh            # → build/site + build/pantomime-web.zip
-tool/build_web.sh --deploy   # + upload to Cloudflare (needs CLOUDFLARE_API_TOKEN)
+tool/build_web.sh            # → build/game, build/espadna, build/pantomime-web.zip
+tool/build_web.sh --deploy   # + upload both to Cloudflare (needs CLOUDFLARE_API_TOKEN)
 ```
 
-`web_deploy/wrangler.toml` serves `build/site` with Cloudflare Workers static
-assets (free, unlimited requests). Cache rules are in the generated
-`build/site/_headers`. Every CI run also uploads `pantomime-web.zip` as an
+Both are Cloudflare Workers static assets (free, unlimited requests) with
+custom domains. Cache rules and old-link redirects for the game are generated
+into `build/game/_headers` and `_redirects`; the site's redirects are in
+`site/_redirects`. Every CI run also uploads `pantomime-web.zip` as an
 artifact.
 
 ## Mirror on an Iranian host
 
 All game paths are relative, so `build/pantomime-web.zip` works inside any
 folder: unzip it into e.g. `public_html/pantomime/` and open
-`https://<host>/pantomime/`. (The service worker needs HTTPS.)
+`https://<host>/pantomime/`. (It contains the game only.) (The service worker needs HTTPS.)
 
 ## Regenerating icons / emoji
 

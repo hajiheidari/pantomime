@@ -4,6 +4,8 @@ name = "pantomime-config"
 main = "src/index.js"
 compatibility_date = "2026-09-01"
 workers_dev = true
+# Main address; the workers.dev one stays as the apps' fallback (and the bot webhook).
+routes = [{ pattern = "api.espadna.com", custom_domain = true }]
 
 # Create with: npx wrangler kv namespace create CONFIG
 # then paste the printed id here.
