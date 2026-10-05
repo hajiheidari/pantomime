@@ -21,8 +21,11 @@ const walk = (dir) => readdirSync(dir).flatMap((f) => {
 });
 
 // Not needed at runtime: debug symbols, Flutter's deprecated worker, template.
+// Also the skwasm/wimp renderers: this is a dart2js + CanvasKit build only
+// (see buildConfig in flutter_bootstrap.js), they are never loaded.
 for (const f of walk(play)) {
-  if (f.endsWith('.symbols') || /flutter_service_worker\.js$|sw\.template\.js$/.test(f)) rmSync(f);
+  if (f.endsWith('.symbols') || /flutter_service_worker\.js$|sw\.template\.js$|\.last_build_id$/.test(f)
+      || /canvaskit\/(skwasm|wimp)/.test(f.split('\\').join('/'))) rmSync(f);
 }
 
 // Relative base href: works at /play/ and at /<any>/play/ on a mirror.
@@ -65,6 +68,18 @@ writeFileSync(join(play, '_headers'), `/*
 writeFileSync(join(play, '_redirects'), `/play/* /:splat 301
 /en/ https://espadna.com/pantomime-app/en/ 301
 `);
+
+// files.json: what the Iranian mirror (espadna-site/mirror-ir/sync.php)
+// copies. Every file with its sha256; written last so it lists everything.
+const manifestFiles = walk(play)
+  .map((f) => relative(play, f).split('\\').join('/'))
+  .filter((f) => !['files.json', '_headers', '_redirects'].includes(f))
+  .sort()
+  .map((f) => {
+    const data = readFileSync(join(play, f));
+    return { path: f, size: data.length, sha256: createHash('sha256').update(data).digest('hex') };
+  });
+writeFileSync(join(play, 'files.json'), JSON.stringify({ version, files: manifestFiles }));
 
 // Zip for a mirror host.
 const zip = join(root, 'build/pantomime-web.zip');
