@@ -95,9 +95,30 @@
       (پیش‌فرض هر ۳ نوبت)، تبلیغ جایزه‌دار روی دسته‌های 🎁. بررسی کنید که
       **هیچ تبلیغی وسط نوبت نمی‌آید.**
 - [ ] دکمه‌ی «امتیاز به بازی» در هر فروشگاه درست باز شود.
-- [ ] **iOS:** این پروژه هرگز روی مک ساخته نشده است. روی یک مک با Xcode
-      این‌ها را اجرا کنید: `cd ios && pod install`، بعد `flutter run`، بعد
-      `tool/release.sh ios`. اگر خطایی دیدید، متنش را بفرستید.
+- [ ] **iOS بدون مک (TestFlight):** بعد از مراحل بخش ۶.۵، در گیت‌هاب
+      **Actions ← iOS (TestFlight) ← Run workflow**. حدود ۲۰ دقیقه بعد نسخه در
+      App Store Connect و برنامه‌ی TestFlight روی آیفون می‌آید. اگر خطا داد، خبر بدهید.
+
+## ۶.۵ اپل (App Store) — حساب توسعه‌دهنده ✅ تأیید شد
+
+- [ ] **Bundle ID:** developer.apple.com ← Certificates, Identifiers & Profiles ←
+      Identifiers ← ➕ ← App IDs ← App. Description: `Pantomime`، Bundle ID از نوع
+      Explicit: `com.espadna.pantomime`. هیچ Capability لازم نیست.
+- [ ] **ساخت اپ:** appstoreconnect.apple.com ← Apps ← ➕ ← New App. Platform: iOS،
+      Name: مثلاً `Pantomime - Charades Party` (باید یکتا باشد)، Primary Language:
+      English (U.S.)، Bundle ID: همان بالا، SKU: `pantomime`.
+      (App Store زبان فارسی برای صفحه‌ی فروشگاه ندارد؛ خود برنامه فارسی است.)
+- [ ] **کلید API:** App Store Connect ← Users and Access ← Integrations ←
+      App Store Connect API ← Team Keys ← ➕. نام `GitHub`، دسترسی **Admin**.
+      فایل `.p8` فقط یک بار دانلود می‌شود؛ نگهش دارید.
+- [ ] **Secrets در گیت‌هاب** (مخزن pantomime ← Settings ← Secrets and variables ←
+      Actions). این‌ها را در چت نفرستید:
+      - `ASC_ISSUER_ID`: همان Issuer ID بالای صفحه‌ی کلیدها
+      - `ASC_KEY_ID`: Key ID کلید ساخته‌شده
+      - `ASC_PRIVATE_KEY`: کل متن فایل `.p8` (با خط‌های BEGIN و END)
+      - `APPLE_TEAM_ID`: از developer.apple.com ← Membership details
+- [ ] (اختیاری) در همان صفحه، زبانه‌ی **Variables**: `IOS_APP_ID` = شماره‌ی
+      Apple ID اپ (App Store Connect ← App Information) برای دکمه‌ی «امتیاز به بازی».
 
 ## ۶. فروشگاه‌ها
 

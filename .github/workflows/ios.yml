@@ -1,0 +1,121 @@
+# Builds the iOS app on a GitHub Mac and sends it to TestFlight.
+# Run by hand: Actions → "iOS (TestFlight)" → Run workflow.
+#
+# Repository secrets (Settings → Secrets and variables → Actions):
+#   ASC_ISSUER_ID, ASC_KEY_ID  App Store Connect API key (Admin role)
+#   ASC_PRIVATE_KEY            the whole AuthKey_….p8 file, BEGIN/END lines included
+#   APPLE_TEAM_ID              10-character Team ID (developer.apple.com → Membership)
+#   ADMOB_IOS_APP_ID           optional; Google's test id is used without it
+# Repository variable (same page, "Variables" tab):
+#   IOS_APP_ID                 optional; the app's number in App Store Connect,
+#                              for the "rate the game" button
+#
+# Signing is automatic: Xcode creates the certificate and profile in the
+# cloud through the API key, so nothing secret lives on the Mac.
+name: iOS (TestFlight)
+
+on: workflow_dispatch
+
+concurrency:
+  group: ios-testflight
+  cancel-in-progress: false
+
+jobs:
+  testflight:
+    runs-on: macos-latest
+    timeout-minutes: 60
+    env:
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+    steps:
+      - name: Check the secrets
+        env:
+          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+        run: |
+          missing=()
+          for name in ASC_ISSUER_ID ASC_KEY_ID ASC_PRIVATE_KEY APPLE_TEAM_ID; do
+            [[ -n "${!name}" ]] || missing+=("$name")
+          done
+          if (( ${#missing[@]} )); then
+            echo "::error::Missing repository secrets: ${missing[*]}"
+            exit 1
+          fi
+          mkdir -p ~/.appstoreconnect/private_keys
+          printf '%s\n' "$ASC_PRIVATE_KEY" > ~/.appstoreconnect/private_keys/AuthKey_"$ASC_KEY_ID".p8
+          chmod 600 ~/.appstoreconnect/private_keys/AuthKey_"$ASC_KEY_ID".p8
+
+      - name: Use the newest Xcode
+        run: |
+          xcode=$(ls -d /Applications/Xcode_*.app | grep -v -i beta | sort -V | tail -1)
+          sudo xcode-select -s "$xcode"
+          xcodebuild -version
+
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.5
+          channel: stable
+          cache: true
+
+      # Same profile as tool/release.sh ios: AdMob only.
+      - run: dart run tool/store.dart ios && flutter pub upgrade google_mobile_ads
+
+      - name: AdMob app id
+        env:
+          ADMOB_IOS_APP_ID: ${{ secrets.ADMOB_IOS_APP_ID }}
+        run: |
+          if [[ -n "$ADMOB_IOS_APP_ID" ]]; then
+            printf 'ADMOB_APP_ID=%s\n' "$ADMOB_IOS_APP_ID" > ios/Flutter/AdKeys.xcconfig
+          fi
+
+      - name: Build
+        run: >
+          flutter build ios --release --no-codesign
+          --obfuscate --split-debug-info=build/symbols/ios
+          --build-number=${{ github.run_number }}
+          --dart-define=IOS_APP_ID=${{ vars.IOS_APP_ID }}
+
+      - name: Archive
+        run: >
+          xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner
+          -configuration Release -destination generic/platform=iOS
+          -archivePath build/ios/Runner.xcarchive
+          archive CODE_SIGNING_ALLOWED=NO
+
+      - name: Sign and upload to App Store Connect
+        run: |
+          cat > build/ios/ExportOptions.plist <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>teamID</key><string>${APPLE_TEAM_ID}</string>
+            <key>uploadSymbols</key><true/>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict>
+          </plist>
+          PLIST
+          xcodebuild -exportArchive \
+            -archivePath build/ios/Runner.xcarchive \
+            -exportOptionsPlist build/ios/ExportOptions.plist \
+            -exportPath build/ios/export \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath ~/.appstoreconnect/private_keys/AuthKey_"$ASC_KEY_ID".p8 \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+
+      # Needed to read crash reports of the obfuscated build.
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: ios-symbols-${{ github.run_number }}
+          path: build/symbols/ios
+          retention-days: 90
+
+      - name: Remove the API key
+        if: always()
+        run: rm -rf ~/.appstoreconnect
