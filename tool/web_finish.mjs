@@ -79,7 +79,9 @@ const manifestFiles = walk(play)
     const data = readFileSync(join(play, f));
     return { path: f, size: data.length, sha256: createHash('sha256').update(data).digest('hex') };
   });
-writeFileSync(join(play, 'files.json'), JSON.stringify({ version, files: manifestFiles }));
+// Cloudflare does not serve _redirects as a file, so its text goes inline.
+const redirects = readFileSync(join(play, '_redirects'), 'utf8');
+writeFileSync(join(play, 'files.json'), JSON.stringify({ version, files: manifestFiles, redirects }));
 
 // Zip for a mirror host.
 const zip = join(root, 'build/pantomime-web.zip');
