@@ -3,6 +3,7 @@
 #   tool/release.sh play     → AAB  (Google Play)
 #   tool/release.sh bazaar   → APK  (Cafe Bazaar)
 #   tool/release.sh myket    → APK  (Myket)
+#   tool/release.sh bazaar --split-per-abi → one smaller APK per CPU type
 #   tool/release.sh ios      → IPA  (App Store; macOS + Xcode only)
 #
 # Selects the store's ad-SDK profile (tool/store.dart), builds the matching
@@ -12,6 +13,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 store="${1:-}"
+extra=("${@:2}") # e.g. --split-per-abi
 case "$store" in
   play | bazaar | myket | ios) ;;
   *) echo "usage: tool/release.sh <play|bazaar|myket|ios>" >&2; exit 64 ;;
@@ -48,7 +50,7 @@ case "$store" in
     echo "→ build/app/outputs/bundle/playRelease/app-play-release.aab"
     ;;
   bazaar | myket)
-    flutter build apk --flavor "$store" "${common[@]}"
+    flutter build apk --flavor "$store" "${common[@]}" "${extra[@]}"
     echo "→ build/app/outputs/flutter-apk/app-$store-release.apk"
     ;;
   ios)
