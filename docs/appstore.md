@@ -76,8 +76,10 @@ screenshots are needed.
 ## Pricing and availability
 
 - Price: **Free**. Availability: all countries (the App Store does not operate in Iran).
-- EU Digital Services Act: declare trader status (Business → Trader), or the app
-  is not shown in the EU.
+- EU Digital Services Act: answer the question, or the app is not shown in the
+  EU. For now **Not a trader** (the iOS build shows no ads yet). **When iOS ads
+  are turned on, switch to Trader** (App Information → Digital Services Act) and
+  give a work e-mail and phone number; they are shown on the EU product page.
 
 ## Agreements
 
