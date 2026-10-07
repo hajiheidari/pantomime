@@ -23,7 +23,14 @@ const configFallbackUrl = String.fromEnvironment(
       'https://pantomime-config.sepanta-hesaban.workers.dev/config.json',
 );
 
-/// Mirror on an Iranian host (server/mirror/pantomime-config.php).
+/// Copy on the Iranian host espadna.ir (espadna-site/mirror-ir/sync.php):
+/// fast from Iran, and still reachable on Iran's national internet.
+const configIranUrl = String.fromEnvironment(
+  'CONFIG_IRAN_URL',
+  defaultValue: 'https://espadna.ir/api/config.json',
+);
+
+/// Older mirror on another Iranian host (server/mirror/pantomime-config.php).
 const configMirrorUrl = String.fromEnvironment(
   'CONFIG_MIRROR_URL',
   defaultValue: 'https://gabia.ir/pantomime-config.php',
@@ -44,7 +51,12 @@ class RemoteConfigService {
   }) : _client = client ?? http.Client(),
        _urls =
            (urls ??
-                   const [configPrimaryUrl, configFallbackUrl, configMirrorUrl])
+                   const [
+                     configPrimaryUrl,
+                     configIranUrl,
+                     configFallbackUrl,
+                     configMirrorUrl,
+                   ])
                .where((u) => u.isNotEmpty)
                .toList(),
        _now = now ?? DateTime.now;
