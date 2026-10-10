@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/providers.dart';
 import 'core/theme/app_theme.dart';
+import 'core/widgets/tablet_scale.dart';
 import 'features/home/splash_screen.dart';
 
 class PantomimeApp extends ConsumerWidget {
@@ -23,6 +24,7 @@ class PantomimeApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
+      builder: (context, child) => TabletScale(child: child!),
       home: const SplashScreen(),
     );
   }

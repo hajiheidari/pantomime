@@ -56,9 +56,11 @@ MORE FUN
 **Support URL:** `https://espadna.com/pantomime-app/`
 **Marketing URL:** `https://espadna.com/pantomime-app/`
 
-**Screenshots:** iPhone 6.9" display, from `store/appstore/en/` (1290×2796;
-`05_forehead.png` is landscape). The app is iPhone-only, so no iPad
-screenshots are needed.
+**Screenshots:**
+- iPhone 6.9" display: `store/appstore/en/` (1290×2796; `05_forehead.png` is landscape).
+- iPad 13" display: `store/appstore/ipad-en/` (2048×2732; `05_forehead.png` is landscape).
+  The app runs natively on iPad (full screen; the UI is scaled up 1.2–1.4× on tablets,
+  `lib/core/widgets/tablet_scale.dart`).
 
 **App Review Information:** no sign-in required. Notes:
 `No account needed. Tap "Team game" or "Forehead mode", then "Let's go!". Forehead mode uses the motion sensor; on the simulator use "Start with buttons".`
