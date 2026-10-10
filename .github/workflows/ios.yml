@@ -48,12 +48,10 @@ jobs:
           fi
           mkdir -p ~/.appstoreconnect/private_keys
           key_file=~/.appstoreconnect/private_keys/AuthKey_"$ASC_KEY_ID".p8
-          if grep -q -- '-----BEGIN' <<<"$ASC_PRIVATE_KEY"; then
-            printf '%s\n' "$ASC_PRIVATE_KEY" > "$key_file"
-          else
-            printf -- '-----BEGIN PRIVATE KEY-----\n%s\n-----END PRIVATE KEY-----\n' \
-              "$(tr -d ' \n\r' <<<"$ASC_PRIVATE_KEY")" > "$key_file"
-          fi
+          # Standard PEM (64-character lines) whatever form the secret has:
+          # Xcode's parser rejects anything else.
+          body=$(sed '/-----/d' <<<"$ASC_PRIVATE_KEY" | tr -d ' \n\r\t')
+          { echo '-----BEGIN PRIVATE KEY-----'; fold -w 64 <<<"$body"; echo '-----END PRIVATE KEY-----'; } > "$key_file"
           chmod 600 "$key_file"
 
       - name: Use the newest Xcode
