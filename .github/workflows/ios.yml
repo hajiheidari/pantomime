@@ -8,8 +8,9 @@
 #   ADMOB_IOS_APP_ID           optional; Google's test id is used without it
 # Team ID and the App Store app id are not secret and are set below.
 #
-# Signing is automatic: Xcode creates the certificate and profile in the
-# cloud through the API key, so nothing secret lives on the Mac.
+# Signing: each run creates a temporary Apple Distribution certificate and
+# App Store profile through the API key (tool/ios_signing.mjs) and revokes
+# them at the end, so no certificate has to be stored anywhere.
 name: iOS (TestFlight)
 
 on:
@@ -79,6 +80,51 @@ jobs:
             printf 'ADMOB_APP_ID=%s\n' "$ADMOB_IOS_APP_ID" > ios/Flutter/AdKeys.xcconfig
           fi
 
+      # A fresh Apple Distribution certificate + App Store profile for this
+      # run only (tool/ios_signing.mjs); revoked again in the last step.
+      - name: Temporary signing certificate and profile
+        env:
+          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+        run: |
+          W="$RUNNER_TEMP/sign"; mkdir -p "$W"
+          /usr/bin/openssl genrsa -out "$W/key.pem" 2048 2>/dev/null
+          /usr/bin/openssl req -new -key "$W/key.pem" -subj "/CN=Pantomime CI/O=Espadna/C=US" -out "$W/req.csr"
+          node tool/ios_signing.mjs prepare "$W/req.csr" "$W" > "$W/out.json"
+          cert_id=$(jq -r .certId "$W/out.json"); profile_id=$(jq -r .profileId "$W/out.json")
+          profile_name=$(jq -r .profileName "$W/out.json"); profile_uuid=$(jq -r .profileUuid "$W/out.json")
+          echo "CERT_ID=$cert_id" >> "$GITHUB_ENV"
+          echo "PROFILE_ID=$profile_id" >> "$GITHUB_ENV"
+          echo "PROFILE_NAME=$profile_name" >> "$GITHUB_ENV"
+
+          /usr/bin/openssl x509 -inform DER -in "$W/cert.cer" -out "$W/cert.pem"
+          p12_pass=$(/usr/bin/openssl rand -hex 16)
+          /usr/bin/openssl pkcs12 -export -inkey "$W/key.pem" -in "$W/cert.pem" \
+            -out "$W/cert.p12" -passout "pass:$p12_pass"
+          kc="$RUNNER_TEMP/signing.keychain-db"; kc_pass=$(/usr/bin/openssl rand -hex 16)
+          echo "KEYCHAIN=$kc" >> "$GITHUB_ENV"
+          security create-keychain -p "$kc_pass" "$kc"
+          security set-keychain-settings -lut 3600 "$kc"
+          security unlock-keychain -p "$kc_pass" "$kc"
+          security list-keychains -d user -s "$kc" $(security list-keychains -d user | tr -d '"')
+          security import "$W/cert.p12" -k "$kc" -P "$p12_pass" -T /usr/bin/codesign -T /usr/bin/security
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$kc_pass" "$kc" >/dev/null
+          security find-identity -v -p codesigning "$kc"
+
+          for d in "$HOME/Library/MobileDevice/Provisioning Profiles" \
+                   "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"; do
+            mkdir -p "$d"; cp "$W/profile.mobileprovision" "$d/$profile_uuid.mobileprovision"
+          done
+          rm -f "$W/key.pem" "$W/cert.p12"
+
+          # Runner target only (Release.xcconfig includes AdKeys.xcconfig).
+          cat >> ios/Flutter/AdKeys.xcconfig <<XC
+          CODE_SIGN_STYLE=Manual
+          DEVELOPMENT_TEAM=$APPLE_TEAM_ID
+          CODE_SIGN_IDENTITY=Apple Distribution
+          CODE_SIGN_IDENTITY[sdk=iphoneos*]=Apple Distribution
+          PROVISIONING_PROFILE_SPECIFIER=$profile_name
+          XC
+
       - name: Build
         run: >
           flutter build ios --release --no-codesign
@@ -87,14 +133,16 @@ jobs:
           --dart-define=IOS_APP_ID=$IOS_APP_ID
 
       - name: Archive
-        run: >
-          xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner
-          -configuration Release -destination generic/platform=iOS
-          -archivePath build/ios/Runner.xcarchive
-          archive CODE_SIGNING_ALLOWED=NO
-
-      - name: Sign and upload to App Store Connect
         run: |
+          set -o pipefail
+          xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner \
+            -configuration Release -destination generic/platform=iOS \
+            -archivePath build/ios/Runner.xcarchive archive 2>&1 | tee "$RUNNER_TEMP/archive.log" \
+            || { grep -E "error:|Error:|failed" "$RUNNER_TEMP/archive.log" | tail -15 | sed 's/^/::error::/'; exit 1; }
+
+      - name: Upload to App Store Connect
+        run: |
+          set -o pipefail
           cat > build/ios/ExportOptions.plist <<PLIST
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -102,8 +150,13 @@ jobs:
           <dict>
             <key>method</key><string>app-store-connect</string>
             <key>destination</key><string>upload</string>
-            <key>signingStyle</key><string>automatic</string>
+            <key>signingStyle</key><string>manual</string>
             <key>teamID</key><string>${APPLE_TEAM_ID}</string>
+            <key>signingCertificate</key><string>Apple Distribution</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>com.espadna.pantomime</key><string>${PROFILE_NAME}</string>
+            </dict>
             <key>uploadSymbols</key><true/>
             <key>manageAppVersionAndBuildNumber</key><false/>
           </dict>
@@ -113,10 +166,10 @@ jobs:
             -archivePath build/ios/Runner.xcarchive \
             -exportOptionsPlist build/ios/ExportOptions.plist \
             -exportPath build/ios/export \
-            -allowProvisioningUpdates \
             -authenticationKeyPath ~/.appstoreconnect/private_keys/AuthKey_"$ASC_KEY_ID".p8 \
             -authenticationKeyID "$ASC_KEY_ID" \
-            -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" 2>&1 | tee "$RUNNER_TEMP/export.log" \
+            || { grep -E "error|Error|failed" "$RUNNER_TEMP/export.log" | tail -15 | sed 's/^/::error::/'; exit 1; }
 
       # Needed to read crash reports of the obfuscated build.
       - uses: actions/upload-artifact@v4
@@ -126,6 +179,11 @@ jobs:
           path: build/symbols/ios
           retention-days: 90
 
-      - name: Remove the API key
+      - name: Revoke the temporary certificate, remove keys
         if: always()
-        run: rm -rf ~/.appstoreconnect
+        env:
+          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+        run: |
+          if [[ -n "${CERT_ID:-}" ]]; then node tool/ios_signing.mjs cleanup "$CERT_ID" "${PROFILE_ID:-}"; fi
+          if [[ -n "${KEYCHAIN:-}" ]]; then security delete-keychain "$KEYCHAIN" || true; fi
+          rm -rf ~/.appstoreconnect "$RUNNER_TEMP/sign"
