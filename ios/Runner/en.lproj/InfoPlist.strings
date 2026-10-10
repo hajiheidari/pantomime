@@ -3,3 +3,4 @@
 "NSCameraUsageDescription" = "If you turn recording on, the front camera films your friends acting in forehead mode. Videos stay on your phone.";
 "NSMicrophoneUsageDescription" = "To record the laughs with the game video. Videos stay on your phone.";
 "NSPhotoLibraryAddUsageDescription" = "To save the game video to your Photos, only when you ask.";
+"NSPhotoLibraryUsageDescription" = "To save the game video to your Photos, only when you ask. The game never reads your photos.";

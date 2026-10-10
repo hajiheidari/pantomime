@@ -12,6 +12,8 @@
 		<string>If you turn recording on, the front camera films your friends acting in forehead mode. Videos stay on your phone.</string>
 		<key>NSMicrophoneUsageDescription</key>
 		<string>To record the laughs with the game video. Videos stay on your phone.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>To save the game video to your Photos, only when you ask. The game never reads your photos.</string>
 		<key>NSPhotoLibraryAddUsageDescription</key>
 		<string>To save the game video to your Photos, only when you ask.</string>
 		<key>GADApplicationIdentifier</key>
