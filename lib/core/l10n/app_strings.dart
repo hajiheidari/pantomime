@@ -94,6 +94,7 @@ abstract class AppStrings {
   String get saveVideo;
   String get videoSaved;
   String get videoSaveFailed;
+  String get preparingVideo;
   String get shareVideo;
   String get shareCard;
   String get shareResult;
@@ -304,6 +305,8 @@ class FaStrings extends AppStrings {
   String get videoSaved => 'ویدیو در گالری ذخیره شد ✅';
   @override
   String get videoSaveFailed => 'ذخیره نشد؛ اجازه دسترسی به گالری را بررسی کن.';
+  @override
+  String get preparingVideo => 'در حال آماده‌سازی ویدیو…';
   @override
   String get shareVideo => 'ارسال ویدیو';
   @override
@@ -560,6 +563,8 @@ class EnStrings extends AppStrings {
   String get videoSaved => 'Video saved to gallery ✅';
   @override
   String get videoSaveFailed => 'Could not save; check gallery permission.';
+  @override
+  String get preparingVideo => 'Preparing the video…';
   @override
   String get shareVideo => 'Share video';
   @override
@@ -821,6 +826,8 @@ class ArStrings extends AppStrings {
   String get videoSaved => 'حُفظ الفيديو في المعرض ✅';
   @override
   String get videoSaveFailed => 'تعذّر الحفظ؛ تحقق من إذن المعرض.';
+  @override
+  String get preparingVideo => 'جارٍ تجهيز الفيديو…';
   @override
   String get shareVideo => 'مشاركة الفيديو';
   @override

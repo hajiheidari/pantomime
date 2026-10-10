@@ -4,6 +4,7 @@ import '../../core/l10n/app_strings.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/cartoon.dart';
 import '../game/domain/game_state.dart';
+import 'share_link.dart';
 
 /// Frame shared by every share card: app name + call to action, so every
 /// shared image advertises the game.
@@ -59,6 +60,17 @@ class _CardFrame extends StatelessWidget {
             fontSize: 13,
             fontWeight: FontWeight.w700,
             color: AppColors.textMuted,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          shareLinkLabel(s.languageCode),
+          textDirection: TextDirection.ltr,
+          style: const TextStyle(
+            fontFamily: appFontFamily,
+            fontSize: 14,
+            fontWeight: FontWeight.w900,
+            color: AppColors.yellow,
           ),
         ),
       ],

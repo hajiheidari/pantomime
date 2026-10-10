@@ -17,6 +17,7 @@ class CartoonButton extends StatefulWidget {
     this.height = 72,
     this.fontSize = 24,
     this.expand = true,
+    this.stacked = false,
   });
 
   final String label;
@@ -29,9 +30,15 @@ class CartoonButton extends StatefulWidget {
   final double fontSize;
   final bool expand;
 
+  /// Icon above the label (for narrow buttons side by side).
+  final bool stacked;
+
   @override
   State<CartoonButton> createState() => _CartoonButtonState();
 }
+
+Widget _maybeFit(bool fit, Widget child) =>
+    fit ? FittedBox(fit: BoxFit.scaleDown, child: child) : child;
 
 class _CartoonButtonState extends State<CartoonButton> {
   static const _depth = 6.0;
@@ -49,7 +56,7 @@ class _CartoonButtonState extends State<CartoonButton> {
     final offset = _down ? _depth - 2 : 0.0;
     // Tall buttons (e.g. play screen) stack the icon above the label so
     // short Persian words never get truncated in narrow buttons.
-    final iconOnTop = widget.height >= 110;
+    final iconOnTop = widget.stacked || widget.height >= 110;
     final content = Flex(
       direction: iconOnTop ? Axis.vertical : Axis.horizontal,
       mainAxisSize: widget.expand && !iconOnTop
@@ -65,16 +72,20 @@ class _CartoonButtonState extends State<CartoonButton> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                widget.label,
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: widget.fontSize,
-                  fontWeight: FontWeight.w900,
-                  color: widget.textColor,
-                  height: 1.2,
+              // Stacked labels shrink to fit rather than lose letters.
+              _maybeFit(
+                iconOnTop,
+                Text(
+                  widget.label,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: iconOnTop ? null : TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: widget.fontSize,
+                    fontWeight: FontWeight.w900,
+                    color: widget.textColor,
+                    height: 1.2,
+                  ),
                 ),
               ),
               if (widget.subtitle != null)

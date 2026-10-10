@@ -10,8 +10,10 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/cartoon.dart';
 import '../../ads/ads_providers.dart';
 import '../../recording/round_recorder.dart';
+import '../../recording/watermark.dart';
 import '../../settings/settings_controller.dart';
 import '../../share/share_cards.dart';
+import '../../share/share_link.dart';
 import '../../share/share_sheet.dart';
 import '../application/game_controller.dart';
 import '../application/motion.dart';
@@ -627,13 +629,27 @@ class _TurnShareRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final clip = ref.watch(roundClipsProvider)[session.game.turns.length - 1];
+    final landscape = isLandscape(context);
+    // Watermark the clip while the players look at the summary.
+    if (clip != null) watermarkedClip(clip, s: s, score: turn.score);
+    Future<String> marked(String clip) {
+      if (!watermarkReady(clip, turn.score)) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(s.preparingVideo)));
+      }
+      return watermarkedClip(clip, s: s, score: turn.score);
+    }
+
     Widget small(String label, String icon, Color color, VoidCallback onTap) =>
         Expanded(
+          // Three side by side (with a clip): icon above the label so the
+          // words fit; compact in landscape so «Continue» stays on screen.
           child: CartoonButton(
             label: label,
             icon: icon,
-            height: 52,
-            fontSize: 15,
+            height: clip == null ? 52 : (landscape ? 56 : 68),
+            fontSize: clip == null ? 15 : 13,
+            stacked: clip != null,
             color: color,
             onPressed: onTap,
           ),
@@ -644,7 +660,7 @@ class _TurnShareRow extends ConsumerWidget {
           showShareCardSheet(
             context,
             s: s,
-            caption: s.shareCaption(turn.score),
+            caption: withShareLink(s.shareCaption(turn.score), s.languageCode),
             card: RoundShareCard(
               s: s,
               name: session.config.teamNames[turn.teamIndex],
@@ -656,7 +672,7 @@ class _TurnShareRow extends ConsumerWidget {
         if (clip != null) ...[
           const SizedBox(width: 8),
           small(s.saveVideo, '💾', AppColors.card, () async {
-            final ok = await saveVideoToGallery(clip);
+            final ok = await saveVideoToGallery(await marked(clip));
             if (!context.mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(ok ? s.videoSaved : s.videoSaveFailed)),
@@ -667,7 +683,10 @@ class _TurnShareRow extends ConsumerWidget {
             s.shareVideo,
             '🎬',
             AppColors.pink,
-            () => shareVideo(clip, s.shareCaption(turn.score)),
+            () async => shareVideo(
+              await marked(clip),
+              withShareLink(s.shareCaption(turn.score), s.languageCode),
+            ),
           ),
         ],
       ],
@@ -939,7 +958,7 @@ class _FinishedView extends ConsumerWidget {
           onPressed: () => showShareCardSheet(
             context,
             s: s,
-            caption: s.shareResultCaption,
+            caption: withShareLink(s.shareResultCaption, s.languageCode),
             card: ResultShareCard(s: s, game: game),
           ),
         ),

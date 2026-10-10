@@ -10,6 +10,8 @@ import io.flutter.plugin.common.MethodChannel
 class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "pantomime/watermark")
+            .setMethodCallHandler(Watermark(applicationContext))
         // Store deep links (rate / update). Cafe Bazaar's rating page needs
         // ACTION_EDIT, which url_launcher cannot send.
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "pantomime/store")

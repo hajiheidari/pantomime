@@ -80,27 +80,50 @@ class _ShareCardSheetState extends State<_ShareCardSheet> {
   }
 
   @override
-  Widget build(BuildContext context) => SafeArea(
-    child: SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: RepaintBoundary(key: _key, child: widget.card),
+  Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final card = RepaintBoundary(key: _key, child: widget.card);
+    final button = CartoonButton(
+      label: widget.s.share,
+      icon: '📤',
+      color: AppColors.green,
+      onPressed: _busy ? null : _share,
+    );
+    // Landscape (forehead mode): card and button side by side, everything
+    // on screen without scrolling.
+    if (size.width > size.height) {
+      return SafeArea(
+        child: SizedBox(
+          height: size.height * 0.88,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: FittedBox(fit: BoxFit.contain, child: card),
+                ),
+                const SizedBox(width: 20),
+                SizedBox(width: 240, child: Center(child: button)),
+              ],
+            ),
           ),
-          const SizedBox(height: 18),
-          CartoonButton(
-            label: widget.s.share,
-            icon: '📤',
-            color: AppColors.green,
-            onPressed: _busy ? null : _share,
-          ),
-        ],
+        ),
+      );
+    }
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FittedBox(fit: BoxFit.scaleDown, child: card),
+            const SizedBox(height: 18),
+            button,
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 /// Saves a recorded clip to the gallery. Returns true on success.
