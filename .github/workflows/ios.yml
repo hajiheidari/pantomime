@@ -4,12 +4,10 @@
 #
 # Repository secrets (Settings → Secrets and variables → Actions):
 #   ASC_ISSUER_ID, ASC_KEY_ID  App Store Connect API key (Admin role)
-#   ASC_PRIVATE_KEY            the whole AuthKey_….p8 file, BEGIN/END lines included
-#   APPLE_TEAM_ID              10-character Team ID (developer.apple.com → Membership)
+#   ASC_PRIVATE_KEY            the AuthKey_….p8 file: whole file, or only the
+#                              base64 line between BEGIN and END
 #   ADMOB_IOS_APP_ID           optional; Google's test id is used without it
-# Repository variable (same page, "Variables" tab):
-#   IOS_APP_ID                 optional; the app's number in App Store Connect,
-#                              for the "rate the game" button
+# Team ID and the App Store app id are not secret and are set below.
 #
 # Signing is automatic: Xcode creates the certificate and profile in the
 # cloud through the API key, so nothing secret lives on the Mac.
@@ -31,14 +29,15 @@ jobs:
     env:
       ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
       ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      APPLE_TEAM_ID: RGR5G6VN69
+      IOS_APP_ID: '6821363120' # App Store Connect → App Information → Apple ID
     steps:
       - name: Check the secrets
         env:
           ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
         run: |
           missing=()
-          for name in ASC_ISSUER_ID ASC_KEY_ID ASC_PRIVATE_KEY APPLE_TEAM_ID; do
+          for name in ASC_ISSUER_ID ASC_KEY_ID ASC_PRIVATE_KEY; do
             [[ -n "${!name}" ]] || missing+=("$name")
           done
           if (( ${#missing[@]} )); then
@@ -46,8 +45,14 @@ jobs:
             exit 1
           fi
           mkdir -p ~/.appstoreconnect/private_keys
-          printf '%s\n' "$ASC_PRIVATE_KEY" > ~/.appstoreconnect/private_keys/AuthKey_"$ASC_KEY_ID".p8
-          chmod 600 ~/.appstoreconnect/private_keys/AuthKey_"$ASC_KEY_ID".p8
+          key_file=~/.appstoreconnect/private_keys/AuthKey_"$ASC_KEY_ID".p8
+          if grep -q -- '-----BEGIN' <<<"$ASC_PRIVATE_KEY"; then
+            printf '%s\n' "$ASC_PRIVATE_KEY" > "$key_file"
+          else
+            printf -- '-----BEGIN PRIVATE KEY-----\n%s\n-----END PRIVATE KEY-----\n' \
+              "$(tr -d ' \n\r' <<<"$ASC_PRIVATE_KEY")" > "$key_file"
+          fi
+          chmod 600 "$key_file"
 
       - name: Use the newest Xcode
         run: |
@@ -78,7 +83,7 @@ jobs:
           flutter build ios --release --no-codesign
           --obfuscate --split-debug-info=build/symbols/ios
           --build-number=${{ github.run_number }}
-          --dart-define=IOS_APP_ID=${{ vars.IOS_APP_ID }}
+          --dart-define=IOS_APP_ID=$IOS_APP_ID
 
       - name: Archive
         run: >
