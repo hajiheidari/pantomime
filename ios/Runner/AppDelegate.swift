@@ -94,7 +94,7 @@ enum Watermark {
     video.frameDuration = CMTime(value: 1, timescale: 30)
     video.instructions = [instruction]
 
-    // Watermark: ~45% of the width, bottom-right (Core Animation's origin is
+    // Watermark: ~60% of the width, bottom-right (Core Animation's origin is
     // bottom-left here).
     let parent = CALayer()
     parent.frame = CGRect(origin: .zero, size: renderSize)
@@ -102,7 +102,7 @@ enum Watermark {
     videoLayer.frame = parent.frame
     let mark = CALayer()
     mark.contents = overlay
-    let w = renderSize.width * 0.45
+    let w = renderSize.width * 0.6
     let h = w * CGFloat(overlay.height) / CGFloat(overlay.width)
     let margin = renderSize.width * 0.03
     mark.frame = CGRect(x: renderSize.width - w - margin, y: margin, width: w, height: h)

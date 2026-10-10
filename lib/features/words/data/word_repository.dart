@@ -4,6 +4,15 @@ import 'package:flutter/services.dart';
 
 import '../domain/word_models.dart';
 
+/// Special categories, unlocked by sharing the game (or a rewarded ad).
+/// Fixed here too, so a word pack downloaded later cannot drop the flag.
+const bonusCategoryIds = {
+  'cartoons',
+  'party',
+  'funny_embarrassing', // Persian
+  'funny_situations', // English, Arabic
+};
+
 /// Source of word categories. Game logic depends only on this interface, so
 /// the bundled JSON can later be replaced/augmented by downloadable packs.
 abstract interface class WordRepository {
@@ -68,7 +77,7 @@ List<WordCategory> parseWordPack(String raw) {
         title: title,
         emoji: c['emoji'] as String? ?? '🎲',
         words: words,
-        bonus: c['bonus'] == true,
+        bonus: c['bonus'] == true || bonusCategoryIds.contains(id),
       ),
     );
   }

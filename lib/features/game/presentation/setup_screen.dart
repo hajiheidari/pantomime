@@ -14,6 +14,7 @@ import '../../words/words_providers.dart';
 import '../application/game_controller.dart';
 import '../domain/game_config.dart';
 import 'game_screen.dart';
+import '../../share/share_sheet.dart';
 
 class SetupScreen extends ConsumerStatefulWidget {
   const SetupScreen({super.key, required this.mode});
@@ -115,41 +116,58 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
         .pushReplacement(MaterialPageRoute(builder: (_) => const GameScreen()));
   }
 
-  /// Rewarded ad → bonus category for this session. If no ad can be shown
-  /// the category unlocks anyway: ads never block gameplay.
+  /// Bonus category for this session: unlocked by sending the game to
+  /// friends, or by a rewarded ad where ads run.
   Future<void> _unlock(WordCategory c) async {
     final s = ref.read(stringsProvider);
-    final ok = await showDialog<bool>(
+    final adOffered = ref.read(adManagerProvider).rewardedOffered;
+    final choice = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text('${c.emoji} ${s.unlockTitle}'),
         content: Text('«${c.title}»\n${s.unlockBody}'),
+        actionsOverflowButtonSpacing: 8,
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => Navigator.pop(context),
             child: Text(s.cancel, style: const TextStyle(color: AppColors.ink)),
           ),
+          if (adOffered)
+            OutlinedButton(
+              onPressed: () => Navigator.pop(context, 'ad'),
+              child: Text(
+                '🎬 ${s.watchAd}',
+                style: const TextStyle(color: AppColors.ink),
+              ),
+            ),
           FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.green,
               foregroundColor: AppColors.ink,
             ),
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.pop(context, 'share'),
             child: Text(
-              '🎬 ${s.watchAd}',
+              '📤 ${s.shareToUnlock}',
               style: const TextStyle(fontWeight: FontWeight.w900),
             ),
           ),
         ],
       ),
     );
-    if (ok != true || !mounted) return;
-    final outcome = await ref.read(adManagerProvider).showRewarded();
-    if (!mounted) return;
-    if (outcome == RewardOutcome.skipped) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(s.unlockSkipped)));
-      return;
+    if (choice == null || !mounted) return;
+    if (choice == 'ad') {
+      final outcome = await ref.read(adManagerProvider).showRewarded();
+      if (!mounted) return;
+      if (outcome == RewardOutcome.skipped) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(s.unlockSkipped)));
+        return;
+      }
+    } else {
+      // Only an explicit "cancel" keeps it locked; platforms that cannot
+      // tell (some Android apps, web) count as shared.
+      final shared = await shareInvite(s);
+      if (!shared || !mounted) return;
     }
     ref.read(unlockedBonusProvider.notifier).unlock(c.id);
     setState(() => _selected = {...?_selected, c.id});
@@ -161,9 +179,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     final categoriesAsync = ref.watch(wordCategoriesProvider);
     final categories = categoriesAsync.value ?? const <WordCategory>[];
     final unlocked = ref.watch(unlockedBonusProvider);
-    final rewardedOffered = ref.watch(adManagerProvider).rewardedOffered;
-    bool locked(WordCategory c) =>
-        c.bonus && rewardedOffered && !unlocked.contains(c.id);
+    bool locked(WordCategory c) => c.bonus && !unlocked.contains(c.id);
     final available = {
       for (final c in categories)
         if (!locked(c)) c.id,

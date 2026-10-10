@@ -10,6 +10,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../core/l10n/app_strings.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/cartoon.dart';
+import 'share_link.dart';
 
 /// Renders the boundary to PNG bytes at 3× for crisp images.
 Future<List<int>?> capturePng(GlobalKey key) async {
@@ -150,5 +151,19 @@ Future<void> shareVideo(String path, String caption) async {
     );
   } catch (e) {
     debugPrint('share video: $e');
+  }
+}
+
+/// Invites friends (text + landing page link). Returns false only when the
+/// player cancelled the share sheet.
+Future<bool> shareInvite(AppStrings s) async {
+  try {
+    final r = await SharePlus.instance.share(
+      ShareParams(text: withShareLink(s.inviteText, s.languageCode)),
+    );
+    return r.status != ShareResultStatus.dismissed;
+  } catch (e) {
+    debugPrint('share invite: $e');
+    return false;
   }
 }

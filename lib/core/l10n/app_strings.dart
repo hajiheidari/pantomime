@@ -83,6 +83,8 @@ abstract class AppStrings {
   String get watchAd;
   String get cancel;
   String get unlockSkipped;
+  String get shareToUnlock;
+  String get inviteText;
   String get updateAvailable;
 
   // Recording & sharing
@@ -272,13 +274,18 @@ class FaStrings extends AppStrings {
   String get unlockTitle => 'باز کردن دسته ویژه';
   @override
   String get unlockBody =>
-      'با دیدن یک تبلیغ کوتاه، این دسته تا وقتی بازی باز است در دسترس می‌ماند.';
+      'بازی را برای دوستانت بفرست تا این دسته باز شود؛ تا وقتی بازی باز است در دسترس می‌ماند.';
   @override
   String get watchAd => 'دیدن تبلیغ';
   @override
   String get cancel => 'بی‌خیال';
   @override
   String get unlockSkipped => 'برای باز شدن دسته، تبلیغ باید تا آخر دیده شود.';
+  @override
+  String get shareToUnlock => 'فرستادن برای دوستان';
+  @override
+  String get inviteText =>
+      'بیا با هم «پانتومیم دورهمی» بازی کنیم! 🎭 بازی ادا و حدس کلمه برای دورهمی‌ها:';
   @override
   String get updateAvailable => 'نسخه جدید بازی آمده؛ از فروشگاه به‌روز کن!';
 
@@ -379,8 +386,7 @@ class FaStrings extends AppStrings {
   @override
   String get aboutBody =>
       'پانتومیم دورهمی؛ بازی ادا و حدس کلمه برای جمع‌های خانوادگی و دوستانه.\n'
-      'کاملاً آفلاین، بدون ثبت‌نام.\n'
-      'فونت: وزیرمتن (مجوز OFL).';
+      'کاملاً آفلاین، بدون ثبت‌نام.';
   @override
   String get privacyPolicy => 'حریم خصوصی';
   @override
@@ -531,13 +537,18 @@ class EnStrings extends AppStrings {
   String get unlockTitle => 'Unlock bonus category';
   @override
   String get unlockBody =>
-      'Watch a short ad to unlock this category until you close the app.';
+      'Send the game to your friends to unlock this category until you close the app.';
   @override
   String get watchAd => 'Watch ad';
   @override
   String get cancel => 'Cancel';
   @override
   String get unlockSkipped => 'Watch the ad to the end to unlock.';
+  @override
+  String get shareToUnlock => 'Send to friends';
+  @override
+  String get inviteText =>
+      "Let's play Pantomime Party together! 🎭 The charades game for game night:";
   @override
   String get updateAvailable => 'A new version is available in the store!';
 
@@ -637,8 +648,7 @@ class EnStrings extends AppStrings {
   @override
   String get aboutBody =>
       'Pantomime Party — a charades game for family and friends.\n'
-      'Fully offline, no sign-up.\n'
-      'Font: Vazirmatn (OFL license).';
+      'Fully offline, no sign-up.';
   @override
   String get privacyPolicy => 'Privacy policy';
   @override
@@ -794,13 +804,18 @@ class ArStrings extends AppStrings {
   String get unlockTitle => 'افتح الفئة الإضافية';
   @override
   String get unlockBody =>
-      'شاهد إعلانًا قصيرًا لفتح هذه الفئة حتى تغلق التطبيق.';
+      'أرسل اللعبة إلى أصدقائك لفتح هذه الفئة حتى تغلق التطبيق.';
   @override
   String get watchAd => 'شاهد الإعلان';
   @override
   String get cancel => 'إلغاء';
   @override
   String get unlockSkipped => 'شاهد الإعلان حتى النهاية لفتح الفئة.';
+  @override
+  String get shareToUnlock => 'أرسل إلى الأصدقاء';
+  @override
+  String get inviteText =>
+      'تعال نلعب «بانتومايم الحفلات» معًا! 🎭 لعبة التمثيل وتخمين الكلمات:';
   @override
   String get updateAvailable => 'يتوفر إصدار جديد في المتجر!';
 
@@ -900,8 +915,7 @@ class ArStrings extends AppStrings {
   @override
   String get aboutBody =>
       'بانتومايم الحفلات: لعبة التمثيل الصامت للعائلة والأصدقاء.\n'
-      'تعمل دون إنترنت ودون تسجيل.\n'
-      'الخط: Vazirmatn (رخصة OFL).';
+      'تعمل دون إنترنت ودون تسجيل.';
   @override
   String get privacyPolicy => 'سياسة الخصوصية';
   @override

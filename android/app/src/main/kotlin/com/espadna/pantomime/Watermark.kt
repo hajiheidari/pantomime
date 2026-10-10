@@ -52,7 +52,7 @@ class Watermark(private val context: Context) : MethodChannel.MethodCallHandler 
             ?: throw IllegalArgumentException("overlay is not an image")
 
         // Width of the video as displayed (rotation applied), to size the
-        // watermark at ~45% of it.
+        // watermark at ~60% of it.
         val retriever = MediaMetadataRetriever()
         val displayWidth = try {
             retriever.setDataSource(input)
@@ -63,7 +63,7 @@ class Watermark(private val context: Context) : MethodChannel.MethodCallHandler 
         } finally {
             retriever.release()
         }
-        val scale = if (displayWidth > 0) 0.45f * displayWidth / bitmap.width else 0.5f
+        val scale = if (displayWidth > 0) 0.6f * displayWidth / bitmap.width else 0.5f
 
         val settings = OverlaySettings.Builder()
             .setScale(scale, scale)

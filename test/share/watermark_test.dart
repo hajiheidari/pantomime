@@ -20,9 +20,10 @@ void main() {
       );
     await font.load();
     final png = await renderWatermark(
-      title: '🎭 پانتومیم دورهمی  |  ۳ امتیاز',
-      link: 'espadna.com/pantomime-app/fa',
+      name: 'پانتومیم دورهمی',
+      detail: 'espadna.com/pantomime-app/fa',
       rtl: true,
+      logo: File('assets/branding/icon_512.png').readAsBytesSync(),
     );
     expect(png.sublist(1, 4), 'PNG'.codeUnits);
     final out = Platform.environment['WATERMARK_PREVIEW'];

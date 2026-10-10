@@ -964,7 +964,8 @@
           "Brain going blank in an exam",
           "Seagull stealing your sandwich"
         ]
-      }
+      },
+      "bonus": true
     },
     {
       "id": "cartoons",

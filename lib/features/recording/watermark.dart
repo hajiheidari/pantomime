@@ -37,9 +37,10 @@ Future<String> _apply(String clip, AppStrings s, int score) async {
   if (!kIsWeb) {
     try {
       final png = await renderWatermark(
-        title: '🎭 ${s.appName}  |  ${s.score(score)}',
-        link: shareLinkLabel(s.languageCode),
+        name: s.appName,
+        detail: shareLinkLabel(s.languageCode),
         rtl: s.isRtl,
+        logo: await _logo(),
       );
       final dot = clip.lastIndexOf('.');
       final out = '${dot > 0 ? clip.substring(0, dot) : clip}_wm$score.mp4';
@@ -59,64 +60,150 @@ Future<String> _apply(String clip, AppStrings s, int score) async {
   return result;
 }
 
-/// The watermark as a transparent PNG: a dark rounded label with the game
-/// name and score on the first line and the site address on the second.
+Future<Uint8List?> _logo() async {
+  try {
+    final d = await rootBundle.load(watermarkLogoAsset);
+    return d.buffer.asUint8List(d.offsetInBytes, d.lengthInBytes);
+  } catch (_) {
+    return null;
+  }
+}
+
+const watermarkLogoAsset = 'assets/branding/icon_512.png';
+
+/// The watermark as a transparent PNG: the app icon next to the game name
+/// (yellow, outlined so it reads on any background) and the site address
+/// under it. No backing box, it hugs the bottom corner.
 Future<Uint8List> renderWatermark({
-  required String title,
-  required String link,
+  required String name,
+  required String detail,
   required bool rtl,
+  Uint8List? logo,
 }) async {
   const width = 1000.0;
-  const pad = 34.0;
-  ui.Paragraph line(String text, double size, Color color, TextDirection d) {
+  const height = 230.0;
+  const logoSize = 210.0;
+  const gap = 26.0;
+  final dir = rtl ? TextDirection.rtl : TextDirection.ltr;
+  const textWidth = width - logoSize - gap - 10;
+
+  ui.Paragraph line(
+    String text,
+    double size,
+    Paint paint,
+    List<Shadow> sh, {
+    TextDirection? d,
+  }) {
     final b =
         ui.ParagraphBuilder(
             ui.ParagraphStyle(
-              textAlign: TextAlign.center,
-              textDirection: d,
+              textAlign: TextAlign.right,
+              textDirection: d ?? dir,
               maxLines: 1,
               ellipsis: '…',
             ),
           )
           ..pushStyle(
             ui.TextStyle(
-              color: color,
+              foreground: paint,
               fontSize: size,
               fontFamily: appFontFamily,
               fontWeight: FontWeight.w900,
+              shadows: sh,
             ),
           )
           ..addText(text);
-    return b.build()
-      ..layout(const ui.ParagraphConstraints(width: width - 2 * pad));
+    return b.build()..layout(const ui.ParagraphConstraints(width: textWidth));
   }
 
-  final top = line(
-    title,
-    66,
-    AppColors.yellow,
-    rtl ? TextDirection.rtl : TextDirection.ltr,
+  Paint fill(Color c) => Paint()..color = c;
+  Paint stroke(double w) => Paint()
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = w
+    ..strokeJoin = StrokeJoin.round
+    ..color = const Color(0xE6140F2E);
+  const glow = [Shadow(color: Color(0x99000000), blurRadius: 14)];
+
+  // Outline first, fill on top.
+  final nameOut = line(name, 84, stroke(14), glow);
+  final nameIn = line(name, 84, fill(AppColors.yellow), const []);
+  final detailOut = line(detail, 46, stroke(10), glow, d: TextDirection.ltr);
+  final detailIn = line(
+    detail,
+    46,
+    fill(const Color(0xFFFFFFFF)),
+    const [],
+    d: TextDirection.ltr,
   );
-  final bottom = line(link, 46, const Color(0xFFFFFFFF), TextDirection.ltr);
-  final height = (pad + top.height + 6 + bottom.height + pad).ceilToDouble();
+
+  // Text block sits beside the logo; everything is pushed to the right edge
+  // (the corner the native side anchors to).
+  final textW = [
+    nameIn.longestLine,
+    detailIn.longestLine,
+  ].reduce((a, b) => a > b ? a : b);
+  final logoLeft = rtl
+      ? width - logoSize - 6
+      : width - 6 - textW - gap - logoSize;
+  // Paragraphs are right-aligned inside textWidth, so offset them so their end
+  // lands where we want.
+  final textEnd = rtl ? logoLeft - gap : width - 6;
+  final textX = textEnd - textWidth;
+  final textH = nameIn.height + detailIn.height;
+  final textTop = (height - textH) / 2;
 
   final recorder = ui.PictureRecorder();
   final canvas = Canvas(recorder);
-  final box = RRect.fromRectAndRadius(
-    Rect.fromLTWH(3, 3, width - 6, height - 6),
-    const Radius.circular(44),
+
+  final logoRect = Rect.fromLTWH(
+    logoLeft,
+    (height - logoSize) / 2,
+    logoSize,
+    logoSize,
   );
-  canvas
-    ..drawRRect(box, Paint()..color = const Color(0xC0140F2E))
-    ..drawRRect(
-      box,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 6
-        ..color = AppColors.yellow,
-    )
-    ..drawParagraph(top, const Offset(pad, pad))
-    ..drawParagraph(bottom, Offset(pad, pad + top.height + 6));
+  final rounded = RRect.fromRectAndRadius(logoRect, const Radius.circular(48));
+  canvas.drawRRect(
+    rounded.shift(const Offset(0, 4)),
+    Paint()
+      ..color = const Color(0x80000000)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10),
+  );
+  if (logo != null) {
+    final codec = await ui.instantiateImageCodec(
+      logo,
+      targetWidth: logoSize.toInt() * 2,
+    );
+    final img = (await codec.getNextFrame()).image;
+    canvas
+      ..save()
+      ..clipRRect(rounded)
+      ..drawImageRect(
+        img,
+        Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
+        logoRect,
+        Paint()..filterQuality = FilterQuality.high,
+      )
+      ..restore();
+  } else {
+    canvas.drawRRect(rounded, fill(AppColors.yellow));
+  }
+  canvas.drawRRect(
+    rounded,
+    Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 6
+      ..color = const Color(0xFFFFFFFF),
+  );
+
+  for (final (p, dy) in [
+    (nameOut, 0.0),
+    (nameIn, 0.0),
+    (detailOut, nameIn.height),
+    (detailIn, nameIn.height),
+  ]) {
+    canvas.drawParagraph(p, Offset(textX, textTop + dy));
+  }
+
   final image = await recorder.endRecording().toImage(
     width.toInt(),
     height.toInt(),
