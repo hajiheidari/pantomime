@@ -1,5 +1,12 @@
 # App Store Connect: what to fill in (copy-paste ready)
 
+Filled in through the App Store Connect API (Oct 2026): name, subtitle,
+privacy URL, categories (Games › Word + Family, secondary Entertainment), age
+rating answers, content rights, price (free), availability (all territories),
+English + Arabic texts, iPhone 6.9" and iPad 13" screenshots, build attached.
+Left for the owner in the web UI: App Review contact (name, phone), App Privacy
+answers, EU Digital Services Act status, and pressing Submit.
+
 Build: `.github/workflows/ios.yml` (TestFlight, no Mac needed). Needs the
 four secrets listed there; then push a tag `ios-<n>` to build and upload.
 
@@ -61,6 +68,7 @@ MORE FUN
 
 **Screenshots:**
 - iPhone 6.9" display: `store/appstore/en/` (1290×2796; `05_forehead.png` is landscape).
+  Made from the web build with `?lang=en&screenshot=1` (hides the web install bar).
 - iPad 13" display: `store/appstore/ipad-en/` (2048×2732; `05_forehead.png` is landscape).
   The app runs natively on iPad (full screen; the UI is scaled up 1.2–1.4× on tablets,
   `lib/core/widgets/tablet_scale.dart`).

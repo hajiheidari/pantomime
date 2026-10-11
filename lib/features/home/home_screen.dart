@@ -32,7 +32,9 @@ class HomeScreen extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
               children: [
-                if (kIsWeb) const _InstallBar(),
+                // Hidden with ?screenshot=1 (store screenshots of the web build).
+                if (kIsWeb && Uri.base.queryParameters['screenshot'] != '1')
+                  const _InstallBar(),
                 Align(
                   alignment: AlignmentDirectional.centerEnd,
                   child: IconButton(
