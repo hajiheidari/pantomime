@@ -45,17 +45,19 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     final s = ref.watch(stringsProvider);
+    // The logo sits exactly where the native launch screen draws it (centre,
+    // same size), so the hand-over is seamless.
     return Scaffold(
       body: DecoratedBox(
         decoration: appBackground,
-        child: Center(
-          child: PopIn(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const BouncyEmoji('🎭', size: 110),
-                const SizedBox(height: 16),
-                Text(
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Image.asset(AppLogo.asset, width: 192, height: 192),
+            Align(
+              alignment: const Alignment(0, 0.32),
+              child: PopIn(
+                child: Text(
                   s.appName,
                   style: const TextStyle(
                     fontSize: 36,
@@ -63,9 +65,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                     color: AppColors.yellow,
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

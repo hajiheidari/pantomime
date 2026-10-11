@@ -571,6 +571,16 @@ class _ClassicPlayView extends ConsumerWidget {
     final team = session.game.currentTeamIndex;
     final swaps = session.config.wordChanges > 0;
     final custom = word?.categoryId == GameController.customCategoryId;
+
+    // A word from the other team is swapped for another one they type.
+    Future<void> change() async {
+      if (!custom) return ctrl.changeWord();
+      ctrl.setPaused(true);
+      final text = await askCustomWord(context, s, null);
+      ctrl.setPaused(false);
+      if (text != null && text.trim().isNotEmpty) ctrl.changeWord(text);
+    }
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
       child: Column(
@@ -614,7 +624,7 @@ class _ClassicPlayView extends ConsumerWidget {
               ),
             ),
           ),
-          if (swaps && !custom)
+          if (swaps)
             Text(
               s.changesLeft(session.changesLeft),
               style: const TextStyle(
@@ -635,7 +645,7 @@ class _ClassicPlayView extends ConsumerWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              if (swaps && !custom) ...[
+              if (swaps) ...[
                 Expanded(
                   child: CartoonButton(
                     label: s.changeWord,
@@ -644,7 +654,7 @@ class _ClassicPlayView extends ConsumerWidget {
                     height: 84,
                     fontSize: 17,
                     color: AppColors.orange,
-                    onPressed: session.changesLeft > 0 ? ctrl.changeWord : null,
+                    onPressed: session.changesLeft > 0 ? change : null,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -668,6 +678,59 @@ class _ClassicPlayView extends ConsumerWidget {
   }
 }
 
+/// The other team types a word; null when cancelled.
+Future<String?> askCustomWord(
+  BuildContext context,
+  AppStrings s,
+  String? initial,
+) async {
+  final field = TextEditingController(text: initial);
+  final text = await showDialog<String>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(s.customWordTitle),
+      content: TextField(
+        controller: field,
+        autofocus: true,
+        maxLength: 40,
+        textInputAction: TextInputAction.done,
+        style: const TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w800,
+          color: AppColors.ink,
+        ),
+        decoration: InputDecoration(
+          hintText: s.customWordHint,
+          hintStyle: TextStyle(
+            fontSize: 15,
+            color: AppColors.ink.withValues(alpha: 0.45),
+          ),
+        ),
+        onSubmitted: (v) => Navigator.pop(context, v),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(s.cancel),
+        ),
+        FilledButton(
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.green,
+            foregroundColor: AppColors.ink,
+          ),
+          onPressed: () => Navigator.pop(context, field.text),
+          child: Text(
+            s.confirmWord,
+            style: const TextStyle(fontWeight: FontWeight.w900),
+          ),
+        ),
+      ],
+    ),
+  );
+  field.dispose();
+  return text;
+}
+
 /// Classic mode, ready screen: the other team types the word instead.
 class _CustomWordButton extends ConsumerWidget {
   const _CustomWordButton({required this.session, required this.s});
@@ -676,39 +739,7 @@ class _CustomWordButton extends ConsumerWidget {
   final AppStrings s;
 
   Future<void> _ask(BuildContext context, WidgetRef ref) async {
-    final field = TextEditingController(text: session.customWord?.text);
-    final text = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(s.customWordTitle),
-        content: TextField(
-          controller: field,
-          autofocus: true,
-          maxLength: 40,
-          textInputAction: TextInputAction.done,
-          decoration: InputDecoration(hintText: s.customWordHint),
-          onSubmitted: (v) => Navigator.pop(context, v),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(s.cancel),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.green,
-              foregroundColor: AppColors.ink,
-            ),
-            onPressed: () => Navigator.pop(context, field.text),
-            child: Text(
-              s.confirmWord,
-              style: const TextStyle(fontWeight: FontWeight.w900),
-            ),
-          ),
-        ],
-      ),
-    );
-    field.dispose();
+    final text = await askCustomWord(context, s, session.customWord?.text);
     if (text != null) {
       ref.read(gameControllerProvider.notifier).setCustomWord(text);
     }

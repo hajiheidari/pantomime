@@ -175,16 +175,14 @@ class GameController extends Notifier<GameSession?> {
     final s = state;
     if (s == null || !s.isClassic || s.phase != GamePhase.ready) return;
     final t = text.trim();
-    state = s.copyWith(
-      customWord: () => t.isEmpty
-          ? null
-          : WordEntry(
-              text: t,
-              categoryId: customCategoryId,
-              difficulty: Difficulty.medium,
-            ),
-    );
+    state = s.copyWith(customWord: () => t.isEmpty ? null : _custom(t));
   }
+
+  static WordEntry _custom(String text) => WordEntry(
+    text: text.trim(),
+    categoryId: customCategoryId,
+    difficulty: Difficulty.medium,
+  );
 
   static const customCategoryId = 'custom';
 
@@ -273,7 +271,8 @@ class GameController extends Notifier<GameSession?> {
   }
 
   /// Classic mode: swap the word (limited per team for the whole game).
-  void changeWord() {
+  /// [typed]: the other team's new word (when they gave the first one).
+  void changeWord([String? typed]) {
     final s = state;
     if (s == null ||
         !s.isClassic ||
@@ -291,7 +290,9 @@ class GameController extends Notifier<GameSession?> {
     _feedback.pass();
     state = s.copyWith(
       changesUsed: used,
-      currentWord: () => _picker?.next() ?? s.currentWord,
+      currentWord: () => typed != null && typed.trim().isNotEmpty
+          ? _custom(typed)
+          : _picker?.next() ?? s.currentWord,
     );
   }
 

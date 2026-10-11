@@ -44,7 +44,7 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ),
                 const Spacer(),
-                const BouncyEmoji('🎭', size: 96),
+                const BouncyEmoji.widget(AppLogo(size: 110)),
                 const SizedBox(height: 8),
                 Text(
                   s.appName,

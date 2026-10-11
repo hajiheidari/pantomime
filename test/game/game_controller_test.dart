@@ -138,6 +138,10 @@ void main() {
     await toPlaying(tester, ctrl);
     expect(c.read(gameControllerProvider)!.currentWord!.text, 'هندوانه');
     expect(c.read(gameControllerProvider)!.customWord, isNull);
+    // With word changes on, they can give another word.
+    ctrl.changeWord('پرتقال');
+    expect(c.read(gameControllerProvider)!.currentWord!.text, 'پرتقال');
+    expect(c.read(gameControllerProvider)!.changesLeft, 0);
     ctrl.quit();
   });
 

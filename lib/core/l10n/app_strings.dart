@@ -486,11 +486,11 @@ class EnStrings extends AppStrings {
   @override
   String get tagline => 'Act it out, laugh out loud!';
   @override
-  String get teamGame => 'Speed pantomime';
+  String get teamGame => 'Speed Pantomime';
   @override
   String get teamGameHint => 'As many words as you can in a minute';
   @override
-  String get foreheadMode => 'Forehead mode';
+  String get foreheadMode => 'Forehead Mode';
   @override
   String get foreheadModeHint => 'Hold the phone on your forehead!';
   @override
@@ -499,19 +499,19 @@ class EnStrings extends AppStrings {
   String get settings => 'Settings';
 
   @override
-  String get setupTitle => 'Game setup';
+  String get setupTitle => 'Game Setup';
   @override
   String get teams => 'Teams';
   @override
   String defaultTeamName(int index) => 'Team ${index + 1}';
   @override
-  String get addTeam => 'Add team';
+  String get addTeam => 'Add Team';
   @override
-  String get roundDuration => 'Turn duration';
+  String get roundDuration => 'Turn Duration';
   @override
   String seconds(int s) => '$s sec';
   @override
-  String get roundsPerTeam => 'Turns per team';
+  String get roundsPerTeam => 'Turns per Team';
   @override
   String get difficulty => 'Difficulty';
   @override
@@ -528,7 +528,7 @@ class EnStrings extends AppStrings {
   @override
   String get clearAll => 'None';
   @override
-  String get passLimit => 'Passes per turn';
+  String get passLimit => 'Passes per Turn';
   @override
   String get unlimited => 'Unlimited';
   @override
@@ -543,7 +543,7 @@ class EnStrings extends AppStrings {
   @override
   String roundOf(int round, int total) => 'Round $round of $total';
   @override
-  String get suddenDeath => 'Sudden death!';
+  String get suddenDeath => 'Sudden Death!';
   @override
   String get suddenDeathHint => "It's a tie — one more round!";
   @override
@@ -564,7 +564,7 @@ class EnStrings extends AppStrings {
   @override
   String get noPassLeft => 'No passes left';
   @override
-  String get giveUp => 'Give up';
+  String get giveUp => 'Give Up';
   @override
   String get classicGame => 'Pantomime';
   @override
@@ -576,33 +576,33 @@ class EnStrings extends AppStrings {
   @override
   String get guessedIt => 'Got it!';
   @override
-  String get changeWord => 'Change word';
+  String get changeWord => 'Change Word';
   @override
   String changesLeft(int left) => 'Changes left: $left';
   @override
-  String get wordChangesTitle => 'Word changes (per team, whole game)';
+  String get wordChangesTitle => 'Word Changes (per Team, Whole Game)';
   @override
   String get off => 'Off';
   @override
-  String get customWordButton => 'Other team picks the word';
+  String get customWordButton => 'Other Team Picks the Word';
   @override
-  String get customWordTitle => "Other team's word";
+  String get customWordTitle => "Other Team's Word";
   @override
   String get customWordHint =>
       'Type the word, then hand the phone to the actor';
   @override
-  String get customWordReady => "Other team's word is ready";
+  String get customWordReady => "Other Team's Word Is Ready";
   @override
-  String get confirmWord => 'Use this word';
+  String get confirmWord => 'Use This Word';
   @override
-  String get installApp => 'Get the app (Android & iPhone)';
+  String get installApp => 'Get the App (Android & iPhone)';
   @override
-  String get giveUpTitle => 'Give up this word?';
+  String get giveUpTitle => 'Give Up This Word?';
   @override
   String get giveUpBody =>
       'The word counts as not guessed and the turn ends right now.';
   @override
-  String get timeUp => "Time's up!";
+  String get timeUp => "Time's Up!";
   @override
   String get paused => 'Paused';
   @override
@@ -613,9 +613,9 @@ class EnStrings extends AppStrings {
   @override
   String defaultPlayerName(int index) => 'Player ${index + 1}';
   @override
-  String get addPlayer => 'Add player';
+  String get addPlayer => 'Add Player';
   @override
-  String get turnsPerPlayer => 'Turns per player';
+  String get turnsPerPlayer => 'Turns per Player';
   @override
   String get foreheadHowTo =>
       'Hold the phone sideways on your forehead, screen facing the group.\n'
@@ -633,12 +633,12 @@ class EnStrings extends AppStrings {
   String get sensorUnavailable =>
       'No motion sensor found; someone else taps the buttons.';
   @override
-  String get startWithButtons => 'Start with buttons';
+  String get startWithButtons => 'Start with Buttons';
 
   @override
   String get bonusBadge => '🎁 Bonus';
   @override
-  String get unlockTitle => 'Unlock bonus category';
+  String get unlockTitle => 'Unlock Bonus Category';
   @override
   String get unlockBody =>
       'Send the game to your friends to unlock this category. Once one of them opens the link, all bonus categories stay unlocked for good.';
@@ -646,13 +646,13 @@ class EnStrings extends AppStrings {
   String get inviteUnlockedForever =>
       '🎉 A friend opened your link: bonus categories are unlocked for good!';
   @override
-  String get watchAd => 'Watch ad';
+  String get watchAd => 'Watch Ad';
   @override
   String get cancel => 'Cancel';
   @override
   String get unlockSkipped => 'Watch the ad to the end to unlock.';
   @override
-  String get shareToUnlock => 'Send to friends';
+  String get shareToUnlock => 'Send to Friends';
   @override
   String get inviteText =>
       "Let's play Pantomime Party together! 🎭 The charades game for game night:";
@@ -660,7 +660,7 @@ class EnStrings extends AppStrings {
   String get updateAvailable => 'A new version is available in the store!';
 
   @override
-  String get recordingExplainTitle => 'Record the fun 🎥';
+  String get recordingExplainTitle => 'Record the Fun 🎥';
   @override
   String get recordingExplainBody =>
       'In forehead mode the front camera films your friends acting, so you '
@@ -668,7 +668,7 @@ class EnStrings extends AppStrings {
       'This needs the camera and microphone. Videos stay on your phone and '
       'are never uploaded — only saved or shared if you choose to.';
   @override
-  String get allow => 'OK, turn it on';
+  String get allow => 'OK, Turn It On';
   @override
   String get recordingDenied =>
       'Camera or microphone access was not granted; recording stays off. '
@@ -676,7 +676,7 @@ class EnStrings extends AppStrings {
   @override
   String get rec => 'REC';
   @override
-  String get saveVideo => 'Save video';
+  String get saveVideo => 'Save Video';
   @override
   String get videoSaved => 'Video saved to gallery ✅';
   @override
@@ -684,11 +684,11 @@ class EnStrings extends AppStrings {
   @override
   String get preparingVideo => 'Preparing the video…';
   @override
-  String get shareVideo => 'Share video';
+  String get shareVideo => 'Share Video';
   @override
-  String get shareCard => 'Score card';
+  String get shareCard => 'Score Card';
   @override
-  String get shareResult => 'Share result';
+  String get shareResult => 'Share Result';
   @override
   String get share => 'Share';
   @override
@@ -698,12 +698,12 @@ class EnStrings extends AppStrings {
   String get shareResultCaption =>
       'Our Pantomime Party results 🎭🏆 Come play with us!';
   @override
-  String get cardCorrectWords => 'Words we got';
+  String get cardCorrectWords => 'Words We Got';
   @override
   String get downloadCta => 'Get Pantomime Party and play with friends!';
 
   @override
-  String get roundSummary => 'Turn summary';
+  String get roundSummary => 'Turn Summary';
   @override
   String get tapToFix => 'Tapped the wrong button? Tap a word to fix it.';
   @override
@@ -719,33 +719,33 @@ class EnStrings extends AppStrings {
   @override
   String nextTurn(String team) => 'Next: $team';
   @override
-  String get seeResults => 'See results';
+  String get seeResults => 'See Results';
   @override
-  String get finalResults => 'Final results';
+  String get finalResults => 'Final Results';
   @override
   String winnerIs(String team) => '$team wins!';
   @override
   String get itsATie => "It's a tie!";
   @override
-  String get playAgain => 'Play again';
+  String get playAgain => 'Play Again';
   @override
   String get backHome => 'Home';
 
   @override
-  String get exitGameTitle => 'Leave the game?';
+  String get exitGameTitle => 'Leave the Game?';
   @override
   String get exitGameBody => 'Scores of this game will be lost.';
   @override
   String get exit => 'Leave';
   @override
-  String get stay => 'Keep playing';
+  String get stay => 'Keep Playing';
 
   @override
   String get sound => 'Sound';
   @override
   String get vibration => 'Vibration';
   @override
-  String get recording => 'Record video in forehead mode';
+  String get recording => 'Record Video in Forehead Mode';
   @override
   String get recordingHint => 'Forehead mode only, front camera';
   @override
@@ -757,7 +757,7 @@ class EnStrings extends AppStrings {
       'Pantomime Party — a charades game for family and friends.\n'
       'Fully offline, no sign-up.';
   @override
-  String get privacyPolicy => 'Privacy policy';
+  String get privacyPolicy => 'Privacy Policy';
   @override
   String get privacyBody =>
       'This game has no accounts and collects no personal data.\n'
@@ -769,7 +769,7 @@ class EnStrings extends AppStrings {
       'start the game downloads a small settings file and sends nothing about '
       'you.';
   @override
-  String get rateApp => 'Rate the app';
+  String get rateApp => 'Rate the App';
   @override
   String get close => 'Close';
 }

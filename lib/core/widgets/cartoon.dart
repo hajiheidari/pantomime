@@ -239,10 +239,16 @@ class CartoonChip extends StatelessWidget {
 
 /// Emoji that gently bounces forever.
 class BouncyEmoji extends StatefulWidget {
-  const BouncyEmoji(this.emoji, {super.key, this.size = 72});
+  const BouncyEmoji(this.emoji, {super.key, this.size = 72}) : content = null;
+
+  /// Bounces any widget (e.g. the app logo) instead of an emoji.
+  const BouncyEmoji.widget(Widget this.content, {super.key})
+    : emoji = '',
+      size = 0;
 
   final String emoji;
   final double size;
+  final Widget? content;
 
   @override
   State<BouncyEmoji> createState() => _BouncyEmojiState();
@@ -271,7 +277,33 @@ class _BouncyEmojiState extends State<BouncyEmoji>
         child: Transform.rotate(angle: (t - 0.5) * 0.15, child: child),
       );
     },
-    child: Text(widget.emoji, style: TextStyle(fontSize: widget.size)),
+    child:
+        widget.content ??
+        Text(widget.emoji, style: TextStyle(fontSize: widget.size)),
+  );
+}
+
+/// The masks logo (same drawing as the app icon and the launch screen).
+/// [size] is the size of the masks; the image has a wide transparent margin.
+class AppLogo extends StatelessWidget {
+  const AppLogo({super.key, this.size = 96});
+
+  static const asset = 'assets/branding/splash_logo.png';
+
+  /// The masks fill about 45% of the image.
+  static const _fill = 0.45;
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    width: size,
+    height: size,
+    child: OverflowBox(
+      maxWidth: size / _fill,
+      maxHeight: size / _fill,
+      child: Image.asset(asset, width: size / _fill, height: size / _fill),
+    ),
   );
 }
 

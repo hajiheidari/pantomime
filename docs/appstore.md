@@ -66,7 +66,7 @@ MORE FUN
   `lib/core/widgets/tablet_scale.dart`).
 
 **App Review Information:** no sign-in required. Notes:
-`No account needed. Tap "Pantomime", "Speed pantomime" or "Forehead mode", then "Let's go!". Forehead mode uses the motion sensor; on the simulator use "Start with buttons".`
+`No account needed. Tap "Pantomime", "Speed Pantomime" or "Forehead Mode", then "Let's go!". Forehead mode uses the motion sensor; on the simulator use "Start with Buttons".`
 
 ## App Privacy
 
