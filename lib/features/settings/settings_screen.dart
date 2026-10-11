@@ -6,7 +6,7 @@ import '../../core/providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/cartoon.dart';
 import '../../core/store/store_service.dart';
-import '../recording/round_recorder.dart';
+import '../recording/recording_offer.dart';
 import 'settings_controller.dart';
 
 /// Privacy policy page (espadna.com redirects it to the config Worker's
@@ -147,41 +147,7 @@ class SettingsScreen extends ConsumerWidget {
       ctrl.setRecording(false);
       return;
     }
-    final s = ref.read(stringsProvider);
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(s.recordingExplainTitle),
-        content: Text(s.recordingExplainBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(s.cancel, style: const TextStyle(color: AppColors.ink)),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.green,
-              foregroundColor: AppColors.ink,
-            ),
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(
-              s.allow,
-              style: const TextStyle(fontWeight: FontWeight.w900),
-            ),
-          ),
-        ],
-      ),
-    );
-    if (ok != true) return;
-    // Opening the camera triggers the OS camera + microphone prompts.
-    final recorder = ref.read(roundRecorderFactoryProvider)();
-    final granted = await recorder.prepare();
-    await recorder.dispose();
-    ctrl.setRecording(granted);
-    if (!granted && context.mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(s.recordingDenied)));
-    }
+    await askToEnableRecording(context, ref);
   }
 
   void _info(BuildContext context, String title, String body, String close) {

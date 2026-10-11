@@ -53,6 +53,7 @@ void main() {
     addTearDown(tester.view.reset);
     SharedPreferences.setMockInitialValues(prefsValues);
     final prefs = await SharedPreferences.getInstance();
+    final recordingOn = prefs.getBool('settings.recording') ?? false;
     motion = StreamController<MotionSample>.broadcast();
     clock = Duration.zero;
     container = ProviderContainer(
@@ -76,6 +77,13 @@ void main() {
     await settle(tester);
     await tester.tap(find.text('گوشی روی پیشونی'));
     await settle(tester);
+    // First time with recording off: it is suggested (once).
+    final offered = find.text('ضبط ویدیوی خنده‌دار 🎥');
+    expect(offered, recordingOn ? findsNothing : findsOneWidget);
+    if (!recordingOn) {
+      await tester.tap(find.text('فعلاً نه'));
+      await settle(tester);
+    }
     expect(find.text('بازیکن‌ها'), findsOneWidget);
     await tester.tap(find.text('بزن بریم!'));
     await settle(tester);

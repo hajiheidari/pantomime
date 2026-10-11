@@ -117,6 +117,7 @@ abstract class AppStrings {
   String get recordingExplainTitle;
   String get recordingExplainBody;
   String get allow;
+  String get notNow;
   String get recordingDenied;
   String get rec;
   String get saveVideo;
@@ -366,6 +367,8 @@ class FaStrings extends AppStrings {
       'ذخیره یا برای کسی بفرستی.';
   @override
   String get allow => 'باشه، فعال کن';
+  @override
+  String get notNow => 'فعلاً نه';
   @override
   String get recordingDenied =>
       'دسترسی به دوربین یا میکروفون داده نشد؛ ضبط خاموش ماند. '
@@ -669,6 +672,8 @@ class EnStrings extends AppStrings {
       'are never uploaded — only saved or shared if you choose to.';
   @override
   String get allow => 'OK, Turn It On';
+  @override
+  String get notNow => 'Not Now';
   @override
   String get recordingDenied =>
       'Camera or microphone access was not granted; recording stays off. '
@@ -975,6 +980,8 @@ class ArStrings extends AppStrings {
       'أبدًا، ولا تُحفظ أو تُشارك إلا إذا اخترت ذلك.';
   @override
   String get allow => 'حسنًا، فعّله';
+  @override
+  String get notNow => 'ليس الآن';
   @override
   String get recordingDenied =>
       'لم يُسمح بالوصول إلى الكاميرا أو الميكروفون، لذا يبقى التسجيل متوقفًا. '

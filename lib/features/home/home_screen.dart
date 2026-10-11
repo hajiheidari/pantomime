@@ -14,6 +14,7 @@ import '../ads/ads_providers.dart';
 import '../ads/config/remote_config.dart';
 import '../game/domain/game_config.dart';
 import '../game/presentation/setup_screen.dart';
+import '../recording/recording_offer.dart';
 import '../settings/settings_screen.dart';
 import '../share/share_link.dart';
 
@@ -111,12 +112,16 @@ class HomeScreen extends ConsumerWidget {
                     height: 90,
                     fontSize: 28,
                     color: AppColors.pink,
-                    onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            const SetupScreen(mode: GameMode.forehead),
-                      ),
-                    ),
+                    onPressed: () async {
+                      await offerRecordingOnce(context, ref);
+                      if (!context.mounted) return;
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              const SetupScreen(mode: GameMode.forehead),
+                        ),
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(height: 16),
