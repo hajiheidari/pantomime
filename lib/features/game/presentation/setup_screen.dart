@@ -256,7 +256,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                       ),
                     SectionTitle(s.roundDuration),
                     _Options<int>(
-                      values: GameConfig.roundSecondsOptions,
+                      values: GameConfig.roundSecondsOptions(widget.mode),
                       selected: _config.roundSeconds,
                       label: s.seconds,
                       onSelect: (v) => setState(
@@ -283,8 +283,20 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                         () => _config = _config.copyWith(difficulty: v),
                       ),
                     ),
+                    // Classic mode: a few word swaps for the whole game.
+                    if (widget.mode == GameMode.classic) ...[
+                      SectionTitle(s.wordChangesTitle),
+                      _Options<int>(
+                        values: GameConfig.wordChangeOptions,
+                        selected: _config.wordChanges,
+                        label: (v) => v == 0 ? s.off : s.n(v),
+                        onSelect: (v) => setState(
+                          () => _config = _config.copyWith(wordChanges: v),
+                        ),
+                      ),
+                    ],
                     // Forehead mode: passing (tilt up) is always allowed.
-                    if (!_forehead) ...[
+                    if (widget.mode == GameMode.teams) ...[
                       SectionTitle(s.passLimit),
                       _Options<int?>(
                         values: GameConfig.passLimitOptions,

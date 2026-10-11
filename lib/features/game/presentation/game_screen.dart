@@ -169,6 +169,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       GamePhase.playing =>
         session.isForehead
             ? ForeheadPlayView(session: session, s: s)
+            : session.isClassic
+            ? _ClassicPlayView(session: session, s: s)
             : _PlayView(session: session, s: s),
       GamePhase.summary => _SummaryView(session: session, s: s),
       GamePhase.scoreboard => _ScoreboardView(session: session, s: s),
@@ -335,7 +337,11 @@ class _ReadyView extends ConsumerWidget {
     ];
     final howTo = CartoonCard(
       child: Text(
-        session.isForehead ? s.foreheadHowTo : s.howToPlay,
+        session.isForehead
+            ? s.foreheadHowTo
+            : session.isClassic
+            ? s.classicHowTo
+            : s.howToPlay,
         textAlign: TextAlign.center,
         style: const TextStyle(
           fontSize: 15,
@@ -359,6 +365,10 @@ class _ReadyView extends ConsumerWidget {
       },
     );
 
+    final custom = session.isClassic
+        ? _CustomWordButton(session: session, s: s)
+        : null;
+
     if (landscape) {
       return Padding(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
@@ -378,7 +388,12 @@ class _ReadyView extends ConsumerWidget {
               child: FillOrScroll(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [howTo, const SizedBox(height: 16), start],
+                  children: [
+                    howTo,
+                    const SizedBox(height: 16),
+                    start,
+                    if (custom != null) ...[const SizedBox(height: 10), custom],
+                  ],
                 ),
               ),
             ),
@@ -397,6 +412,7 @@ class _ReadyView extends ConsumerWidget {
           howTo,
           const SizedBox(height: 24),
           start,
+          if (custom != null) ...[const SizedBox(height: 12), custom],
         ],
       ),
     );
@@ -520,23 +536,14 @@ class _PlayView extends ConsumerWidget {
                   const SizedBox(width: 14),
                   Expanded(
                     flex: 2,
-                    child: session.canPass
-                        ? CartoonButton(
-                            label: s.pass,
-                            icon: '⏭️',
-                            height: 120,
-                            fontSize: 26,
-                            color: AppColors.orange,
-                            onPressed: ctrl.markPass,
-                          )
-                        : CartoonButton(
-                            label: s.giveUp,
-                            icon: '🏳️',
-                            height: 120,
-                            fontSize: 26,
-                            color: AppColors.red,
-                            onPressed: () => _confirmGiveUp(context, ref, s),
-                          ),
+                    child: CartoonButton(
+                      label: s.pass,
+                      icon: '⏭️',
+                      height: 120,
+                      fontSize: 26,
+                      color: AppColors.orange,
+                      onPressed: session.canPass ? ctrl.markPass : null,
+                    ),
                   ),
                 ],
               ),
@@ -544,6 +551,176 @@ class _PlayView extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Play (classic mode: one word per turn)
+
+class _ClassicPlayView extends ConsumerWidget {
+  const _ClassicPlayView({required this.session, required this.s});
+
+  final GameSession session;
+  final AppStrings s;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ctrl = ref.read(gameControllerProvider.notifier);
+    final word = session.currentWord;
+    final team = session.game.currentTeamIndex;
+    final swaps = session.config.wordChanges > 0;
+    final custom = word?.categoryId == GameController.customCategoryId;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              TeamAvatar(teamIndex: team, size: 48),
+              const Spacer(),
+              TimerBadge(seconds: session.remainingSeconds, s: s),
+              const Spacer(),
+              IconButton(
+                iconSize: 34,
+                icon: const Icon(Icons.pause_circle_filled_rounded),
+                onPressed: () => ctrl.setPaused(true),
+              ),
+            ],
+          ),
+          Expanded(
+            child: Center(
+              child: PopIn(
+                key: ValueKey(word),
+                child: CartoonCard(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 36,
+                  ),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      word?.text ?? '—',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 48,
+                        height: 1.35,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.ink,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          if (swaps && !custom)
+            Text(
+              s.changesLeft(session.changesLeft),
+              style: const TextStyle(
+                fontSize: 16,
+                color: AppColors.textMuted,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          const SizedBox(height: 12),
+          CartoonButton(
+            label: s.guessedIt,
+            icon: '✅',
+            height: 110,
+            fontSize: 32,
+            color: AppColors.green,
+            onPressed: ctrl.markCorrect,
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              if (swaps && !custom) ...[
+                Expanded(
+                  child: CartoonButton(
+                    label: s.changeWord,
+                    icon: '🔄',
+                    stacked: true,
+                    height: 84,
+                    fontSize: 17,
+                    color: AppColors.orange,
+                    onPressed: session.changesLeft > 0 ? ctrl.changeWord : null,
+                  ),
+                ),
+                const SizedBox(width: 12),
+              ],
+              Expanded(
+                child: CartoonButton(
+                  label: s.giveUp,
+                  icon: '🏳️',
+                  stacked: true,
+                  height: 84,
+                  fontSize: 17,
+                  color: AppColors.red,
+                  onPressed: () => _confirmGiveUp(context, ref, s),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Classic mode, ready screen: the other team types the word instead.
+class _CustomWordButton extends ConsumerWidget {
+  const _CustomWordButton({required this.session, required this.s});
+
+  final GameSession session;
+  final AppStrings s;
+
+  Future<void> _ask(BuildContext context, WidgetRef ref) async {
+    final field = TextEditingController(text: session.customWord?.text);
+    final text = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(s.customWordTitle),
+        content: TextField(
+          controller: field,
+          autofocus: true,
+          maxLength: 40,
+          textInputAction: TextInputAction.done,
+          decoration: InputDecoration(hintText: s.customWordHint),
+          onSubmitted: (v) => Navigator.pop(context, v),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(s.cancel),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.green,
+              foregroundColor: AppColors.ink,
+            ),
+            onPressed: () => Navigator.pop(context, field.text),
+            child: Text(
+              s.confirmWord,
+              style: const TextStyle(fontWeight: FontWeight.w900),
+            ),
+          ),
+        ],
+      ),
+    );
+    field.dispose();
+    if (text != null) {
+      ref.read(gameControllerProvider.notifier).setCustomWord(text);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ready = session.customWord != null;
+    return CartoonChip(
+      label: ready ? '✅ ${s.customWordReady}' : '✍️ ${s.customWordButton}',
+      selected: ready,
+      onTap: () => _ask(context, ref),
     );
   }
 }

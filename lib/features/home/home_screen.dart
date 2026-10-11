@@ -70,12 +70,30 @@ class HomeScreen extends ConsumerWidget {
                 const Spacer(),
                 PopIn(
                   child: CartoonButton(
-                    label: s.teamGame,
-                    subtitle: s.teamGameHint,
+                    label: s.classicGame,
+                    subtitle: s.classicGameHint,
                     icon: '👥',
-                    height: 96,
+                    height: 90,
                     fontSize: 28,
                     color: AppColors.yellow,
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            const SetupScreen(mode: GameMode.classic),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                PopIn(
+                  delay: const Duration(milliseconds: 80),
+                  child: CartoonButton(
+                    label: s.teamGame,
+                    subtitle: s.teamGameHint,
+                    icon: '⚡',
+                    height: 90,
+                    fontSize: 28,
+                    color: AppColors.orange,
                     onPressed: () => Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) => const SetupScreen(mode: GameMode.teams),
@@ -83,14 +101,14 @@ class HomeScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
                 PopIn(
-                  delay: const Duration(milliseconds: 120),
+                  delay: const Duration(milliseconds: 160),
                   child: CartoonButton(
                     label: s.foreheadMode,
                     subtitle: s.foreheadModeHint,
                     icon: '🤳',
-                    height: 96,
+                    height: 90,
                     fontSize: 28,
                     color: AppColors.pink,
                     onPressed: () => Navigator.of(context).push(

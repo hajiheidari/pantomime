@@ -63,6 +63,21 @@ abstract class AppStrings {
   /// Button when no passes are left: give up the word and end the turn.
   String get giveUp;
 
+  /// Classic mode (one word per turn).
+  String get classicGame;
+  String get classicGameHint;
+  String get classicHowTo;
+  String get guessedIt;
+  String get changeWord;
+  String changesLeft(int left);
+  String get wordChangesTitle;
+  String get off;
+  String get customWordButton;
+  String get customWordTitle;
+  String get customWordHint;
+  String get customWordReady;
+  String get confirmWord;
+
   /// Web only: bar on the home screen leading to the app page.
   String get installApp;
   String get giveUpTitle;
@@ -168,9 +183,9 @@ class FaStrings extends AppStrings {
   @override
   String get tagline => 'بی‌صدا بازی کن، بلند بخند!';
   @override
-  String get teamGame => 'بازی تیمی';
+  String get teamGame => 'پانتومیم سرعتی';
   @override
-  String get teamGameHint => 'تیم‌ها نوبتی ادا درمی‌آورند';
+  String get teamGameHint => 'هر تیم در یک دقیقه هر چند کلمه که بتواند';
   @override
   String get foreheadMode => 'گوشی روی پیشونی';
   @override
@@ -247,6 +262,34 @@ class FaStrings extends AppStrings {
   String get noPassLeft => 'پاس تمام شد';
   @override
   String get giveUp => 'انصراف';
+  @override
+  String get classicGame => 'پانتومیم';
+  @override
+  String get classicGameHint => 'هر نوبت فقط یک کلمه';
+  @override
+  String get classicHowTo =>
+      'یک نفر از تیم کلمه را ببیند و بدون حرف زدن ادایش را دربیاورد.\n'
+      'اگر هم‌تیمی‌ها گفتند «گفتند!» را بزن؛ هر کلمه یک امتیاز.';
+  @override
+  String get guessedIt => 'گفتند!';
+  @override
+  String get changeWord => 'عوض کردن کلمه';
+  @override
+  String changesLeft(int left) => 'تعویض باقی‌مانده: ${n(left)}';
+  @override
+  String get wordChangesTitle => 'عوض کردن کلمه (برای هر تیم در کل بازی)';
+  @override
+  String get off => 'خاموش';
+  @override
+  String get customWordButton => 'کلمه را تیم مقابل بدهد';
+  @override
+  String get customWordTitle => 'کلمه‌ی تیم مقابل';
+  @override
+  String get customWordHint => 'کلمه را بنویسید و گوشی را به بازیگر بدهید';
+  @override
+  String get customWordReady => 'کلمه‌ی تیم مقابل آماده است';
+  @override
+  String get confirmWord => 'ثبت کلمه';
   @override
   String get installApp => 'نصب اپ روی گوشی (اندروید و آیفون)';
   @override
@@ -443,9 +486,9 @@ class EnStrings extends AppStrings {
   @override
   String get tagline => 'Act it out, laugh out loud!';
   @override
-  String get teamGame => 'Team game';
+  String get teamGame => 'Speed pantomime';
   @override
-  String get teamGameHint => 'Teams take turns acting';
+  String get teamGameHint => 'As many words as you can in a minute';
   @override
   String get foreheadMode => 'Forehead mode';
   @override
@@ -522,6 +565,35 @@ class EnStrings extends AppStrings {
   String get noPassLeft => 'No passes left';
   @override
   String get giveUp => 'Give up';
+  @override
+  String get classicGame => 'Pantomime';
+  @override
+  String get classicGameHint => 'One word per turn';
+  @override
+  String get classicHowTo =>
+      'One player sees the word and acts it out without speaking.\n'
+      'When the team guesses it, tap "Got it!"; each word is one point.';
+  @override
+  String get guessedIt => 'Got it!';
+  @override
+  String get changeWord => 'Change word';
+  @override
+  String changesLeft(int left) => 'Changes left: $left';
+  @override
+  String get wordChangesTitle => 'Word changes (per team, whole game)';
+  @override
+  String get off => 'Off';
+  @override
+  String get customWordButton => 'Other team picks the word';
+  @override
+  String get customWordTitle => "Other team's word";
+  @override
+  String get customWordHint =>
+      'Type the word, then hand the phone to the actor';
+  @override
+  String get customWordReady => "Other team's word is ready";
+  @override
+  String get confirmWord => 'Use this word';
   @override
   String get installApp => 'Get the app (Android & iPhone)';
   @override
@@ -722,9 +794,9 @@ class ArStrings extends AppStrings {
   @override
   String get tagline => 'مثّل بصمت، واضحك بصوت عالٍ!';
   @override
-  String get teamGame => 'لعب جماعي';
+  String get teamGame => 'بانتومايم سريع';
   @override
-  String get teamGameHint => 'الفرق تمثّل بالتناوب';
+  String get teamGameHint => 'أكبر عدد من الكلمات في دقيقة';
   @override
   String get foreheadMode => 'الهاتف على الجبين';
   @override
@@ -801,6 +873,34 @@ class ArStrings extends AppStrings {
   String get noPassLeft => 'لم يبقَ تخطٍّ';
   @override
   String get giveUp => 'استسلام';
+  @override
+  String get classicGame => 'بانتومايم';
+  @override
+  String get classicGameHint => 'كلمة واحدة في كل دور';
+  @override
+  String get classicHowTo =>
+      'يرى لاعب الكلمة ويمثّلها دون كلام.\n'
+      'عندما يخمّنها الفريق اضغط «خمّنوها!»؛ لكل كلمة نقطة.';
+  @override
+  String get guessedIt => 'خمّنوها!';
+  @override
+  String get changeWord => 'تغيير الكلمة';
+  @override
+  String changesLeft(int left) => 'التغييرات المتبقية: ${n(left)}';
+  @override
+  String get wordChangesTitle => 'تغيير الكلمة (لكل فريق في اللعبة كلها)';
+  @override
+  String get off => 'إيقاف';
+  @override
+  String get customWordButton => 'الفريق المنافس يختار الكلمة';
+  @override
+  String get customWordTitle => 'كلمة الفريق المنافس';
+  @override
+  String get customWordHint => 'اكتب الكلمة ثم أعطِ الهاتف للممثّل';
+  @override
+  String get customWordReady => 'كلمة الفريق المنافس جاهزة';
+  @override
+  String get confirmWord => 'اعتمد الكلمة';
   @override
   String get installApp => 'ثبّت التطبيق (أندرويد وآيفون)';
   @override

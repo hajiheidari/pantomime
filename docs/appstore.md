@@ -27,14 +27,17 @@ four secrets listed there; then push a tag `ios-<n>` to build and upload.
 ## Version page (1.0)
 
 **Promotional text (≤170):**
-Game night in your pocket: act it out in teams or put the phone on your forehead. Works offline, no sign-up.
+Game night in your pocket: classic charades, a speed round, or the phone on your forehead. Works offline, no sign-up.
 
 **Description:**
 ```
 Turn any get-together into a laugh-out-loud game night with Pantomime Party!
 
-TEAM GAME
-2–4 teams, pick the turn length and number of rounds. One player acts out the word without speaking while teammates shout their guesses.
+PANTOMIME (CLASSIC)
+The traditional game: one word per turn. One player acts it out without speaking; if the team guesses it before time runs out, one point. 1–10 words per team, 30 s / 1 min / 2 min, optional word changes, or let the other team pick the word. Most words wins.
+
+SPEED PANTOMIME
+2–4 teams race the clock: act out and guess as many words as you can in one turn.
 
 FOREHEAD MODE
 Put the phone on your forehead while your friends act it out. Tilt down = correct, tilt up = pass.
@@ -63,7 +66,7 @@ MORE FUN
   `lib/core/widgets/tablet_scale.dart`).
 
 **App Review Information:** no sign-in required. Notes:
-`No account needed. Tap "Team game" or "Forehead mode", then "Let's go!". Forehead mode uses the motion sensor; on the simulator use "Start with buttons".`
+`No account needed. Tap "Pantomime", "Speed pantomime" or "Forehead mode", then "Let's go!". Forehead mode uses the motion sensor; on the simulator use "Start with buttons".`
 
 ## App Privacy
 

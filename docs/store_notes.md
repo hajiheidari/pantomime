@@ -166,13 +166,14 @@ forehead mode.
 **Title:** پانتومیم دورهمی · **Short name (under icon):** پانتومیم
 
 **Short description (≤80):**
-بازی پانتومیم و حدس کلمه برای دورهمی‌ها؛ تیمی یا گوشی روی پیشونی!
+پانتومیم کلاسیک، سرعتی یا گوشی روی پیشونی؛ بازی حدس کلمه برای دورهمی‌ها!
 
 **Long description:**
 > دورهمی‌تان را با «پانتومیم دورهمی» پر از خنده کنید! 🎭
 >
-> 👥 **بازی تیمی:** ۲ تا ۴ تیم، زمان و تعداد نوبت دلخواه، یک نفر بی‌صدا ادا
-> درمی‌آورد و هم‌تیمی‌ها حدس می‌زنند.
+> 👥 **پانتومیم:** همان بازی قدیمی؛ هر نوبت یک کلمه. یک نفر بی‌صدا ادا
+> درمی‌آورد و اگر هم‌تیمی‌ها گفتند، یک امتیاز. کلمه را اپ می‌دهد یا تیم مقابل.
+> ⚡ **پانتومیم سرعتی:** هر تیم در یک نوبت هر چند کلمه که بتواند!
 > 🤳 **گوشی روی پیشونی:** گوشی را روی پیشانی بگذار؛ دوستانت ادا درمی‌آورند،
 > سرت را پایین بیاور = درست، بالا = پاس.
 > 📚 بیش از ۹۰۰ کلمه در ۱۳ دسته: فیلم و سریال، غذای ایرانی، حیوانات،
@@ -191,8 +192,10 @@ Charades for parties: act it out in teams or with the phone on your forehead!
 **Long description:**
 > Turn any get-together into a laugh-out-loud game night with Pantomime Party! 🎭
 >
-> 👥 **Team game:** 2–4 teams, pick the turn length and number of rounds. One
-> player acts out the word without speaking, teammates shout their guesses.
+> 👥 **Pantomime:** the classic game, one word per turn. One player acts it
+> out without speaking; guessed in time = one point. The app or the other
+> team picks the word.
+> ⚡ **Speed pantomime:** as many words as you can in one turn!
 > 🤳 **Forehead mode:** put the phone on your forehead while your friends act
 > it out. Tilt down = correct, tilt up = pass.
 > 📚 800+ words in 11 categories: movies, food, animals, jobs, idioms,

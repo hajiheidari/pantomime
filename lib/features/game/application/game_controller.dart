@@ -36,6 +36,8 @@ class GameSession {
     this.passesUsed = 0,
     this.paused = false,
     this.tiltBaseline = 0,
+    this.changesUsed = const [],
+    this.customWord,
   });
 
   final GameState game;
@@ -50,8 +52,22 @@ class GameSession {
   /// Forehead mode: calibrated neutral pitch (degrees).
   final double tiltBaseline;
 
+  /// Classic mode: word swaps used by each team so far in this game.
+  final List<int> changesUsed;
+
+  /// Classic mode: a word the other team typed for the next turn.
+  final WordEntry? customWord;
+
   GameConfig get config => game.config;
   bool get isForehead => config.mode == GameMode.forehead;
+  bool get isClassic => config.mode == GameMode.classic;
+
+  /// Classic mode: word swaps the current team has left.
+  int get changesLeft {
+    final team = game.currentTeamIndex;
+    final used = team < changesUsed.length ? changesUsed[team] : 0;
+    return (config.wordChanges - used).clamp(0, config.wordChanges);
+  }
 
   /// Passes left this turn, `null` = unlimited.
   int? get passesLeft {
@@ -76,6 +92,8 @@ class GameSession {
     int? passesUsed,
     bool? paused,
     double? tiltBaseline,
+    List<int>? changesUsed,
+    WordEntry? Function()? customWord,
   }) => GameSession(
     game: game ?? this.game,
     phase: phase ?? this.phase,
@@ -86,6 +104,8 @@ class GameSession {
     passesUsed: passesUsed ?? this.passesUsed,
     paused: paused ?? this.paused,
     tiltBaseline: tiltBaseline ?? this.tiltBaseline,
+    changesUsed: changesUsed ?? this.changesUsed,
+    customWord: customWord != null ? customWord() : this.customWord,
   );
 }
 
@@ -128,7 +148,11 @@ class GameController extends Notifier<GameSession?> {
       seen: store.load(lang),
       onSeenChanged: (seen) => store.save(lang, seen),
     );
-    state = GameSession(game: GameState.start(config), phase: GamePhase.ready);
+    state = GameSession(
+      game: GameState.start(config),
+      phase: GamePhase.ready,
+      changesUsed: List.filled(config.teamCount, 0),
+    );
   }
 
   /// Same settings, fresh scores.
@@ -144,6 +168,25 @@ class GameController extends Notifier<GameSession?> {
   }
 
   // ---- Turn flow -----------------------------------------------------------
+
+  /// Classic mode, ready screen: the other team gives the next word
+  /// (empty text clears it, so the app picks one again).
+  void setCustomWord(String text) {
+    final s = state;
+    if (s == null || !s.isClassic || s.phase != GamePhase.ready) return;
+    final t = text.trim();
+    state = s.copyWith(
+      customWord: () => t.isEmpty
+          ? null
+          : WordEntry(
+              text: t,
+              categoryId: customCategoryId,
+              difficulty: Difficulty.medium,
+            ),
+    );
+  }
+
+  static const customCategoryId = 'custom';
 
   /// "Start" on the ready screen: forehead mode calibrates first.
   void startTurn() {
@@ -199,7 +242,8 @@ class GameController extends Notifier<GameSession?> {
     state = s.copyWith(
       phase: GamePhase.playing,
       remainingSeconds: s.config.roundSeconds,
-      currentWord: () => _picker?.next(),
+      currentWord: () => s.customWord ?? _picker?.next(),
+      customWord: () => null,
       results: const [],
       passesUsed: 0,
       paused: false,
@@ -221,7 +265,35 @@ class GameController extends Notifier<GameSession?> {
     if (left <= warningSeconds) _feedback.tick();
   }
 
-  void markCorrect() => _answer(WordOutcome.correct);
+  /// Speed mode: next word. Classic mode: the team guessed it, turn over.
+  void markCorrect() {
+    final s = state;
+    if (s != null && s.isClassic) return _finishClassic(WordOutcome.correct);
+    _answer(WordOutcome.correct);
+  }
+
+  /// Classic mode: swap the word (limited per team for the whole game).
+  void changeWord() {
+    final s = state;
+    if (s == null ||
+        !s.isClassic ||
+        s.phase != GamePhase.playing ||
+        s.paused ||
+        s.changesLeft <= 0) {
+      return;
+    }
+    final team = s.game.currentTeamIndex;
+    final used = [...s.changesUsed];
+    while (used.length <= team) {
+      used.add(0);
+    }
+    used[team]++;
+    _feedback.pass();
+    state = s.copyWith(
+      changesUsed: used,
+      currentWord: () => _picker?.next() ?? s.currentWord,
+    );
+  }
 
   void markPass() {
     final s = state;
@@ -229,17 +301,20 @@ class GameController extends Notifier<GameSession?> {
     _answer(WordOutcome.passed);
   }
 
-  /// The team gives up on the current word (no passes left): the word
-  /// counts as passed and the turn ends now instead of waiting for the clock.
+  /// Classic mode: the team gives up on the word; the turn ends now
+  /// instead of waiting for the clock.
   void giveUp() {
+    final s = state;
+    if (s != null && s.isClassic) _finishClassic(WordOutcome.passed);
+  }
+
+  void _finishClassic(WordOutcome outcome) {
     final s = state;
     if (s == null || s.phase != GamePhase.playing || s.paused) return;
     final word = s.currentWord;
+    if (outcome == WordOutcome.correct) _feedback.correct();
     state = s.copyWith(
-      results: [
-        ...s.results,
-        if (word != null) WordResult(word, WordOutcome.passed),
-      ],
+      results: [if (word != null) WordResult(word, outcome)],
       currentWord: () => null,
     );
     _endTurn();

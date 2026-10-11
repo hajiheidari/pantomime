@@ -45,12 +45,12 @@ void main() {
     await settle(tester);
 
     // Home
-    expect(find.text('بازی تیمی'), findsOneWidget);
+    expect(find.text('پانتومیم سرعتی'), findsOneWidget);
     expect(
-      Directionality.of(tester.element(find.text('بازی تیمی'))),
+      Directionality.of(tester.element(find.text('پانتومیم سرعتی'))),
       TextDirection.rtl,
     );
-    await tester.tap(find.text('بازی تیمی'));
+    await tester.tap(find.text('پانتومیم سرعتی'));
     await settle(tester);
 
     // Setup: defaults (2 teams, all categories) → start
