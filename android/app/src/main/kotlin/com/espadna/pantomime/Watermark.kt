@@ -36,18 +36,19 @@ class Watermark(private val context: Context) : MethodChannel.MethodCallHandler 
         val input = call.argument<String>("input")
         val output = call.argument<String>("output")
         val png = call.argument<ByteArray>("overlay")
+        val left = call.argument<Boolean>("left") ?: false
         if (input == null || output == null || png == null) {
             result.error("args", "input, output and overlay are required", null)
             return
         }
         try {
-            start(input, output, png, result)
+            start(input, output, png, left, result)
         } catch (e: Exception) {
             result.error("watermark", e.message, null)
         }
     }
 
-    private fun start(input: String, output: String, png: ByteArray, result: MethodChannel.Result) {
+    private fun start(input: String, output: String, png: ByteArray, left: Boolean, result: MethodChannel.Result) {
         val bitmap = BitmapFactory.decodeByteArray(png, 0, png.size)
             ?: throw IllegalArgumentException("overlay is not an image")
 
@@ -67,9 +68,10 @@ class Watermark(private val context: Context) : MethodChannel.MethodCallHandler 
 
         val settings = OverlaySettings.Builder()
             .setScale(scale, scale)
-            // Overlay's bottom-right corner near the frame's bottom-right.
-            .setOverlayFrameAnchor(1f, -1f)
-            .setBackgroundFrameAnchor(0.95f, -0.93f)
+            // Overlay's bottom corner near the frame's bottom-right (or
+            // bottom-left for left-to-right languages).
+            .setOverlayFrameAnchor(if (left) -1f else 1f, -1f)
+            .setBackgroundFrameAnchor(if (left) -0.95f else 0.95f, -0.93f)
             .build()
         val overlay = BitmapOverlay.createStaticBitmapOverlay(bitmap, settings)
         val item = EditedMediaItem.Builder(MediaItem.fromUri(File(input).toURI().toString()))

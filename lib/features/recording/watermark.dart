@@ -49,6 +49,7 @@ Future<String> _apply(String clip, AppStrings s, int score) async {
             'input': clip,
             'output': out,
             'overlay': png,
+            'left': !s.isRtl,
           })
           .timeout(const Duration(seconds: 120));
       if (path != null && File(path).existsSync()) result = path;
@@ -73,7 +74,8 @@ const watermarkLogoAsset = 'assets/branding/icon_512.png';
 
 /// The watermark as a transparent PNG: the app icon next to the game name
 /// (yellow, outlined so it reads on any background) and the site address
-/// under it. No backing box, it hugs the bottom corner.
+/// under it. No backing box; it hugs the bottom-right corner (RTL) or the
+/// bottom-left one (LTR).
 Future<Uint8List> renderWatermark({
   required String name,
   required String detail,
@@ -97,7 +99,7 @@ Future<Uint8List> renderWatermark({
     final b =
         ui.ParagraphBuilder(
             ui.ParagraphStyle(
-              textAlign: TextAlign.right,
+              textAlign: rtl ? TextAlign.right : TextAlign.left,
               textDirection: d ?? dir,
               maxLines: 1,
               ellipsis: '…',
@@ -136,19 +138,11 @@ Future<Uint8List> renderWatermark({
     d: TextDirection.ltr,
   );
 
-  // Text block sits beside the logo; everything is pushed to the right edge
-  // (the corner the native side anchors to).
-  final textW = [
-    nameIn.longestLine,
-    detailIn.longestLine,
-  ].reduce((a, b) => a > b ? a : b);
-  final logoLeft = rtl
-      ? width - logoSize - 6
-      : width - 6 - textW - gap - logoSize;
-  // Paragraphs are right-aligned inside textWidth, so offset them so their end
-  // lands where we want.
-  final textEnd = rtl ? logoLeft - gap : width - 6;
-  final textX = textEnd - textWidth;
+  // Text block sits beside the logo, and everything hugs the corner the
+  // native side anchors to: bottom-right for RTL, bottom-left for LTR.
+  final logoLeft = rtl ? width - logoSize - 6 : 6.0;
+  // Paragraphs are aligned inside textWidth towards the logo.
+  final textX = rtl ? logoLeft - gap - textWidth : logoLeft + logoSize + gap;
   final textH = nameIn.height + detailIn.height;
   final textTop = (height - textH) / 2;
 

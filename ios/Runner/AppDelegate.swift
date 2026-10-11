@@ -38,7 +38,11 @@ enum Watermark {
       result(FlutterMethodNotImplemented)
       return
     }
-    apply(input: URL(fileURLWithPath: input), output: URL(fileURLWithPath: output), overlay: image) {
+    let left = args["left"] as? Bool ?? false
+    apply(
+      input: URL(fileURLWithPath: input), output: URL(fileURLWithPath: output), overlay: image,
+      left: left
+    ) {
       error in
       DispatchQueue.main.async {
         if let error = error {
@@ -62,7 +66,8 @@ enum Watermark {
   }
 
   static func apply(
-    input: URL, output: URL, overlay: CGImage, completion: @escaping (Error?) -> Void
+    input: URL, output: URL, overlay: CGImage, left: Bool = false,
+    completion: @escaping (Error?) -> Void
   ) {
     let fail = { (message: String) in
       completion(NSError(domain: "watermark", code: 1, userInfo: [NSLocalizedDescriptionKey: message]))
@@ -75,7 +80,8 @@ enum Watermark {
     let mark = CIImage(cgImage: decoded)
 
     // Core Image composites the mark onto every (already upright) frame:
-    // ~60% of the width, bottom-right with a 3% margin. Core Image's origin
+    // ~60% of the width, bottom-right (bottom-left when [left]) with a 3%
+    // margin. Core Image's origin
     // is bottom-left.
     let video = AVMutableVideoComposition(asset: asset) { request in
       let frame = request.sourceImage
@@ -87,7 +93,8 @@ enum Watermark {
         .transformed(by: CGAffineTransform(scaleX: scale, y: scale))
         .transformed(
           by: CGAffineTransform(
-            translationX: box.maxX - w - margin, y: box.minY + margin))
+            translationX: left ? box.minX + margin : box.maxX - w - margin,
+            y: box.minY + margin))
       request.finish(with: placed.composited(over: frame).cropped(to: box), context: nil)
     }
 

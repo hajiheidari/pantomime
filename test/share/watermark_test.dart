@@ -26,8 +26,17 @@ void main() {
       logo: File('assets/branding/icon_512.png').readAsBytesSync(),
     );
     expect(png.sublist(1, 4), 'PNG'.codeUnits);
+    final ltr = await renderWatermark(
+      name: 'Pantomime Party',
+      detail: 'espadna.com/pantomime-app',
+      rtl: false,
+      logo: File('assets/branding/icon_512.png').readAsBytesSync(),
+    );
     final out = Platform.environment['WATERMARK_PREVIEW'];
-    if (out != null) File(out).writeAsBytesSync(png);
+    if (out != null) {
+      File(out).writeAsBytesSync(png);
+      File(out.replaceFirst('.png', '_ltr.png')).writeAsBytesSync(ltr);
+    }
   });
 
   test('native failure → original clip (sharing never breaks)', () async {
