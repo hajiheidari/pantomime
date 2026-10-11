@@ -62,7 +62,7 @@ void main() {
     final button = t.getRect(find.widgetWithText(CartoonButton, s.share));
     expect(button.bottom, lessThanOrEqualTo(430));
     expect(button.top, greaterThanOrEqualTo(0));
-    expect(find.text('espadna.com/pantomime-app/fa'), findsOneWidget);
+    expect(find.text('pantomime.espadna.com'), findsOneWidget);
     expect(t.takeException(), isNull);
   });
 
@@ -110,25 +110,25 @@ void main() {
   test('share links per store and language', () {
     expect(
       shareLink('fa', AppStore.bazaar),
-      'https://espadna.ir/pantomime-app/fa/',
-    );
-    expect(
-      shareLink('en', AppStore.myket),
-      'https://espadna.ir/pantomime-app/fa/',
-    );
-    expect(
-      shareLink('fa', AppStore.ios),
-      'https://espadna.com/pantomime-app/fa/',
+      'https://pantomime.espadna.ir/?lang=fa',
     );
     expect(
       shareLink('ar', AppStore.play),
-      'https://espadna.com/pantomime-app/ar/',
+      'https://pantomime.espadna.com/?lang=ar',
     );
-    expect(shareLink('en', AppStore.ios), 'https://espadna.com/pantomime-app/');
-    expect(shareLinkLabel('en', AppStore.ios), 'espadna.com/pantomime-app');
+    expect(shareLinkLabel('en', AppStore.ios), 'pantomime.espadna.com');
+    expect(shareLinkLabel('fa', AppStore.myket), 'pantomime.espadna.ir');
     expect(
       withShareLink('hi', 'en', AppStore.ios),
-      'hi\nhttps://espadna.com/pantomime-app/',
+      'hi\nhttps://pantomime.espadna.com/?lang=en',
+    );
+    expect(
+      appPageLink('fa', AppStore.bazaar),
+      'https://espadna.ir/pantomime-app/fa/',
+    );
+    expect(
+      appPageLink('en', AppStore.ios),
+      'https://espadna.com/pantomime-app/',
     );
   });
 }

@@ -62,6 +62,9 @@ abstract class AppStrings {
 
   /// Button when no passes are left: give up the word and end the turn.
   String get giveUp;
+
+  /// Web only: bar on the home screen leading to the app page.
+  String get installApp;
   String get giveUpTitle;
   String get giveUpBody;
   String get timeUp;
@@ -244,6 +247,8 @@ class FaStrings extends AppStrings {
   String get noPassLeft => 'پاس تمام شد';
   @override
   String get giveUp => 'انصراف';
+  @override
+  String get installApp => 'نصب اپ روی گوشی (اندروید و آیفون)';
   @override
   String get giveUpTitle => 'انصراف از این کلمه؟';
   @override
@@ -517,6 +522,8 @@ class EnStrings extends AppStrings {
   String get noPassLeft => 'No passes left';
   @override
   String get giveUp => 'Give up';
+  @override
+  String get installApp => 'Get the app (Android & iPhone)';
   @override
   String get giveUpTitle => 'Give up this word?';
   @override
@@ -794,6 +801,8 @@ class ArStrings extends AppStrings {
   String get noPassLeft => 'لم يبقَ تخطٍّ';
   @override
   String get giveUp => 'استسلام';
+  @override
+  String get installApp => 'ثبّت التطبيق (أندرويد وآيفون)';
   @override
   String get giveUpTitle => 'الاستسلام في هذه الكلمة؟';
   @override

@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/providers.dart';
 import '../../core/store/store_service.dart';
@@ -13,6 +15,7 @@ import '../ads/config/remote_config.dart';
 import '../game/domain/game_config.dart';
 import '../game/presentation/setup_screen.dart';
 import '../settings/settings_screen.dart';
+import '../share/share_link.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -28,6 +31,7 @@ class HomeScreen extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
               children: [
+                if (kIsWeb) const _InstallBar(),
                 Align(
                   alignment: AlignmentDirectional.centerEnd,
                   child: IconButton(
@@ -103,6 +107,46 @@ class HomeScreen extends ConsumerWidget {
                 const HomeBanner(),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Web game only: leads to the app page, where every store is listed.
+class _InstallBar extends ConsumerWidget {
+  const _InstallBar();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final s = ref.watch(stringsProvider);
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: GestureDetector(
+        onTap: () => launchUrl(
+          Uri.parse(appPageLink(s.languageCode)),
+          webOnlyWindowName: '_blank',
+        ),
+        child: CartoonCard(
+          color: AppColors.green,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          child: Row(
+            children: [
+              const Text('📲', style: TextStyle(fontSize: 22)),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  s.installApp,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.ink,
+                  ),
+                ),
+              ),
+              const Icon(Icons.open_in_new_rounded, color: AppColors.ink),
+            ],
           ),
         ),
       ),

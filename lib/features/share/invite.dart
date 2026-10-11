@@ -10,8 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/providers.dart';
 import 'share_link.dart';
 
-/// Invite links: every shared link carries this install's code (?i=CODE).
-/// The landing page reports a friend's visit to the server (Cloudflare
+/// Invite links: every shared link carries this install's code (i=CODE).
+/// The web game (or the app page) reports a friend's visit to the server (Cloudflare
 /// Worker, server/src/invite.js, or its copy on the Iranian host), and once
 /// anyone has opened the link the special categories unlock for good.
 /// Sharing alone still unlocks a category for the current app session.
@@ -70,6 +70,24 @@ class InviteService {
       debugPrint('invite check $endpoint: $e');
       return 0;
     }
+  }
+}
+
+/// Web game opened from someone's invite link (?i=CODE): count the visit.
+/// Link-preview bots don't run the game, so only real visits count.
+Future<void> reportInviteVisit({http.Client? client}) async {
+  if (!kIsWeb) return;
+  final code = Uri.base.queryParameters['i'];
+  if (code == null || !InviteService._valid.hasMatch(code)) return;
+  final api = Uri.base.host.endsWith('espadna.ir')
+      ? inviteEndpoints[1]
+      : inviteEndpoints[0];
+  try {
+    await (client ?? http.Client())
+        .post(Uri.parse('$api/invite/$code'))
+        .timeout(const Duration(seconds: 8));
+  } catch (e) {
+    debugPrint('invite visit: $e');
   }
 }
 

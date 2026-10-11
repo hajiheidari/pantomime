@@ -21,14 +21,14 @@ void main() {
     await font.load();
     final png = await renderWatermark(
       name: 'پانتومیم دورهمی',
-      detail: 'espadna.com/pantomime-app/fa',
+      detail: 'pantomime.espadna.com',
       rtl: true,
       logo: File('assets/branding/icon_512.png').readAsBytesSync(),
     );
     expect(png.sublist(1, 4), 'PNG'.codeUnits);
     final ltr = await renderWatermark(
       name: 'Pantomime Party',
-      detail: 'espadna.com/pantomime-app',
+      detail: 'pantomime.espadna.com',
       rtl: false,
       logo: File('assets/branding/icon_512.png').readAsBytesSync(),
     );

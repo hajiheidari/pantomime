@@ -40,11 +40,8 @@ void main() {
 
   test('shared links carry the code', () {
     inviteCode = 'K7Q2ABCD';
-    expect(
-      withShareLink('hi', 'fa'),
-      endsWith('/pantomime-app/fa/?i=K7Q2ABCD'),
-    );
+    expect(withShareLink('hi', 'fa'), endsWith('/?lang=fa&i=K7Q2ABCD'));
     inviteCode = null;
-    expect(withShareLink('hi', 'fa'), endsWith('/pantomime-app/fa/'));
+    expect(withShareLink('hi', 'fa'), endsWith('/?lang=fa'));
   });
 }
