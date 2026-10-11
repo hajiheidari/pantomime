@@ -59,6 +59,11 @@ abstract class AppStrings {
   String get pass;
   String passesLeft(int? left);
   String get noPassLeft;
+
+  /// Button when no passes are left: give up the word and end the turn.
+  String get giveUp;
+  String get giveUpTitle;
+  String get giveUpBody;
   String get timeUp;
   String get paused;
   String get resume;
@@ -237,6 +242,13 @@ class FaStrings extends AppStrings {
       left == null ? 'پاس: نامحدود' : 'پاس باقی‌مانده: ${n(left)}';
   @override
   String get noPassLeft => 'پاس تمام شد';
+  @override
+  String get giveUp => 'انصراف';
+  @override
+  String get giveUpTitle => 'انصراف از این کلمه؟';
+  @override
+  String get giveUpBody =>
+      'این کلمه حدس‌زده‌نشده حساب می‌شود و نوبت همین حالا تمام می‌شود.';
   @override
   String get timeUp => 'وقت تمام شد!';
   @override
@@ -503,6 +515,13 @@ class EnStrings extends AppStrings {
       left == null ? 'Passes: unlimited' : 'Passes left: $left';
   @override
   String get noPassLeft => 'No passes left';
+  @override
+  String get giveUp => 'Give up';
+  @override
+  String get giveUpTitle => 'Give up this word?';
+  @override
+  String get giveUpBody =>
+      'The word counts as not guessed and the turn ends right now.';
   @override
   String get timeUp => "Time's up!";
   @override
@@ -773,6 +792,12 @@ class ArStrings extends AppStrings {
       left == null ? 'التخطي: بلا حدود' : 'مرات التخطي المتبقية: ${n(left)}';
   @override
   String get noPassLeft => 'لم يبقَ تخطٍّ';
+  @override
+  String get giveUp => 'استسلام';
+  @override
+  String get giveUpTitle => 'الاستسلام في هذه الكلمة؟';
+  @override
+  String get giveUpBody => 'تُحسب الكلمة غير مخمَّنة وينتهي الدور الآن.';
   @override
   String get timeUp => 'انتهى الوقت!';
   @override

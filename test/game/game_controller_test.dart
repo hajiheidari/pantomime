@@ -5,6 +5,7 @@ import 'package:pantomime/features/game/application/feedback_service.dart';
 import 'package:pantomime/features/game/application/game_controller.dart';
 import 'package:pantomime/features/game/application/sound_service.dart';
 import 'package:pantomime/features/game/domain/game_config.dart';
+import 'package:pantomime/features/game/domain/game_state.dart';
 import 'package:pantomime/features/words/domain/word_models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -61,6 +62,26 @@ void main() {
     ctrl.setPaused(true); // ready: no effect
     expect(c.read(gameControllerProvider)!.phase, GamePhase.ready);
     expect(c.read(gameControllerProvider)!.paused, isFalse);
+    ctrl.quit();
+  });
+
+  testWidgets('give up ends the turn without waiting for the clock', (
+    tester,
+  ) async {
+    final c = await container();
+    final ctrl = c.read(gameControllerProvider.notifier);
+    ctrl.startGame(const GameConfig(teamNames: ['A', 'B']), words);
+    ctrl.startTurn();
+    await tester.pump(const Duration(seconds: 4));
+    final s = c.read(gameControllerProvider)!;
+    expect(s.phase, GamePhase.playing);
+    final word = s.currentWord!;
+    ctrl.giveUp();
+    final after = c.read(gameControllerProvider)!;
+    expect(after.phase, GamePhase.summary);
+    final turn = after.lastTurn!;
+    expect(turn.results.last.word, word);
+    expect(turn.results.last.outcome, WordOutcome.passed);
     ctrl.quit();
   });
 }

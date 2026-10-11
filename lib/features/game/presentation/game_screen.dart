@@ -520,14 +520,23 @@ class _PlayView extends ConsumerWidget {
                   const SizedBox(width: 14),
                   Expanded(
                     flex: 2,
-                    child: CartoonButton(
-                      label: s.pass,
-                      icon: '⏭️',
-                      height: 120,
-                      fontSize: 26,
-                      color: AppColors.orange,
-                      onPressed: session.canPass ? ctrl.markPass : null,
-                    ),
+                    child: session.canPass
+                        ? CartoonButton(
+                            label: s.pass,
+                            icon: '⏭️',
+                            height: 120,
+                            fontSize: 26,
+                            color: AppColors.orange,
+                            onPressed: ctrl.markPass,
+                          )
+                        : CartoonButton(
+                            label: s.giveUp,
+                            icon: '🏳️',
+                            height: 120,
+                            fontSize: 26,
+                            color: AppColors.red,
+                            onPressed: () => _confirmGiveUp(context, ref, s),
+                          ),
                   ),
                 ],
               ),
@@ -541,6 +550,42 @@ class _PlayView extends ConsumerWidget {
 
 // ---------------------------------------------------------------------------
 // Summary
+
+/// Asks before giving up (the clock is paused meanwhile).
+Future<void> _confirmGiveUp(
+  BuildContext context,
+  WidgetRef ref,
+  AppStrings s,
+) async {
+  final ctrl = ref.read(gameControllerProvider.notifier);
+  ctrl.setPaused(true);
+  final yes = await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(s.giveUpTitle),
+      content: Text(s.giveUpBody),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: Text(s.cancel),
+        ),
+        FilledButton(
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.red,
+            foregroundColor: Colors.white,
+          ),
+          onPressed: () => Navigator.pop(context, true),
+          child: Text(
+            '🏳️ ${s.giveUp}',
+            style: const TextStyle(fontWeight: FontWeight.w900),
+          ),
+        ),
+      ],
+    ),
+  );
+  ctrl.setPaused(false);
+  if (yes ?? false) ctrl.giveUp();
+}
 
 class _SummaryView extends ConsumerWidget {
   const _SummaryView({required this.session, required this.s});

@@ -229,6 +229,22 @@ class GameController extends Notifier<GameSession?> {
     _answer(WordOutcome.passed);
   }
 
+  /// The team gives up on the current word (no passes left): the word
+  /// counts as passed and the turn ends now instead of waiting for the clock.
+  void giveUp() {
+    final s = state;
+    if (s == null || s.phase != GamePhase.playing || s.paused) return;
+    final word = s.currentWord;
+    state = s.copyWith(
+      results: [
+        ...s.results,
+        if (word != null) WordResult(word, WordOutcome.passed),
+      ],
+      currentWord: () => null,
+    );
+    _endTurn();
+  }
+
   void _answer(WordOutcome outcome) {
     final s = state;
     final word = s?.currentWord;
