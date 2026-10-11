@@ -24,6 +24,14 @@ String shareLinkLabel(String languageCode, [AppStore? store]) => shareLink(
   store,
 ).replaceFirst(RegExp('^https://'), '').replaceFirst(RegExp(r'/$'), '');
 
+/// This install's invite code (set at startup, see invite.dart): shared
+/// links carry it as ?i=<code> so a friend's visit can be counted.
+String? inviteCode;
+
+/// [url] with the invite code, if there is one.
+String withInviteCode(String url) =>
+    inviteCode == null ? url : '$url?i=$inviteCode';
+
 /// Caption text followed by the landing page link on its own line.
 String withShareLink(String caption, String languageCode, [AppStore? store]) =>
-    '$caption\n${shareLink(languageCode, store)}';
+    '$caption\n${withInviteCode(shareLink(languageCode, store))}';

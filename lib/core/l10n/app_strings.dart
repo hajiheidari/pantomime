@@ -80,6 +80,9 @@ abstract class AppStrings {
   String get bonusBadge;
   String get unlockTitle;
   String get unlockBody;
+
+  /// Snackbar when a friend opened the invite link.
+  String get inviteUnlockedForever;
   String get watchAd;
   String get cancel;
   String get unlockSkipped;
@@ -274,7 +277,10 @@ class FaStrings extends AppStrings {
   String get unlockTitle => 'باز کردن دسته ویژه';
   @override
   String get unlockBody =>
-      'بازی را برای دوستانت بفرست تا این دسته باز شود؛ تا وقتی بازی باز است در دسترس می‌ماند.';
+      'بازی را برای دوستانت بفرست تا این دسته باز شود. هر وقت یکی از آن‌ها لینک را باز کند، همه‌ی دسته‌های ویژه برای همیشه باز می‌شوند.';
+  @override
+  String get inviteUnlockedForever =>
+      '🎉 یکی از دوستانت لینک را باز کرد؛ دسته‌های ویژه برای همیشه باز شد!';
   @override
   String get watchAd => 'دیدن تبلیغ';
   @override
@@ -537,7 +543,10 @@ class EnStrings extends AppStrings {
   String get unlockTitle => 'Unlock bonus category';
   @override
   String get unlockBody =>
-      'Send the game to your friends to unlock this category until you close the app.';
+      'Send the game to your friends to unlock this category. Once one of them opens the link, all bonus categories stay unlocked for good.';
+  @override
+  String get inviteUnlockedForever =>
+      '🎉 A friend opened your link: bonus categories are unlocked for good!';
   @override
   String get watchAd => 'Watch ad';
   @override
@@ -804,7 +813,10 @@ class ArStrings extends AppStrings {
   String get unlockTitle => 'افتح الفئة الإضافية';
   @override
   String get unlockBody =>
-      'أرسل اللعبة إلى أصدقائك لفتح هذه الفئة حتى تغلق التطبيق.';
+      'أرسل اللعبة إلى أصدقائك لفتح هذه الفئة. عندما يفتح أحدهم الرابط، تبقى كل الفئات الإضافية مفتوحة دائمًا.';
+  @override
+  String get inviteUnlockedForever =>
+      '🎉 فتح أحد أصدقائك رابطك: الفئات الإضافية مفتوحة دائمًا!';
   @override
   String get watchAd => 'شاهد الإعلان';
   @override

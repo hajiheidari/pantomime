@@ -4,6 +4,7 @@
 //   GET  /config.json                  → current config (cached 5 min)
 //   GET  /words_fa.json                → current word list (cached 5 min)
 //   GET  /privacy                      → privacy policy page (fa + en)
+//   GET|POST /invite/<code>            → invite link visits (see invite.js)
 //   POST /tg/<WEBHOOK_PATH>            → Telegram webhook (admin only)
 //
 // Bindings (see wrangler.toml / README):
@@ -15,6 +16,7 @@
 //   MIRROR_*           optional S3-compatible mirror (see mirror.js)
 import { runCommand } from './commands.js';
 import { summary } from './config.js';
+import { handleInvite } from './invite.js';
 import { mirrorEnabled, pushToMirror } from './mirror.js';
 import { privacyHtml } from './privacy.js';
 import { ConfigStore, WordStore } from './store.js';
@@ -228,6 +230,8 @@ export default {
     if (request.method === 'POST' && env.WEBHOOK_PATH && url.pathname === `/tg/${env.WEBHOOK_PATH}`) {
       return handleTelegram(request, env, ctx);
     }
+    const invite = url.pathname.match(/^\/invite\/([^/]+)$/);
+    if (invite) return handleInvite(request, env, invite[1]);
     if (url.pathname === '/privacy') {
       return new Response(privacyHtml(env.CONTACT_EMAIL), {
         headers: {

@@ -11,6 +11,7 @@ import 'core/l10n/default_language.dart';
 import 'core/providers.dart';
 import 'features/ads/ads_providers.dart';
 import 'features/settings/settings_controller.dart';
+import 'features/share/invite.dart';
 import 'features/words/words_providers.dart';
 
 Future<void> main() async {
@@ -44,6 +45,9 @@ Future<void> main() async {
       child: const PantomimeApp(),
     ),
   );
+  // Invite code for shared links; a friend may have opened one meanwhile.
+  container.read(inviteServiceProvider);
+  unawaited(container.read(bonusForeverProvider.notifier).refresh());
   // Remote config + ad SDKs: background only, never blocks start.
   unawaited(startAds(container));
   // A newer word list, if one was published (background, offline-safe).

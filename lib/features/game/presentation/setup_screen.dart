@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ import '../../words/words_providers.dart';
 import '../application/game_controller.dart';
 import '../domain/game_config.dart';
 import 'game_screen.dart';
+import '../../share/invite.dart';
 import '../../share/share_sheet.dart';
 
 class SetupScreen extends ConsumerStatefulWidget {
@@ -43,6 +45,10 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
   @override
   void initState() {
     super.initState();
+    // Did a friend open the invite link? Checked now and whenever the app
+    // comes back (e.g. after the share sheet).
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkInvite());
+    _lifecycle = AppLifecycleListener(onResume: _checkInvite);
     // Empty name = "use the default name in the current language" (hint).
     _config = GameConfig.defaults(widget.mode);
     final raw = ref.read(sharedPreferencesProvider).getString(_prefsKey);
@@ -61,8 +67,18 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     }
   }
 
+  late final AppLifecycleListener _lifecycle;
+
+  Future<void> _checkInvite() async {
+    final unlocked = await ref.read(bonusForeverProvider.notifier).refresh();
+    if (!unlocked || !mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(_s.inviteUnlockedForever)));
+  }
+
   @override
   void dispose() {
+    _lifecycle.dispose();
     for (final c in _names) {
       c.dispose();
     }
@@ -171,6 +187,8 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     } else {
       // Only an explicit "cancel" keeps it locked; platforms that cannot
       // tell (some Android apps, web) count as shared.
+      // Registers this device as the link's owner before anyone opens it.
+      unawaited(ref.read(bonusForeverProvider.notifier).refresh());
       final shared = await shareInvite(s);
       if (!shared || !mounted) return;
     }
@@ -184,7 +202,9 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     final categoriesAsync = ref.watch(wordCategoriesProvider);
     final categories = categoriesAsync.value ?? const <WordCategory>[];
     final unlocked = ref.watch(unlockedBonusProvider);
-    bool locked(WordCategory c) => c.bonus && !unlocked.contains(c.id);
+    final forever = ref.watch(bonusForeverProvider);
+    bool locked(WordCategory c) =>
+        c.bonus && !forever && !unlocked.contains(c.id);
     final available = {
       for (final c in categories)
         if (!locked(c)) c.id,
