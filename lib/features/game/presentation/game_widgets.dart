@@ -100,10 +100,18 @@ class TimerBadge extends StatelessWidget {
 }
 
 class PausedOverlay extends StatelessWidget {
-  const PausedOverlay({super.key, required this.s, required this.onResume});
+  const PausedOverlay({
+    super.key,
+    required this.s,
+    required this.onResume,
+    this.onExit,
+  });
 
   final AppStrings s;
   final VoidCallback onResume;
+
+  /// Leave the game (asks for confirmation first).
+  final VoidCallback? onExit;
 
   @override
   Widget build(BuildContext context) => Positioned.fill(
@@ -130,6 +138,16 @@ class PausedOverlay extends StatelessWidget {
                 color: AppColors.green,
                 onPressed: onResume,
               ),
+              if (onExit != null) ...[
+                const SizedBox(height: 14),
+                CartoonButton(
+                  label: s.exit,
+                  icon: '🚪',
+                  expand: false,
+                  color: AppColors.red,
+                  onPressed: onExit,
+                ),
+              ],
             ],
           ),
         ),

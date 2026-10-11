@@ -104,7 +104,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     super.dispose();
   }
 
-  Future<void> _confirmExit() async {
+  /// [resume]: unpause when the player chooses to stay (false when asked
+  /// from the pause screen, which should stay paused).
+  Future<void> _confirmExit({bool resume = true}) async {
     final ctrl = ref.read(gameControllerProvider.notifier);
     final session = ref.read(gameControllerProvider);
     if (session == null || session.phase == GamePhase.finished) {
@@ -139,7 +141,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     );
     if (leave ?? false) {
       _leave();
-    } else {
+    } else if (resume) {
       ctrl.setPaused(false);
     }
   }
@@ -209,6 +211,14 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                     start: 12,
                     child: _RecBadge(label: s.rec),
                   ),
+                if (session.paused && session.phase == GamePhase.playing)
+                  PausedOverlay(
+                    s: s,
+                    onResume: () => ref
+                        .read(gameControllerProvider.notifier)
+                        .setPaused(false),
+                    onExit: () => _confirmExit(resume: false),
+                  ),
                 if (showClose)
                   PositionedDirectional(
                     top: 4,
@@ -216,7 +226,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                     child: IconButton(
                       iconSize: 30,
                       icon: const Icon(Icons.close_rounded),
-                      onPressed: _confirmExit,
+                      onPressed: () => _confirmExit(),
                     ),
                   ),
               ],
@@ -524,8 +534,6 @@ class _PlayView extends ConsumerWidget {
             ],
           ),
         ),
-        if (session.paused)
-          PausedOverlay(s: s, onResume: () => ctrl.setPaused(false)),
       ],
     );
   }

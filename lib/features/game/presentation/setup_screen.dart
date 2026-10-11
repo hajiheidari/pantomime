@@ -56,7 +56,8 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
       } catch (_) {}
     }
     for (final name in _config.teamNames) {
-      _names.add(TextEditingController(text: name));
+      // Older saves kept default names of another language ("اللاعب ١").
+      _names.add(TextEditingController(text: _isDefault(name) ? '' : name));
     }
   }
 
@@ -67,6 +68,17 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     }
     super.dispose();
   }
+
+  /// A default player/team name in any of the app's languages.
+  static bool _isDefault(String name) => _defaults.contains(name.trim());
+
+  static final _defaults = {
+    for (var i = 0; i < 20; i++)
+      for (final lang in ['fa', 'en', 'ar']) ...[
+        AppStrings.forLanguage(lang).defaultPlayerName(i),
+        AppStrings.forLanguage(lang).defaultTeamName(i),
+      ],
+  };
 
   String _defaultName(AppStrings s, int i) =>
       _forehead ? s.defaultPlayerName(i) : s.defaultTeamName(i);
@@ -97,15 +109,8 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     );
     // Remember setup; names equal to a default are stored empty so they
     // follow the UI language.
-    final defaults = {
-      for (var i = 0; i < _max; i++)
-        for (final lang in ['fa', 'en'])
-          _defaultName(AppStrings.forLanguage(lang), i),
-    };
     final toSave = config.copyWith(
-      teamNames: [
-        for (final n in config.teamNames) defaults.contains(n) ? '' : n,
-      ],
+      teamNames: [for (final n in config.teamNames) _isDefault(n) ? '' : n],
     );
     ref
         .read(sharedPreferencesProvider)

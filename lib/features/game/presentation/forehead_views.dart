@@ -334,8 +334,6 @@ class _ForeheadPlayViewState extends ConsumerState<ForeheadPlayView>
               ),
             ),
           ),
-        if (session.paused)
-          PausedOverlay(s: s, onResume: () => ctrl.setPaused(false)),
       ],
     );
   }
