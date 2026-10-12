@@ -9,7 +9,7 @@
 		<key>CFBundleDisplayName</key>
 		<string>Pantomime</string>
 		<key>NSCameraUsageDescription</key>
-		<string>If you turn recording on, the front camera films your friends acting in forehead mode. Videos stay on your phone.</string>
+		<string>If you turn recording on, the front camera films your friends in Heads Up, or the back camera films the actor in a pantomime turn you choose to film. Videos stay on your phone.</string>
 		<key>NSMicrophoneUsageDescription</key>
 		<string>To record the laughs with the game video. Videos stay on your phone.</string>
 		<key>NSPhotoLibraryUsageDescription</key>
@@ -30,6 +30,8 @@
 			<string>fa</string>
 			<string>en</string>
 			<string>ar</string>
+			<string>ru</string>
+			<string>tr</string>
 		</array>
 		<key>CFBundleExecutable</key>
 		<string>$(EXECUTABLE_NAME)</string>

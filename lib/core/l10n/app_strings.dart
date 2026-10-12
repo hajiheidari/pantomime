@@ -1,7 +1,10 @@
 import '../../features/words/domain/word_models.dart';
 import '../utils/persian_text.dart';
+import 'strings_ru.dart';
+import 'strings_tr.dart';
 
-/// All user-visible strings: Persian (primary), English and Arabic.
+/// All user-visible strings: Persian (primary), English, Arabic, Russian
+/// (strings_ru.dart) and Turkish (strings_tr.dart).
 ///
 /// Plain Dart instead of ARB/codegen: few languages, easy to review.
 abstract class AppStrings {
@@ -10,6 +13,8 @@ abstract class AppStrings {
   static AppStrings forLanguage(String code) => switch (code) {
     'en' => const EnStrings(),
     'ar' => const ArStrings(),
+    'ru' => const RuStrings(),
+    'tr' => const TrStrings(),
     _ => const FaStrings(),
   };
 
@@ -62,6 +67,13 @@ abstract class AppStrings {
 
   /// Button when no passes are left: give up the word and end the turn.
   String get giveUp;
+
+  /// Pantomime modes: film a turn with the back camera.
+  String get filmThisTurn;
+
+  /// iOS settings: opens Game Center.
+  String get leaderboards;
+  String get filmOn;
 
   /// Classic mode (one word per turn).
   String get classicGame;
@@ -263,6 +275,12 @@ class FaStrings extends AppStrings {
   String get noPassLeft => 'پاس تمام شد';
   @override
   String get giveUp => 'انصراف';
+  @override
+  String get leaderboards => 'جدول امتیازها و مدال‌ها';
+  @override
+  String get filmThisTurn => 'فیلم گرفتن از این نوبت';
+  @override
+  String get filmOn => 'ضبط روشن؛ دوربین پشت را رو به بازیگر بگیرید';
   @override
   String get classicGame => 'پانتومیم';
   @override
@@ -568,6 +586,12 @@ class EnStrings extends AppStrings {
   String get noPassLeft => 'No passes left';
   @override
   String get giveUp => 'Give Up';
+  @override
+  String get leaderboards => 'Leaderboards & Achievements';
+  @override
+  String get filmThisTurn => 'Film This Turn';
+  @override
+  String get filmOn => 'Recording: point the back camera at the actor';
   @override
   String get classicGame => 'Pantomime';
   @override
@@ -878,6 +902,12 @@ class ArStrings extends AppStrings {
   String get noPassLeft => 'لم يبقَ تخطٍّ';
   @override
   String get giveUp => 'استسلام';
+  @override
+  String get leaderboards => 'المتصدرون والإنجازات';
+  @override
+  String get filmThisTurn => 'صوّر هذا الدور';
+  @override
+  String get filmOn => 'التسجيل مفعّل: وجّه الكاميرا الخلفية نحو الممثل';
   @override
   String get classicGame => 'بانتومايم';
   @override

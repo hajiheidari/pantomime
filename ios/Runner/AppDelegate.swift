@@ -1,6 +1,7 @@
 import AVFoundation
 import CoreImage
 import Flutter
+import GameKit
 import UIKit
 
 @main
@@ -19,6 +20,58 @@ import UIKit
         name: "pantomime/watermark", binaryMessenger: registrar.messenger())
       channel.setMethodCallHandler(Watermark.handle)
     }
+    if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "PantomimeGameCenter") {
+      let channel = FlutterMethodChannel(
+        name: "pantomime/gamecenter", binaryMessenger: registrar.messenger())
+      channel.setMethodCallHandler(GameCenter.handle)
+    }
+  }
+}
+
+/// Game Center (lib/features/gamecenter/game_center.dart). Channel
+/// "pantomime/gamecenter": signIn, submit {id, score}, unlock {id}, show.
+/// Every call is best effort: no player signed in → silently nothing.
+enum GameCenter {
+  static func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    let args = call.arguments as? [String: Any] ?? [:]
+    switch call.method {
+    case "signIn":
+      GKLocalPlayer.local.authenticateHandler = { viewController, _ in
+        if let vc = viewController { topController()?.present(vc, animated: true) }
+      }
+      result(nil)
+    case "submit":
+      guard GKLocalPlayer.local.isAuthenticated, let id = args["id"] as? String,
+        let score = args["score"] as? Int
+      else { return result(false) }
+      GKLeaderboard.submitScore(
+        score, context: 0, player: GKLocalPlayer.local, leaderboardIDs: [id]
+      ) { error in DispatchQueue.main.async { result(error == nil) } }
+    case "unlock":
+      guard GKLocalPlayer.local.isAuthenticated, let id = args["id"] as? String else {
+        return result(false)
+      }
+      let achievement = GKAchievement(identifier: id)
+      achievement.percentComplete = 100
+      achievement.showsCompletionBanner = true
+      GKAchievement.report([achievement]) { error in
+        DispatchQueue.main.async { result(error == nil) }
+      }
+    case "show":
+      guard GKLocalPlayer.local.isAuthenticated else { return result(false) }
+      GKAccessPoint.shared.trigger(state: .dashboard) {}
+      result(true)
+    default:
+      result(FlutterMethodNotImplemented)
+    }
+  }
+
+  static func topController() -> UIViewController? {
+    let scene = UIApplication.shared.connectedScenes
+      .compactMap { $0 as? UIWindowScene }.first
+    var top = scene?.windows.first { $0.isKeyWindow }?.rootViewController
+    while let presented = top?.presentedViewController { top = presented }
+    return top
   }
 }
 

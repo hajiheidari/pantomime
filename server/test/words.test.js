@@ -149,3 +149,26 @@ test('/wordsfile sends a document; strangers are ignored', async () => {
   assert.equal(g.calls.length, 0);
   assert.equal(kv.map.size, 0);
 });
+
+test('/wordlang en: commands edit the English list, served as /words_en.json', async () => {
+  const kv = new FakeKV();
+  const f = fakeFetch();
+  await handleTelegram(msg({ text: '/wordlang xx' }), env(kv), ctx, f);
+  assert.match(replies(f).at(-1), /edit: fa/);
+  await handleTelegram(msg({ text: '/wordlang en' }), env(kv), ctx, f);
+  assert.match(replies(f).at(-1), /English/);
+
+  const cat = bundledPack('en').categories[0].id;
+  await handleTelegram(msg({ text: `/addword ${cat} easy Sock puppet` }), env(kv), ctx, f);
+  assert.match(replies(f).at(-1), /^\[en\] /);
+  assert.match(replies(f).at(-1), /en words v2 published/);
+
+  const en = await (await worker.fetch(new Request('https://w.example/words_en.json'), env(kv), ctx)).json();
+  assert.equal(en.language, 'en');
+  assert.ok(en.categories[0].words.easy.includes('Sock puppet'));
+  // Persian untouched.
+  const fa = await (await worker.fetch(new Request('https://w.example/words_fa.json'), env(kv), ctx)).json();
+  assert.equal(fa.version, bundledPack('fa').version);
+  // Unknown languages are not served.
+  assert.equal((await worker.fetch(new Request('https://w.example/words_xx.json'), env(kv), ctx)).status, 404);
+});

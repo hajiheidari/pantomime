@@ -2,7 +2,8 @@ import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Records the front camera during a forehead-mode round.
+/// Records a round: the front camera in forehead mode, the back camera in
+/// the pantomime modes (whoever holds the phone films the actor).
 /// Videos stay on the device; nothing is ever uploaded.
 abstract interface class RoundRecorder {
   /// Opens the camera (asks for camera + microphone permission the first
@@ -21,6 +22,11 @@ abstract interface class RoundRecorder {
 }
 
 class CameraRoundRecorder implements RoundRecorder {
+  CameraRoundRecorder({this.back = false});
+
+  /// Back camera instead of the front one.
+  final bool back;
+
   CameraController? _controller;
   bool _recording = false;
 
@@ -33,11 +39,12 @@ class CameraRoundRecorder implements RoundRecorder {
     try {
       final cameras = await availableCameras();
       if (cameras.isEmpty) return false;
-      final front = cameras.firstWhere(
-        (c) => c.lensDirection == CameraLensDirection.front,
+      final want = back ? CameraLensDirection.back : CameraLensDirection.front;
+      final camera = cameras.firstWhere(
+        (c) => c.lensDirection == want,
         orElse: () => cameras.first,
       );
-      final c = CameraController(front, ResolutionPreset.medium);
+      final c = CameraController(camera, ResolutionPreset.medium);
       await c.initialize();
       await c.prepareForVideoRecording();
       _controller = c;
@@ -88,6 +95,12 @@ class CameraRoundRecorder implements RoundRecorder {
 /// A fresh recorder per game screen. Overridden in tests.
 final roundRecorderFactoryProvider = Provider<RoundRecorder Function()>(
   (ref) => CameraRoundRecorder.new,
+);
+
+/// Back-camera recorder for the pantomime modes. Overridden in tests.
+final backRecorderFactoryProvider = Provider<RoundRecorder Function()>(
+  (ref) =>
+      () => CameraRoundRecorder(back: true),
 );
 
 /// Video of each finished turn (turn index → file path) in the current game.

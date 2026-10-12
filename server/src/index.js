@@ -2,7 +2,7 @@
 // control bot.
 //
 //   GET  /config.json                  → current config (cached 5 min)
-//   GET  /words_fa.json                → current word list (cached 5 min)
+//   GET  /words_<lang>.json            → current word list (fa, en, ar…; cached 5 min)
 //   GET  /privacy                      → privacy policy page (fa + en)
 //   GET|POST /invite/<code>            → invite link visits (see invite.js)
 //   POST /tg/<WEBHOOK_PATH>            → Telegram webhook (admin only)
@@ -20,7 +20,7 @@ import { handleInvite } from './invite.js';
 import { mirrorEnabled, pushToMirror } from './mirror.js';
 import { privacyHtml } from './privacy.js';
 import { ConfigStore, WordStore } from './store.js';
-import { runWordsCommand, validatePack, WordsError } from './words.js';
+import { LANGUAGE_NAMES, runWordsCommand, validatePack, WORD_LANGUAGES, WordsError } from './words.js';
 
 const CONFIG_HEADERS = {
   'content-type': 'application/json; charset=utf-8',
@@ -44,8 +44,14 @@ async function serveCached(request, ctx, path, load) {
 const serveConfig = (request, env, ctx) =>
   serveCached(request, ctx, '/config.json', () => new ConfigStore(env.CONFIG).current());
 
-const serveWords = (request, env, ctx) =>
-  serveCached(request, ctx, '/words_fa.json', () => new WordStore(env.CONFIG).current());
+const serveWords = (request, env, ctx, lang) =>
+  serveCached(request, ctx, `/words_${lang}.json`, () => new WordStore(env.CONFIG, undefined, lang).current());
+
+/** Language the admin's word commands edit (/wordlang), default Persian. */
+async function wordLanguage(env, chatId) {
+  const lang = await env.CONFIG.get(`wordlang:${chatId}`);
+  return WORD_LANGUAGES.includes(lang) ? lang : 'fa';
+}
 
 /** Constant-time string comparison for secrets. */
 function safeEqual(a, b) {
@@ -82,7 +88,7 @@ async function sendWordsFile(env, chatId, pack, fetchFn) {
   form.append(
     'document',
     new Blob([JSON.stringify(pack, null, 2)], { type: 'application/json' }),
-    `words_fa_v${pack.version}.json`,
+    `words_${pack.language ?? 'fa'}_v${pack.version}.json`,
   );
   try {
     await fetchFn(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendDocument`, {
@@ -95,7 +101,7 @@ async function sendWordsFile(env, chatId, pack, fetchFn) {
 }
 
 /** Downloads a .json file the admin sent and checks it. */
-async function receiveWordsFile(env, doc, fetchFn) {
+async function receiveWordsFile(env, doc, lang, fetchFn) {
   if (!/\.json$/i.test(doc.file_name ?? '')) throw new WordsError('send a .json file');
   if ((doc.file_size ?? 0) > 2 * 1024 * 1024) throw new WordsError('file too big (max 2 MB)');
   const info = await (await telegram(env, 'getFile', { file_id: doc.file_id }, fetchFn))?.json();
@@ -108,21 +114,39 @@ async function receiveWordsFile(env, doc, fetchFn) {
   } catch {
     throw new WordsError('the file is not valid JSON');
   }
-  pack.language ??= 'fa';
+  pack.language ??= lang;
+  if (pack.language !== lang) {
+    throw new WordsError(`this file is for "${pack.language}" but the bot edits "${lang}" (/wordlang ${pack.language})`);
+  }
   pack.version = Number.isInteger(pack.version) ? pack.version : 1;
-  validatePack(pack);
+  validatePack(pack, lang);
   return pack;
 }
 
 async function handleWords(env, ctx, request, msg, cmd, restText, fetchFn) {
   const chatId = msg.chat.id;
-  const words = new WordStore(env.CONFIG);
+  if (cmd === '/wordlang') {
+    const want = restText.trim().toLowerCase();
+    if (!WORD_LANGUAGES.includes(want)) {
+      const now = await wordLanguage(env, chatId);
+      const list = WORD_LANGUAGES.map((l) => `${l} (${LANGUAGE_NAMES[l] ?? l})`).join(', ');
+      await reply(env, chatId, `🌐 Word commands edit: ${now}
+Usage: /wordlang <code>
+Languages: ${list}`, fetchFn);
+      return;
+    }
+    await env.CONFIG.put(`wordlang:${chatId}`, want);
+    await reply(env, chatId, `🌐 Word commands now edit the ${LANGUAGE_NAMES[want] ?? want} list (${want}).`, fetchFn);
+    return;
+  }
+  const lang = await wordLanguage(env, chatId);
+  const words = new WordStore(env.CONFIG, undefined, lang);
   const actor = msg.from.username ?? String(msg.from.id);
   let published = null;
   let text;
   try {
     if (msg.document) {
-      published = await words.publish(await receiveWordsFile(env, msg.document, fetchFn), {
+      published = await words.publish(await receiveWordsFile(env, msg.document, lang, fetchFn), {
         actor,
         command: `words file ${msg.document.file_name}`,
       });
@@ -130,7 +154,7 @@ async function handleWords(env, ctx, request, msg, cmd, restText, fetchFn) {
     } else {
       const current = await words.current();
       const result = runWordsCommand(cmd, restText, current);
-      text = result.reply;
+      text = result.reply && lang !== 'fa' ? `[${lang}] ${result.reply}` : result.reply;
       if (result.sendFile) {
         await sendWordsFile(env, chatId, current, fetchFn);
         return;
@@ -148,8 +172,8 @@ async function handleWords(env, ctx, request, msg, cmd, restText, fetchFn) {
   }
   if (published) {
     const cache = typeof caches !== 'undefined' ? caches.default : null;
-    if (cache) ctx.waitUntil(cache.delete(cacheKey(request.url, '/words_fa.json')));
-    text += `\n\n📚 words v${published.version} published. Phones get it within a few hours.`;
+    if (cache) ctx.waitUntil(cache.delete(cacheKey(request.url, `/words_${lang}.json`)));
+    text += `\n\n📚 ${lang} words v${published.version} published. Phones get it within a few hours.`;
   }
   await reply(env, chatId, text, fetchFn);
 }
@@ -180,7 +204,7 @@ export async function handleTelegram(request, env, ctx, fetchFn = fetch) {
   const chatId = msg.chat.id;
   const [head = ''] = (msg.text ?? '').trim().split(/\s+/);
   const cmd = head.split('@')[0].toLowerCase();
-  if (msg.document || ['/words', '/wordsfile', '/wordsundo', '/addword', '/delword', '/findword'].includes(cmd)) {
+  if (msg.document || ['/words', '/wordsfile', '/wordsundo', '/addword', '/delword', '/findword', '/wordlang'].includes(cmd)) {
     const restText = (msg.text ?? '').trim().slice(head.length).trim();
     await handleWords(env, ctx, request, msg, cmd, restText, fetchFn);
     return new Response('ok');
@@ -224,8 +248,9 @@ export default {
     if ((request.method === 'GET' || request.method === 'HEAD') && url.pathname === '/config.json') {
       return serveConfig(request, env, ctx);
     }
-    if ((request.method === 'GET' || request.method === 'HEAD') && url.pathname === '/words_fa.json') {
-      return serveWords(request, env, ctx);
+    const wordsFile = url.pathname.match(/^\/words_([a-z]{2})\.json$/);
+    if ((request.method === 'GET' || request.method === 'HEAD') && wordsFile && WORD_LANGUAGES.includes(wordsFile[1])) {
+      return serveWords(request, env, ctx, wordsFile[1]);
     }
     if (request.method === 'POST' && env.WEBHOOK_PATH && url.pathname === `/tg/${env.WEBHOOK_PATH}`) {
       return handleTelegram(request, env, ctx);

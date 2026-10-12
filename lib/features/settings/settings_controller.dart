@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/providers.dart';
 
-enum AppLanguage { fa, en, ar }
+enum AppLanguage { fa, en, ar, ru, tr }
 
 class AppSettings {
   const AppSettings({

@@ -7,6 +7,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/widgets/cartoon.dart';
 import '../../core/store/store_service.dart';
 import '../recording/recording_offer.dart';
+import '../gamecenter/game_center.dart';
 import 'settings_controller.dart';
 
 /// Privacy policy page (espadna.com redirects it to the config Worker's
@@ -88,6 +89,8 @@ class SettingsScreen extends ConsumerWidget {
                         AppLanguage.fa => 'فارسی',
                         AppLanguage.en => 'English',
                         AppLanguage.ar => 'العربية',
+                        AppLanguage.ru => 'Русский',
+                        AppLanguage.tr => 'Türkçe',
                       },
                       selected: ref.watch(languageCodeProvider) == l.name,
                       onTap: () => ctrl.setLanguage(l),
@@ -99,6 +102,14 @@ class SettingsScreen extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(vertical: 6),
                 child: Column(
                   children: [
+                    if (ref.read(gameCenterProvider).enabled) ...[
+                      _Row(
+                        emoji: '🏆',
+                        title: s.leaderboards,
+                        onTap: () => ref.read(gameCenterProvider).show(),
+                      ),
+                      const _Divider(),
+                    ],
                     if (!kIsWeb) ...[
                       _Row(
                         emoji: '⭐',

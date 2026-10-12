@@ -8,6 +8,7 @@ import '../../words/domain/word_picker.dart';
 import '../../words/words_providers.dart';
 import '../domain/game_config.dart';
 import '../domain/game_state.dart';
+import '../../gamecenter/game_center.dart';
 import 'feedback_service.dart';
 
 enum GamePhase {
@@ -359,6 +360,12 @@ class GameController extends Notifier<GameSession?> {
         WordResult(s.currentWord!, WordOutcome.timeout),
     ];
     _feedback.roundEnd();
+    ref
+        .read(gameCenterProvider)
+        .turnEnded(
+          correct: results.where((r) => r.isCorrect).length,
+          speed: s.config.mode == GameMode.teams,
+        );
     state = s.copyWith(
       game: s.game.completeTurn(results),
       phase: GamePhase.summary,
@@ -391,7 +398,10 @@ class GameController extends Notifier<GameSession?> {
     final s = state;
     if (s == null || s.phase != GamePhase.scoreboard) return;
     final game = s.game.advance();
-    if (game.finished) _feedback.win();
+    if (game.finished) {
+      _feedback.win();
+      ref.read(gameCenterProvider).gameFinished();
+    }
     state = s.copyWith(
       game: game,
       phase: game.finished ? GamePhase.finished : GamePhase.ready,

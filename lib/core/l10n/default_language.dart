@@ -22,7 +22,7 @@ class DeviceLocale {
 /// Language used until the player picks one in settings:
 /// - Bazaar / Myket builds: always Persian.
 /// - Elsewhere (Google Play, App Store, web): the first device language we
-///   have (Persian, Arabic or English). Many Iranians keep their phone in
+///   have (Persian, Arabic, Russian, Turkish or English). Many Iranians keep their phone in
 ///   English, so an Iranian or Afghan region or time zone also means Persian.
 ///   Anything else: English.
 AppLanguage defaultLanguage(AppStore store, DeviceLocale device) {
@@ -37,6 +37,8 @@ AppLanguage defaultLanguage(AppStore store, DeviceLocale device) {
       return AppLanguage.fa;
     }
     if (parts.first == 'ar') return AppLanguage.ar;
+    if (parts.first == 'ru') return AppLanguage.ru;
+    if (parts.first == 'tr') return AppLanguage.tr;
   }
   const tehran = Duration(hours: 3, minutes: 30);
   const kabul = Duration(hours: 4, minutes: 30);

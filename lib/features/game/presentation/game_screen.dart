@@ -35,9 +35,34 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   late final AppLifecycleListener _lifecycle;
   late final bool _forehead;
 
-  /// Front-camera recorder (forehead mode with recording enabled only).
+  /// Front camera in forehead mode (recording enabled in settings); back
+  /// camera in the pantomime modes, only for turns the players chose to film.
   RoundRecorder? _recorder;
   bool _recording = false;
+
+  /// Pantomime modes: film the next turn (chosen on the ready screen).
+  bool _filmNext = false;
+
+  bool get _canFilm => !_forehead && !kIsWeb;
+
+  Future<void> _toggleFilm() async {
+    if (_filmNext) {
+      setState(() => _filmNext = false);
+      await _recorder?.dispose();
+      return;
+    }
+    final recorder = _recorder ??= ref.read(backRecorderFactoryProvider)();
+    // Opens the camera now: asks for permission before the turn starts.
+    if (!await recorder.prepare()) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(ref.read(stringsProvider).recordingDenied)),
+        );
+      }
+      return;
+    }
+    if (mounted) setState(() => _filmNext = true);
+  }
 
   @override
   void initState() {
@@ -65,11 +90,13 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   /// Starts recording when a round starts, stops it when the round ends.
   Future<void> _onPhase(GamePhase? prev, GameSession next) async {
-    final recorder = _recorder;
-    if (recorder == null) return;
     if (next.phase == GamePhase.ready && next.game.turnIndex == 0) {
       ref.read(roundClipsProvider.notifier).clear(); // "play again"
     }
+    final recorder = _recorder;
+    if (recorder == null) return;
+    // Pantomime modes: only the turns the players chose to film.
+    if (!_forehead && !_filmNext && !recorder.isRecording) return;
     // The camera is on only from calibration to the end of the round (no
     // privacy indicator during summaries or the scoreboard).
     if (next.phase == GamePhase.calibrating) {
@@ -85,7 +112,12 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       final turn = next.game.turns.length - 1;
       final path = await recorder.stop();
       await recorder.dispose(); // release the camera until the next round
-      if (mounted) setState(() => _recording = false);
+      if (mounted) {
+        setState(() {
+          _recording = false;
+          _filmNext = false; // one turn at a time
+        });
+      }
       if (path != null && turn >= 0) {
         ref.read(roundClipsProvider.notifier).add(turn, path);
       }
@@ -163,7 +195,12 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     if (session == null) return const Scaffold(body: SizedBox.shrink());
 
     final Widget view = switch (session.phase) {
-      GamePhase.ready => _ReadyView(session: session, s: s),
+      GamePhase.ready => _ReadyView(
+        session: session,
+        s: s,
+        film: _filmNext,
+        onFilm: _canFilm ? _toggleFilm : null,
+      ),
       GamePhase.calibrating => CalibrateView(session: session, s: s),
       GamePhase.countdown => _CountdownView(session: session, s: s),
       GamePhase.playing =>
@@ -290,10 +327,19 @@ class _RecBadgeState extends State<_RecBadge>
 // Ready
 
 class _ReadyView extends ConsumerWidget {
-  const _ReadyView({required this.session, required this.s});
+  const _ReadyView({
+    required this.session,
+    required this.s,
+    this.film = false,
+    this.onFilm,
+  });
 
   final GameSession session;
   final AppStrings s;
+
+  /// Pantomime modes: film this turn with the back camera (null: not here).
+  final bool film;
+  final VoidCallback? onFilm;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -314,14 +360,21 @@ class _ReadyView extends ConsumerWidget {
           );
     final who = [
       PopIn(
-        child: TeamAvatar(teamIndex: team, size: landscape ? 96 : 130),
+        child: TeamAvatar(
+          teamIndex: team,
+          size: landscape
+              ? 96
+              : onFilm != null || session.isClassic
+              ? 96
+              : 130,
+        ),
       ),
       const SizedBox(height: 14),
       Text(
         s.turnOf(game.config.teamNames[team]),
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: landscape ? 32 : 38,
+          fontSize: landscape ? 32 : 34,
           fontWeight: FontWeight.w900,
           color: style.color,
           shadows: const [
@@ -346,7 +399,7 @@ class _ReadyView extends ConsumerWidget {
         style: const TextStyle(
           fontSize: 15,
           color: AppColors.ink,
-          height: 1.7,
+          height: 1.5,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -365,9 +418,23 @@ class _ReadyView extends ConsumerWidget {
       },
     );
 
-    final custom = session.isClassic
-        ? _CustomWordButton(session: session, s: s)
-        : null;
+    final options = [
+      if (session.isClassic) _CustomWordButton(session: session, s: s),
+      if (onFilm != null)
+        CartoonChip(
+          label: film ? '🎥 ${s.filmOn}' : '🎥 ${s.filmThisTurn}',
+          selected: film,
+          onTap: onFilm!,
+        ),
+    ];
+    final custom = options.isEmpty
+        ? null
+        : Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 10,
+            runSpacing: 10,
+            children: options,
+          );
 
     if (landscape) {
       return Padding(
@@ -390,9 +457,9 @@ class _ReadyView extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     howTo,
+                    if (custom != null) ...[const SizedBox(height: 12), custom],
                     const SizedBox(height: 16),
                     start,
-                    if (custom != null) ...[const SizedBox(height: 10), custom],
                   ],
                 ),
               ),
@@ -410,9 +477,9 @@ class _ReadyView extends ConsumerWidget {
           ...who,
           const Spacer(),
           howTo,
-          const SizedBox(height: 24),
-          start,
           if (custom != null) ...[const SizedBox(height: 12), custom],
+          const SizedBox(height: 16),
+          start,
         ],
       ),
     );

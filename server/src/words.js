@@ -2,9 +2,18 @@
 // ({version, language, categories: [{id, title, emoji, words: {easy, medium, hard}}]}).
 // The app accepts a downloaded pack only if it passes the same checks as
 // validatePack (lib/features/words/data/remote_words.dart).
-import bundled from '../../assets/words/words_fa.json' with { type: 'json' };
+import ar from '../../assets/words/words_ar.json' with { type: 'json' };
+import en from '../../assets/words/words_en.json' with { type: 'json' };
+import fa from '../../assets/words/words_fa.json' with { type: 'json' };
+import ru from '../../assets/words/words_ru.json' with { type: 'json' };
+import tr from '../../assets/words/words_tr.json' with { type: 'json' };
 
-export const bundledPack = () => JSON.parse(JSON.stringify(bundled));
+/** Word packs bundled in the app, per language (the bot edits copies). */
+const BUNDLED = { fa, en, ar, ru, tr };
+export const WORD_LANGUAGES = Object.keys(BUNDLED);
+export const LANGUAGE_NAMES = { fa: 'فارسی', en: 'English', ar: 'العربية', ru: 'Русский', tr: 'Türkçe' };
+
+export const bundledPack = (lang = 'fa') => JSON.parse(JSON.stringify(BUNDLED[lang] ?? BUNDLED.fa));
 
 export const LEVELS = ['easy', 'medium', 'hard'];
 const LEVEL_ALIASES = {
@@ -15,6 +24,7 @@ const LEVEL_ALIASES = {
 
 export const WORD_HELP = `📚 Word list
 
+/wordlang fa|en|ar… – which language the commands below edit
 /words – categories and counts
 /addword <category> [easy|medium|hard] word1، word2
    (category: its id, emoji or title; default level: medium;

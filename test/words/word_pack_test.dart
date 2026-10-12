@@ -21,7 +21,12 @@ void main() {
     expect(cats.map((c) => c.id).toSet().length, cats.length);
   });
 
-  for (final (lang, minWords) in [('en', 800), ('ar', 700)]) {
+  for (final (lang, minWords) in [
+    ('en', 800),
+    ('ar', 700),
+    ('ru', 800),
+    ('tr', 800),
+  ]) {
     test('$lang pack: 10 regular categories + 3 bonus, no duplicates', () {
       final raw = File('assets/words/words_$lang.json').readAsStringSync();
       final cats = parseWordPack(raw);

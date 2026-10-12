@@ -11,6 +11,7 @@ import 'core/l10n/default_language.dart';
 import 'core/providers.dart';
 import 'features/ads/ads_providers.dart';
 import 'features/settings/settings_controller.dart';
+import 'features/gamecenter/game_center.dart';
 import 'features/share/invite.dart';
 import 'features/words/words_providers.dart';
 
@@ -48,6 +49,8 @@ Future<void> main() async {
   // Invite code for shared links; a friend may have opened one meanwhile.
   container.read(inviteServiceProvider);
   unawaited(reportInviteVisit());
+  // Game Center sign-in (iOS; shows its own banner the first time).
+  unawaited(container.read(gameCenterProvider).signIn());
   unawaited(container.read(bonusForeverProvider.notifier).refresh());
   // Remote config + ad SDKs: background only, never blocks start.
   unawaited(startAds(container));

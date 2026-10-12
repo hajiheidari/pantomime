@@ -1,0 +1,6 @@
+/* App name and permission texts (tr). */
+"CFBundleDisplayName" = "Pandomim";
+"NSCameraUsageDescription" = "Kaydı açarsan, \"Telefon Alnında\" modunda ön kamera arkadaşlarını, seçtiğin pandomim turunda ise arka kamera anlatan kişiyi çeker. Videolar yalnızca telefonunda kalır.";
+"NSMicrophoneUsageDescription" = "Kahkahaları oyun videosuyla birlikte kaydetmek için. Videolar yalnızca telefonunda kalır.";
+"NSPhotoLibraryAddUsageDescription" = "Oyun videosunu yalnızca sen istediğinde Fotoğraflar'a kaydetmek için.";
+"NSPhotoLibraryUsageDescription" = "Oyun videosunu yalnızca sen istediğinde Fotoğraflar'a kaydetmek için. Oyun fotoğraflarını asla okumaz.";

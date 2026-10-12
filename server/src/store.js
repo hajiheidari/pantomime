@@ -89,19 +89,25 @@ export class ConfigStore {
 }
 
 // Word list storage in the same KV namespace.
-//   words:fa        live word pack (what GET /words_fa.json serves);
+//   words:<lang>      live word pack (what GET /words_<lang>.json serves);
 //                   missing → the pack bundled with the app
-//   words:fa:prev   the pack before the last change (/wordsundo)
+//   words:<lang>:prev the pack before the last change (/wordsundo)
+//   wordlang:<chat>   language the bot's word commands edit (default fa)
 export class WordStore {
   /** @param {KVNamespace} kv */
-  constructor(kv, now = () => new Date()) {
+  constructor(kv, now = () => new Date(), language = 'fa') {
     this.kv = kv;
     this.now = now;
+    this.language = language;
     this.log = new ConfigStore(kv, now);
   }
 
+  get key() {
+    return `words:${this.language}`;
+  }
+
   async current() {
-    return (await this.kv.get('words:fa', 'json')) ?? bundledPack();
+    return (await this.kv.get(this.key, 'json')) ?? bundledPack(this.language);
   }
 
   /** Publishes [next] with a higher version than both the live and the
@@ -109,18 +115,18 @@ export class WordStore {
   async publish(next, { actor, command }) {
     const prev = await this.current();
     const pack = JSON.parse(JSON.stringify(next));
-    pack.version = Math.max(prev.version ?? 0, bundledPack().version, pack.version ?? 0) + 1;
-    pack.language = 'fa';
-    validatePack(pack);
-    await this.kv.put('words:fa:prev', JSON.stringify(prev));
-    await this.kv.put('words:fa', JSON.stringify(pack));
-    await this.log._appendLog({ actor, command, words_version: pack.version });
+    pack.version = Math.max(prev.version ?? 0, bundledPack(this.language).version, pack.version ?? 0) + 1;
+    pack.language = this.language;
+    validatePack(pack, this.language);
+    await this.kv.put(`${this.key}:prev`, JSON.stringify(prev));
+    await this.kv.put(this.key, JSON.stringify(pack));
+    await this.log._appendLog({ actor, command, words_version: pack.version, language: this.language });
     return pack;
   }
 
   /** Republishes the previous pack (under a new version). */
   async undo({ actor }) {
-    const prev = await this.kv.get('words:fa:prev', 'json');
+    const prev = await this.kv.get(`${this.key}:prev`, 'json');
     if (!prev) return null;
     return this.publish(prev, { actor, command: '/wordsundo' });
   }

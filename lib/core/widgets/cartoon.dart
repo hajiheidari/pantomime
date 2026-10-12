@@ -57,6 +57,9 @@ class _CartoonButtonState extends State<CartoonButton> {
     // Tall buttons (e.g. play screen) stack the icon above the label so
     // short Persian words never get truncated in narrow buttons.
     final iconOnTop = widget.stacked || widget.height >= 110;
+    // Labels that must not lose letters shrink to fit: stacked ones and the
+    // big menu buttons with a subtitle (long words in Russian, Turkish…).
+    final fit = iconOnTop || widget.subtitle != null;
     final content = Flex(
       direction: iconOnTop ? Axis.vertical : Axis.horizontal,
       mainAxisSize: widget.expand && !iconOnTop
@@ -74,12 +77,12 @@ class _CartoonButtonState extends State<CartoonButton> {
             children: [
               // Stacked labels shrink to fit rather than lose letters.
               _maybeFit(
-                iconOnTop,
+                fit,
                 Text(
                   widget.label,
                   textAlign: TextAlign.center,
                   maxLines: 1,
-                  overflow: iconOnTop ? null : TextOverflow.ellipsis,
+                  overflow: fit ? null : TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: widget.fontSize,
                     fontWeight: FontWeight.w900,
@@ -89,15 +92,17 @@ class _CartoonButtonState extends State<CartoonButton> {
                 ),
               ),
               if (widget.subtitle != null)
-                Text(
-                  widget.subtitle!,
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: widget.fontSize * 0.55,
-                    fontWeight: FontWeight.w600,
-                    color: widget.textColor.withValues(alpha: 0.8),
+                _maybeFit(
+                  true,
+                  Text(
+                    widget.subtitle!,
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize: widget.fontSize * 0.55,
+                      fontWeight: FontWeight.w600,
+                      color: widget.textColor.withValues(alpha: 0.8),
+                    ),
                   ),
                 ),
             ],

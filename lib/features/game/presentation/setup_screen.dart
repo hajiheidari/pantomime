@@ -90,7 +90,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
 
   static final _defaults = {
     for (var i = 0; i < 20; i++)
-      for (final lang in ['fa', 'en', 'ar']) ...[
+      for (final lang in ['fa', 'en', 'ar', 'ru', 'tr']) ...[
         AppStrings.forLanguage(lang).defaultPlayerName(i),
         AppStrings.forLanguage(lang).defaultTeamName(i),
       ],
