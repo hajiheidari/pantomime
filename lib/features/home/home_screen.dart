@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -129,7 +127,6 @@ class HomeScreen extends ConsumerWidget {
                 const SizedBox(height: 16),
                 const _Notice(),
                 const Spacer(),
-                const HomeBanner(),
               ],
             ),
           ),
@@ -224,44 +221,4 @@ class _Notice extends ConsumerWidget {
       child: card,
     );
   }
-}
-
-/// Small banner at the bottom of Home (the only screen with a banner).
-/// Waits for the ad SDK to finish its delayed start; empty if unavailable.
-class HomeBanner extends ConsumerStatefulWidget {
-  const HomeBanner({super.key});
-
-  @override
-  ConsumerState<HomeBanner> createState() => _HomeBannerState();
-}
-
-class _HomeBannerState extends ConsumerState<HomeBanner> {
-  Widget? _banner;
-  Timer? _retry;
-  int _attempts = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _tryBuild();
-  }
-
-  void _tryBuild() {
-    final banner = ref.read(adManagerProvider).homeBanner();
-    if (banner != null) {
-      if (mounted) setState(() => _banner = banner);
-    } else if (++_attempts < 8) {
-      _retry = Timer(const Duration(seconds: 2), _tryBuild);
-    }
-  }
-
-  @override
-  void dispose() {
-    _retry?.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) =>
-      SizedBox(height: 60, child: Center(child: _banner));
 }

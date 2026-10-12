@@ -116,6 +116,12 @@ abstract class AppStrings {
   String get unlockTitle;
   String get unlockBody;
 
+  /// Badge on a special category while it is open.
+  String bonusOpenHours(int hours);
+
+  /// [unlockBody] where no rewarded ad is offered.
+  String get unlockBodyShareOnly;
+
   /// Snackbar when a friend opened the invite link.
   String get inviteUnlockedForever;
   String get watchAd;
@@ -356,10 +362,15 @@ class FaStrings extends AppStrings {
   String get unlockTitle => 'باز کردن دسته ویژه';
   @override
   String get unlockBody =>
-      'بازی را برای دوستانت بفرست تا این دسته باز شود. هر وقت یکی از آن‌ها لینک را باز کند، همه‌ی دسته‌های ویژه برای همیشه باز می‌شوند.';
+      'یک تبلیغ کوتاه ببین یا بازی را برای دوستانت بفرست تا همه‌ی دسته‌های ویژه ۲۴ ساعت باز شوند.';
   @override
   String get inviteUnlockedForever =>
-      '🎉 یکی از دوستانت لینک را باز کرد؛ دسته‌های ویژه برای همیشه باز شد!';
+      '🎉 یکی از دوستانت لینک را باز کرد؛ دسته‌های ویژه ۲۴ ساعت دیگر باز است!';
+  @override
+  String bonusOpenHours(int hours) => 'باز: ${n(hours)} ساعت دیگر';
+  @override
+  String get unlockBodyShareOnly =>
+      'بازی را برای دوستانت بفرست تا همه‌ی دسته‌های ویژه ۲۴ ساعت باز شوند.';
   @override
   String get watchAd => 'دیدن تبلیغ';
   @override
@@ -668,10 +679,15 @@ class EnStrings extends AppStrings {
   String get unlockTitle => 'Unlock Bonus Category';
   @override
   String get unlockBody =>
-      'Send the game to your friends to unlock this category. Once one of them opens the link, all bonus categories stay unlocked for good.';
+      'Watch a short ad or send the game to friends: all special categories open for 24 hours.';
   @override
   String get inviteUnlockedForever =>
-      '🎉 A friend opened your link: bonus categories are unlocked for good!';
+      '🎉 A friend opened your link: special categories are open for another 24 hours!';
+  @override
+  String bonusOpenHours(int hours) => 'Open: ${hours}h left';
+  @override
+  String get unlockBodyShareOnly =>
+      'Send the game to friends: all special categories open for 24 hours.';
   @override
   String get watchAd => 'Watch Ad';
   @override
@@ -982,10 +998,15 @@ class ArStrings extends AppStrings {
   String get unlockTitle => 'افتح الفئة الإضافية';
   @override
   String get unlockBody =>
-      'أرسل اللعبة إلى أصدقائك لفتح هذه الفئة. عندما يفتح أحدهم الرابط، تبقى كل الفئات الإضافية مفتوحة دائمًا.';
+      'شاهد إعلانًا قصيرًا أو أرسل اللعبة لأصدقائك لتُفتح كل الفئات الخاصة لمدة ٢٤ ساعة.';
   @override
   String get inviteUnlockedForever =>
-      '🎉 فتح أحد أصدقائك رابطك: الفئات الإضافية مفتوحة دائمًا!';
+      '🎉 فتح أحد أصدقائك رابطك: الفئات الخاصة مفتوحة ٢٤ ساعة أخرى!';
+  @override
+  String bonusOpenHours(int hours) => 'مفتوحة: ${n(hours)} ساعة';
+  @override
+  String get unlockBodyShareOnly =>
+      'أرسل اللعبة لأصدقائك لتُفتح كل الفئات الخاصة لمدة ٢٤ ساعة.';
   @override
   String get watchAd => 'شاهد الإعلان';
   @override

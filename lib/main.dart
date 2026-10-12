@@ -51,7 +51,12 @@ Future<void> main() async {
   unawaited(reportInviteVisit());
   // Game Center sign-in (iOS; shows its own banner the first time).
   unawaited(container.read(gameCenterProvider).signIn());
-  unawaited(container.read(bonusForeverProvider.notifier).refresh());
+  unawaited(
+    checkInviteVisits(
+      container.read(inviteServiceProvider),
+      container.read(bonusUnlockProvider.notifier),
+    ),
+  );
   // Remote config + ad SDKs: background only, never blocks start.
   unawaited(startAds(container));
   // A newer word list, if one was published (background, offline-safe).

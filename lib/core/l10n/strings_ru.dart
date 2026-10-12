@@ -190,10 +190,15 @@ class RuStrings extends AppStrings {
   String get unlockTitle => 'Открыть бонусную категорию';
   @override
   String get unlockBody =>
-      'Отправь игру друзьям, чтобы открыть эту категорию. Как только кто-то из них откроет ссылку, все бонусные категории откроются навсегда.';
+      'Посмотри короткую рекламу или отправь игру друзьям — все особые категории откроются на 24 часа.';
   @override
   String get inviteUnlockedForever =>
-      '🎉 Друг открыл твою ссылку: бонусные категории открыты навсегда!';
+      '🎉 Друг открыл твою ссылку: особые категории открыты ещё на 24 часа!';
+  @override
+  String bonusOpenHours(int hours) => 'Открыто: ещё $hours ч';
+  @override
+  String get unlockBodyShareOnly =>
+      'Отправь игру друзьям — все особые категории откроются на 24 часа.';
   @override
   String get watchAd => 'Смотреть рекламу';
   @override

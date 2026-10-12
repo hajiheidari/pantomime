@@ -8,7 +8,6 @@ import '../../../core/l10n/app_strings.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/cartoon.dart';
-import '../../ads/ads_providers.dart';
 import '../../recording/round_recorder.dart';
 import '../../recording/watermark.dart';
 import '../../settings/settings_controller.dart';
@@ -1089,20 +1088,9 @@ class _ScoreboardView extends ConsumerStatefulWidget {
 }
 
 class _ScoreboardViewState extends ConsumerState<_ScoreboardView> {
-  bool _busy = false;
-
-  /// Between turns is the only interstitial slot. The ad manager skips
-  /// silently when nothing is ready within ~3 s.
-  Future<void> _next() async {
-    if (_busy) return;
-    setState(() => _busy = true);
-    try {
-      await ref.read(adManagerProvider).onTurnTransition();
-    } finally {
-      ref.read(gameControllerProvider.notifier).nextTurn();
-      if (mounted) setState(() => _busy = false);
-    }
-  }
+  /// No ads between turns (product decision: the only ad is the optional
+  /// rewarded one that unlocks the special categories).
+  void _next() => ref.read(gameControllerProvider.notifier).nextTurn();
 
   @override
   Widget build(BuildContext context) {
@@ -1138,7 +1126,7 @@ class _ScoreboardViewState extends ConsumerState<_ScoreboardView> {
           color: nextName == null
               ? AppColors.yellow
               : TeamStyle.of(preview.currentTeamIndex).color,
-          onPressed: _busy ? null : _next,
+          onPressed: _next,
         ),
       ],
     );

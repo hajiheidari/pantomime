@@ -176,10 +176,15 @@ class TrStrings extends AppStrings {
   String get unlockTitle => 'Bonus Kategorinin Kilidini Aç';
   @override
   String get unlockBody =>
-      'Bu kategoriyi açmak için oyunu arkadaşlarına gönder. Biri bağlantıyı açtığında tüm bonus kategoriler sonsuza dek açık kalır.';
+      'Kısa bir reklam izle ya da oyunu arkadaşlarına gönder: tüm özel kategoriler 24 saat açılır.';
   @override
   String get inviteUnlockedForever =>
-      '🎉 Bir arkadaşın bağlantını açtı: bonus kategoriler artık hep açık!';
+      '🎉 Bir arkadaşın bağlantını açtı: özel kategoriler 24 saat daha açık!';
+  @override
+  String bonusOpenHours(int hours) => 'Açık: $hours saat kaldı';
+  @override
+  String get unlockBodyShareOnly =>
+      'Oyunu arkadaşlarına gönder: tüm özel kategoriler 24 saat açılır.';
   @override
   String get watchAd => 'Reklam İzle';
   @override

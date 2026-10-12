@@ -102,7 +102,8 @@ class AdManager {
   Future<void> warmUp() async {
     final p = await _provider();
     if (p == null) return;
-    p.preload(AdFormat.interstitial);
+    // Only the rewarded ad is placed in the app (special categories); the
+    // interstitial and banner code paths stay for tests and a future change.
     if (_ads.rewardedEnabled) p.preload(AdFormat.rewarded);
   }
 

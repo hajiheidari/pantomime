@@ -19,7 +19,7 @@ void main() {
   });
 
   test(
-    'no visits → stays locked; a visit on any server → unlocked for good',
+    'each new friend visit counts once (opens the categories a day)',
     () async {
       final p = await prefs();
       var iranVisits = 0;
@@ -31,10 +31,11 @@ void main() {
       });
       final service = InviteService(p, client: client);
       expect(await service.check(), isFalse);
-      expect(service.unlockedForever, isFalse);
       iranVisits = 1;
       expect(await service.check(), isTrue);
-      expect(InviteService(p).unlockedForever, isTrue);
+      expect(await service.check(), isFalse); // same visit, already used
+      iranVisits = 2;
+      expect(await service.check(), isTrue);
     },
   );
 

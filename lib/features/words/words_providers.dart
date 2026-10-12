@@ -34,14 +34,41 @@ final wordCategoriesProvider = FutureProvider<List<WordCategory>>((ref) {
   return ref.watch(wordRepositoryProvider).loadCategories(lang);
 });
 
-/// Bonus categories unlocked in this app session (rewarded ad).
-final unlockedBonusProvider = NotifierProvider<UnlockedBonus, Set<String>>(
-  UnlockedBonus.new,
+/// Clock, overridden in tests.
+final clockProvider = Provider<DateTime Function()>((ref) => DateTime.now);
+
+/// The special (bonus) categories are open until this time, or null. One
+/// rewarded ad, sharing the game, or a friend opening the invite link opens
+/// all of them for 24 hours. Kept across app restarts.
+final bonusUnlockProvider = NotifierProvider<BonusUnlock, DateTime?>(
+  BonusUnlock.new,
 );
 
-class UnlockedBonus extends Notifier<Set<String>> {
-  @override
-  Set<String> build() => const {};
+class BonusUnlock extends Notifier<DateTime?> {
+  static const duration = Duration(hours: 24);
+  static const _key = 'bonus.open_until';
 
-  void unlock(String categoryId) => state = {...state, categoryId};
+  @override
+  DateTime? build() {
+    final ms = ref.watch(sharedPreferencesProvider).getInt(_key);
+    return ms == null ? null : DateTime.fromMillisecondsSinceEpoch(ms);
+  }
+
+  /// Time left, or null when closed.
+  Duration? get remaining {
+    final until = state;
+    if (until == null) return null;
+    final left = until.difference(ref.read(clockProvider)());
+    return left.isNegative ? null : left;
+  }
+
+  bool get isOpen => remaining != null;
+
+  void openForADay() {
+    final until = ref.read(clockProvider)().add(duration);
+    ref
+        .read(sharedPreferencesProvider)
+        .setInt(_key, until.millisecondsSinceEpoch);
+    state = until;
+  }
 }

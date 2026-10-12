@@ -8,13 +8,14 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/providers.dart';
+import '../words/words_providers.dart';
 import 'share_link.dart';
 
 /// Invite links: every shared link carries this install's code (i=CODE).
 /// The web game (or the app page) reports a friend's visit to the server (Cloudflare
 /// Worker, server/src/invite.js, or its copy on the Iranian host), and once
-/// anyone has opened the link the special categories unlock for good.
-/// Sharing alone still unlocks a category for the current app session.
+/// a friend opens the link the special categories open for 24 hours (like
+/// sharing itself or a rewarded ad, see [bonusUnlockProvider]).
 const inviteEndpoints = ['https://api.espadna.com', 'https://espadna.ir/api'];
 
 class InviteService {
@@ -27,7 +28,7 @@ class InviteService {
   final List<String> _endpoints;
 
   static const _codeKey = 'invite_code';
-  static const _foreverKey = 'invite_unlocked';
+  static const _seenKey = 'invite_seen_visits';
   static final _valid = RegExp(r'^[A-Z2-9]{6,12}$');
   static const _alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
@@ -43,16 +44,16 @@ class InviteService {
     return fresh;
   }
 
-  bool get unlockedForever => _prefs.getBool(_foreverKey) ?? false;
-
-  /// Asks the servers whether a friend opened the link. Also registers this
-  /// device as the owner, so opening your own link never counts.
+  /// Asks the servers whether a friend opened the link since the last check
+  /// (true once per new visit). Also registers this device as the owner, so
+  /// opening your own link never counts.
   Future<bool> check() async {
-    if (unlockedForever) return true;
     final c = code;
-    final visits = await Future.wait(_endpoints.map((e) => _visits(e, c)));
-    if (visits.any((v) => v > 0)) {
-      await _prefs.setBool(_foreverKey, true);
+    final counts = await Future.wait(_endpoints.map((e) => _visits(e, c)));
+    final total = counts.fold(0, (a, b) => a + b);
+    final seen = _prefs.getInt(_seenKey) ?? 0;
+    if (total > seen) {
+      await _prefs.setInt(_seenKey, total);
       return true;
     }
     return false;
@@ -97,23 +98,10 @@ final inviteServiceProvider = Provider<InviteService>((ref) {
   return service;
 });
 
-/// True once a friend opened the invite link (kept for good).
-final bonusForeverProvider = NotifierProvider<BonusForever, bool>(
-  BonusForever.new,
-);
-
-class BonusForever extends Notifier<bool> {
-  @override
-  bool build() => ref.watch(inviteServiceProvider).unlockedForever;
-
-  /// Checks the servers; returns true when this call newly unlocked.
-  Future<bool> refresh() async {
-    if (state) return false;
-    final unlocked = await ref.read(inviteServiceProvider).check();
-    if (unlocked && !state) {
-      state = true;
-      return true;
-    }
-    return false;
-  }
+/// A friend opened the invite link since the last check: the special
+/// categories open for another 24 hours. Returns true when that happened.
+Future<bool> checkInviteVisits(InviteService invites, BonusUnlock bonus) async {
+  if (!await invites.check()) return false;
+  bonus.openForADay();
+  return true;
 }

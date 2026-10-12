@@ -70,8 +70,11 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
   late final AppLifecycleListener _lifecycle;
 
   Future<void> _checkInvite() async {
-    final unlocked = await ref.read(bonusForeverProvider.notifier).refresh();
-    if (!unlocked || !mounted) return;
+    final opened = await checkInviteVisits(
+      ref.read(inviteServiceProvider),
+      ref.read(bonusUnlockProvider.notifier),
+    );
+    if (!opened || !mounted) return;
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(_s.inviteUnlockedForever)));
   }
@@ -137,8 +140,8 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
         .pushReplacement(MaterialPageRoute(builder: (_) => const GameScreen()));
   }
 
-  /// Bonus category for this session: unlocked by sending the game to
-  /// friends, or by a rewarded ad where ads run.
+  /// Opens all special categories for 24 hours: a rewarded ad (where ads
+  /// run) or sending the game to friends.
   Future<void> _unlock(WordCategory c) async {
     final s = ref.read(stringsProvider);
     final adOffered = ref.read(adManagerProvider).rewardedOffered;
@@ -146,7 +149,9 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text('${c.emoji} ${s.unlockTitle}'),
-        content: Text('«${c.title}»\n${s.unlockBody}'),
+        content: Text(
+          '«${c.title}»\n${adOffered ? s.unlockBody : s.unlockBodyShareOnly}',
+        ),
         actionsOverflowButtonSpacing: 8,
         actions: [
           TextButton(
@@ -188,11 +193,11 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
       // Only an explicit "cancel" keeps it locked; platforms that cannot
       // tell (some Android apps, web) count as shared.
       // Registers this device as the link's owner before anyone opens it.
-      unawaited(ref.read(bonusForeverProvider.notifier).refresh());
+      unawaited(ref.read(inviteServiceProvider).check());
       final shared = await shareInvite(s);
       if (!shared || !mounted) return;
     }
-    ref.read(unlockedBonusProvider.notifier).unlock(c.id);
+    ref.read(bonusUnlockProvider.notifier).openForADay();
     setState(() => _selected = {...?_selected, c.id});
   }
 
@@ -201,10 +206,9 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     final s = ref.watch(stringsProvider);
     final categoriesAsync = ref.watch(wordCategoriesProvider);
     final categories = categoriesAsync.value ?? const <WordCategory>[];
-    final unlocked = ref.watch(unlockedBonusProvider);
-    final forever = ref.watch(bonusForeverProvider);
-    bool locked(WordCategory c) =>
-        c.bonus && !forever && !unlocked.contains(c.id);
+    ref.watch(bonusUnlockProvider);
+    final bonusLeft = ref.read(bonusUnlockProvider.notifier).remaining;
+    bool locked(WordCategory c) => c.bonus && bonusLeft == null;
     final available = {
       for (final c in categories)
         if (!locked(c)) c.id,
@@ -334,7 +338,11 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                           count: c.wordsFor(_config.difficulty.levels).length,
                           selected: selected.contains(c.id),
                           locked: locked(c),
-                          badge: c.bonus ? s.bonusBadge : null,
+                          badge: !c.bonus
+                              ? null
+                              : bonusLeft == null
+                              ? s.bonusBadge
+                              : '🎁 ${s.bonusOpenHours((bonusLeft.inMinutes / 60).ceil())}',
                           countLabel: s.wordsCount,
                           onTap: locked(c)
                               ? () => _unlock(c)
