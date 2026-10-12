@@ -493,7 +493,7 @@ class EnStrings extends AppStrings {
   @override
   String get teamGameHint => 'As many words as you can in a minute';
   @override
-  String get foreheadMode => 'Forehead Mode';
+  String get foreheadMode => 'Heads Up';
   @override
   String get foreheadModeHint => 'Hold the phone on your forehead!';
   @override
@@ -666,7 +666,7 @@ class EnStrings extends AppStrings {
   String get recordingExplainTitle => 'Record the Fun 🎥';
   @override
   String get recordingExplainBody =>
-      'In forehead mode the front camera films your friends acting, so you '
+      'In Heads Up the front camera films your friends acting, so you '
       'can watch and laugh afterwards.\n\n'
       'This needs the camera and microphone. Videos stay on your phone and '
       'are never uploaded — only saved or shared if you choose to.';
@@ -750,9 +750,9 @@ class EnStrings extends AppStrings {
   @override
   String get vibration => 'Vibration';
   @override
-  String get recording => 'Record Video in Forehead Mode';
+  String get recording => 'Record Video in Heads Up';
   @override
-  String get recordingHint => 'Forehead mode only, front camera';
+  String get recordingHint => 'Heads Up only, front camera';
   @override
   String get language => 'Language';
   @override

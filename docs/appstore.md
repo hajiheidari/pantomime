@@ -10,6 +10,12 @@ answers, EU Digital Services Act status, and pressing Submit.
 Build: `.github/workflows/ios.yml` (TestFlight, no Mac needed). Needs the
 four secrets listed there; then push a tag `ios-<n>` to build and upload.
 
+## Next version (after 1.0)
+
+- The English name of forehead mode is now **Heads Up** (in the app since
+  build 17+). Update the description, review notes and screenshots with the
+  next version.
+
 ## App record (Apps → ➕ → New App)
 
 | Field | Value |
@@ -46,7 +52,7 @@ The traditional game: one word per turn. One player acts it out without speaking
 SPEED PANTOMIME
 2–4 teams race the clock: act out and guess as many words as you can in one turn.
 
-FOREHEAD MODE
+HEADS UP
 Put the phone on your forehead while your friends act it out. Tilt down = correct, tilt up = pass.
 
 800+ WORDS
@@ -74,7 +80,7 @@ MORE FUN
   `lib/core/widgets/tablet_scale.dart`).
 
 **App Review Information:** no sign-in required. Notes:
-`No account needed. Tap "Pantomime", "Speed Pantomime" or "Forehead Mode", then "Let's go!". Forehead mode uses the motion sensor; on the simulator use "Start with Buttons".`
+`No account needed. Tap "Pantomime", "Speed Pantomime" or "Heads Up", then "Let's go!". Heads Up uses the motion sensor; on the simulator use "Start with Buttons".`
 
 ## App Privacy
 
