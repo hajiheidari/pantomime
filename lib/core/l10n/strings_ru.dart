@@ -200,6 +200,27 @@ class RuStrings extends AppStrings {
   String get unlockBodyShareOnly =>
       'Отправь игру друзьям — все особые категории откроются на 24 часа.';
   @override
+  String get groupPhotoTitle => '📸 Общее фото?';
+  @override
+  String get groupPhotoBody =>
+      'Перед началом сделайте весёлое фото всей компанией — с рамкой пантомимы, сегодняшней датой и своей подписью.';
+  @override
+  String get groupPhotoYes => 'Давайте!';
+  @override
+  String get photoTonight => 'Сегодня на сцене';
+  @override
+  String get captionHint => 'Напишите подпись к фото';
+  @override
+  String get defaultCaption => 'Наш вечер пантомимы 🎭';
+  @override
+  String get savePhoto => 'Сохранить фото';
+  @override
+  String get photoSaved => 'Фото сохранено в галерею ✅';
+  @override
+  String get retake => 'Переснять';
+  @override
+  String get noCamera => 'Камера недоступна.';
+  @override
   String get watchAd => 'Смотреть рекламу';
   @override
   String get cancel => 'Отмена';

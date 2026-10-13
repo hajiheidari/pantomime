@@ -186,6 +186,27 @@ class TrStrings extends AppStrings {
   String get unlockBodyShareOnly =>
       'Oyunu arkadaşlarına gönder: tüm özel kategoriler 24 saat açılır.';
   @override
+  String get groupPhotoTitle => '📸 Toplu Fotoğraf?';
+  @override
+  String get groupPhotoBody =>
+      'Başlamadan önce hep birlikte eğlenceli bir fotoğraf çekin: pandomim çerçevesi, bugünün tarihi ve kendi notunuzla.';
+  @override
+  String get groupPhotoYes => 'Hadi Çekelim';
+  @override
+  String get photoTonight => 'Bu Gece Sahnede';
+  @override
+  String get captionHint => 'Fotoğraf için bir not yaz';
+  @override
+  String get defaultCaption => 'Pandomim gecemiz 🎭';
+  @override
+  String get savePhoto => 'Fotoğrafı Kaydet';
+  @override
+  String get photoSaved => 'Fotoğraf galeriye kaydedildi ✅';
+  @override
+  String get retake => 'Tekrar';
+  @override
+  String get noCamera => 'Kamera kullanılamıyor.';
+  @override
   String get watchAd => 'Reklam İzle';
   @override
   String get cancel => 'İptal';

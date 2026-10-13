@@ -71,6 +71,18 @@ abstract class AppStrings {
   /// Pantomime modes: film a turn with the back camera.
   String get filmThisTurn;
 
+  /// Group photo before the first turn.
+  String get groupPhotoTitle;
+  String get groupPhotoBody;
+  String get groupPhotoYes;
+  String get photoTonight;
+  String get captionHint;
+  String get defaultCaption;
+  String get savePhoto;
+  String get photoSaved;
+  String get retake;
+  String get noCamera;
+
   /// iOS settings: opens Game Center.
   String get leaderboards;
   String get filmOn;
@@ -371,6 +383,27 @@ class FaStrings extends AppStrings {
   @override
   String get unlockBodyShareOnly =>
       'بازی را برای دوستانت بفرست تا همه‌ی دسته‌های ویژه ۲۴ ساعت باز شوند.';
+  @override
+  String get groupPhotoTitle => '📸 عکس دسته‌جمعی؟';
+  @override
+  String get groupPhotoBody =>
+      'قبل از شروع، همه با هم یک عکس باحال بگیرید؛ با قاب پانتومیم، تاریخ امروز و جمله‌ی خودتان.';
+  @override
+  String get groupPhotoYes => 'بزن بریم';
+  @override
+  String get photoTonight => 'امشب روی صحنه';
+  @override
+  String get captionHint => 'یک جمله برای عکس بنویسید';
+  @override
+  String get defaultCaption => 'شب پانتومیم ما 🎭';
+  @override
+  String get savePhoto => 'ذخیره عکس';
+  @override
+  String get photoSaved => 'عکس در گالری ذخیره شد ✅';
+  @override
+  String get retake => 'دوباره';
+  @override
+  String get noCamera => 'دوربین در دسترس نیست.';
   @override
   String get watchAd => 'دیدن تبلیغ';
   @override
@@ -688,6 +721,27 @@ class EnStrings extends AppStrings {
   @override
   String get unlockBodyShareOnly =>
       'Send the game to friends: all special categories open for 24 hours.';
+  @override
+  String get groupPhotoTitle => '📸 Group Photo?';
+  @override
+  String get groupPhotoBody =>
+      'Before you start, take a fun photo all together, with a Pantomime frame, today\'s date and your own line.';
+  @override
+  String get groupPhotoYes => 'Let\'s Do It';
+  @override
+  String get photoTonight => 'Tonight on Stage';
+  @override
+  String get captionHint => 'Write a line for the photo';
+  @override
+  String get defaultCaption => 'Our pantomime night 🎭';
+  @override
+  String get savePhoto => 'Save Photo';
+  @override
+  String get photoSaved => 'Photo saved to gallery ✅';
+  @override
+  String get retake => 'Retake';
+  @override
+  String get noCamera => 'The camera isn\'t available.';
   @override
   String get watchAd => 'Watch Ad';
   @override
@@ -1007,6 +1061,27 @@ class ArStrings extends AppStrings {
   @override
   String get unlockBodyShareOnly =>
       'أرسل اللعبة لأصدقائك لتُفتح كل الفئات الخاصة لمدة ٢٤ ساعة.';
+  @override
+  String get groupPhotoTitle => '📸 صورة جماعية؟';
+  @override
+  String get groupPhotoBody =>
+      'قبل البدء، التقطوا صورة ممتعة معًا، بإطار البانتومايم وتاريخ اليوم وجملتكم الخاصة.';
+  @override
+  String get groupPhotoYes => 'هيا بنا';
+  @override
+  String get photoTonight => 'الليلة على المسرح';
+  @override
+  String get captionHint => 'اكتب جملة للصورة';
+  @override
+  String get defaultCaption => 'ليلة البانتومايم 🎭';
+  @override
+  String get savePhoto => 'احفظ الصورة';
+  @override
+  String get photoSaved => 'تم حفظ الصورة في المعرض ✅';
+  @override
+  String get retake => 'أعد';
+  @override
+  String get noCamera => 'الكاميرا غير متاحة.';
   @override
   String get watchAd => 'شاهد الإعلان';
   @override

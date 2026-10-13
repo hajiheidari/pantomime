@@ -8,6 +8,7 @@ import '../../../core/l10n/app_strings.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/cartoon.dart';
+import '../../photo/group_photo_screen.dart';
 import '../../recording/round_recorder.dart';
 import '../../recording/watermark.dart';
 import '../../settings/settings_controller.dart';
@@ -41,6 +42,44 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   /// Pantomime modes: film the next turn (chosen on the ready screen).
   bool _filmNext = false;
+
+  /// The group photo is offered once, before the first turn of the game.
+  bool _photoAsked = false;
+
+  Future<void> _offerGroupPhoto() async {
+    if (!mounted) return;
+    final s = ref.read(stringsProvider);
+    final yes = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(s.groupPhotoTitle),
+        content: Text(s.groupPhotoBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(s.notNow, style: const TextStyle(color: AppColors.ink)),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.green,
+              foregroundColor: AppColors.ink,
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(
+              '📸 ${s.groupPhotoYes}',
+              style: const TextStyle(fontWeight: FontWeight.w900),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (yes != true || !mounted) return;
+    final names =
+        ref.read(gameControllerProvider)?.config.teamNames ?? const [];
+    await Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => GroupPhotoScreen(names: names)));
+  }
 
   bool get _canFilm => !_forehead && !kIsWeb;
 
@@ -192,6 +231,13 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       }
     });
     if (session == null) return const Scaffold(body: SizedBox.shrink());
+    if (!_photoAsked &&
+        _canFilm &&
+        session.phase == GamePhase.ready &&
+        session.game.turnIndex == 0) {
+      _photoAsked = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) => _offerGroupPhoto());
+    }
 
     final Widget view = switch (session.phase) {
       GamePhase.ready => _ReadyView(

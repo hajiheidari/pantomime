@@ -72,6 +72,10 @@ void main() {
     await settle(tester);
     await tester.tap(find.text('بزن بریم!'));
     await settle(tester);
+    // Group photo is offered once, before the first turn.
+    expect(find.text('📸 عکس دسته‌جمعی؟'), findsOneWidget);
+    await tester.tap(find.text('فعلاً نه'));
+    await settle(tester);
 
     // Ready: choose to film this turn.
     await tester.ensureVisible(find.text('🎥 فیلم گرفتن از این نوبت'));
