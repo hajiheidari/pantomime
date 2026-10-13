@@ -66,7 +66,7 @@ class _GroupPhotoScreenState extends ConsumerState<GroupPhotoScreen> {
       );
       final c = CameraController(
         cam,
-        ResolutionPreset.high,
+        ResolutionPreset.veryHigh,
         enableAudio: false,
       );
       await c.initialize();
@@ -281,13 +281,13 @@ class _GroupPhotoScreenState extends ConsumerState<GroupPhotoScreen> {
     children: [
       Center(
         child: SizedBox(
-          height: 420,
+          height: 460,
           child: FittedBox(child: _frameView(_frame, key: _key)),
         ),
       ),
       const SizedBox(height: 12),
       SizedBox(
-        height: 120,
+        height: 132,
         child: ListView(
           scrollDirection: Axis.horizontal,
           children: [
@@ -295,7 +295,7 @@ class _GroupPhotoScreenState extends ConsumerState<GroupPhotoScreen> {
               GestureDetector(
                 onTap: () => setState(() => _frame = f),
                 child: Container(
-                  width: 88,
+                  width: 76,
                   margin: const EdgeInsets.symmetric(horizontal: 5),
                   decoration: BoxDecoration(
                     border: Border.all(

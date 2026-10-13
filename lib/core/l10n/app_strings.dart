@@ -139,6 +139,8 @@ abstract class AppStrings {
   String get watchAd;
   String get cancel;
   String get unlockSkipped;
+  String get adUnavailable;
+  String get adLoading;
   String get shareToUnlock;
   String get inviteText;
   String get updateAvailable;
@@ -410,6 +412,11 @@ class FaStrings extends AppStrings {
   String get cancel => 'بی‌خیال';
   @override
   String get unlockSkipped => 'برای باز شدن دسته، تبلیغ باید تا آخر دیده شود.';
+  @override
+  String get adUnavailable =>
+      'الان تبلیغی برای نمایش نیست. کمی بعد دوباره امتحان کن یا بازی را برای دوستانت بفرست تا دسته باز شود.';
+  @override
+  String get adLoading => 'در حال آوردن تبلیغ…';
   @override
   String get shareToUnlock => 'فرستادن برای دوستان';
   @override
@@ -748,6 +755,11 @@ class EnStrings extends AppStrings {
   String get cancel => 'Cancel';
   @override
   String get unlockSkipped => 'Watch the ad to the end to unlock.';
+  @override
+  String get adUnavailable =>
+      'No ad is available right now. Try again later, or share the game with friends to unlock.';
+  @override
+  String get adLoading => 'Loading ad…';
   @override
   String get shareToUnlock => 'Send to Friends';
   @override
@@ -1088,6 +1100,11 @@ class ArStrings extends AppStrings {
   String get cancel => 'إلغاء';
   @override
   String get unlockSkipped => 'شاهد الإعلان حتى النهاية لفتح الفئة.';
+  @override
+  String get adUnavailable =>
+      'لا يوجد إعلان متاح الآن. حاول لاحقًا أو أرسل اللعبة لأصدقائك لفتح الفئة.';
+  @override
+  String get adLoading => 'جارٍ تحميل الإعلان…';
   @override
   String get shareToUnlock => 'أرسل إلى الأصدقاء';
   @override

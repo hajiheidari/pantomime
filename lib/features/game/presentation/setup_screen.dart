@@ -182,11 +182,30 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     );
     if (choice == null || !mounted) return;
     if (choice == 'ad') {
-      final outcome = await ref.read(adManagerProvider).showRewarded();
+      final messenger = ScaffoldMessenger.of(context);
+      final loading = messenger.showSnackBar(
+        SnackBar(
+          content: Text(s.adLoading),
+          duration: const Duration(seconds: 15),
+        ),
+      );
+      final outcome = await ref
+          .read(adManagerProvider)
+          .showRewarded(timeout: const Duration(seconds: 10));
+      loading.close();
       if (!mounted) return;
-      if (outcome == RewardOutcome.skipped) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(s.unlockSkipped)));
+      if (outcome != RewardOutcome.earned) {
+        // No fill / load error must never unlock silently.
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              outcome == RewardOutcome.skipped
+                  ? s.unlockSkipped
+                  : s.adUnavailable,
+            ),
+            duration: const Duration(seconds: 5),
+          ),
+        );
         return;
       }
     } else {

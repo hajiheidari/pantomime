@@ -213,6 +213,11 @@ class TrStrings extends AppStrings {
   @override
   String get unlockSkipped => 'Kilidi açmak için reklamı sonuna kadar izle.';
   @override
+  String get adUnavailable =>
+      'Şu an gösterilecek reklam yok. Daha sonra tekrar dene ya da kilidi açmak için oyunu arkadaşlarınla paylaş.';
+  @override
+  String get adLoading => 'Reklam yükleniyor…';
+  @override
   String get shareToUnlock => 'Arkadaşlara Gönder';
   @override
   String get inviteText =>

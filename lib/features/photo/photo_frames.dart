@@ -5,11 +5,14 @@ import '../../core/theme/app_theme.dart';
 import '../../core/widgets/cartoon.dart';
 
 /// Frames for the group photo (designs: polaroid, theater, cartoon, film,
-/// minimal). Each is laid out on a fixed 1080 × 1350 canvas (Instagram 4:5)
-/// and captured at that size.
+/// minimal). Each is laid out on a fixed 1080 × 1920 canvas (9:16, the
+/// Instagram / WhatsApp story size) and captured at that size. Text and
+/// faces stay out of the top and bottom [storySafe] pixels, where story
+/// apps draw their own bars and reply box.
 enum PhotoFrame { polaroid, theater, cartoon, film, minimal }
 
-const photoCanvas = Size(1080, 1350);
+const photoCanvas = Size(1080, 1920);
+const storySafe = 250.0;
 
 const _ink = Color(0xFF140F2E);
 const _night = Color(0xFF2A1D5E);
@@ -134,7 +137,7 @@ class PhotoFrameView extends StatelessWidget {
   Widget _polaroid() => ColoredBox(
     color: _night,
     child: Padding(
-      padding: const EdgeInsets.fromLTRB(90, 70, 90, 60),
+      padding: const EdgeInsets.fromLTRB(90, 280, 90, 260),
       child: Transform.rotate(
         angle: -0.035,
         child: Container(
@@ -156,7 +159,7 @@ class PhotoFrameView extends StatelessWidget {
                 left: 50,
                 right: 50,
                 top: 50,
-                height: 860,
+                height: 1000,
                 child: _photo(radius: 4),
               ),
               Positioned(
@@ -177,7 +180,7 @@ class PhotoFrameView extends StatelessWidget {
               Positioned(
                 left: 50,
                 right: 50,
-                top: 935,
+                top: 1080,
                 child: _text(caption, 50, _night),
               ),
               Positioned(
@@ -208,12 +211,12 @@ class PhotoFrameView extends StatelessWidget {
           top: 0,
           left: 0,
           right: 0,
-          height: 150,
+          height: 290,
           child: Container(
             decoration: const BoxDecoration(
               border: Border(bottom: BorderSide(color: _yellow, width: 10)),
               borderRadius: BorderRadius.vertical(
-                bottom: Radius.elliptical(540, 60),
+                bottom: Radius.elliptical(540, 80),
               ),
             ),
             clipBehavior: Clip.antiAlias,
@@ -233,7 +236,7 @@ class PhotoFrameView extends StatelessWidget {
           ),
         ),
         Positioned(
-          top: 170,
+          top: 305,
           left: 40,
           right: 40,
           child: Text(
@@ -248,10 +251,10 @@ class PhotoFrameView extends StatelessWidget {
           ),
         ),
         Positioned(
-          top: 290,
+          top: 425,
           left: 90,
           right: 90,
-          height: 760,
+          height: 950,
           child: Container(
             decoration: BoxDecoration(
               border: Border.all(color: _yellow, width: 14),
@@ -265,15 +268,32 @@ class PhotoFrameView extends StatelessWidget {
           ),
         ),
         Positioned(
-          top: 1075,
+          top: 1410,
           left: 90,
           right: 90,
           child: _text(caption, 48, Colors.white),
         ),
+        // Stage floor.
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: 200,
+          child: Container(
+            decoration: const BoxDecoration(
+              border: Border(top: BorderSide(color: _yellow, width: 10)),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFF6B3A1E), Color(0xFF3A1E0E)],
+              ),
+            ),
+          ),
+        ),
         Positioned(
           left: 90,
           right: 90,
-          bottom: 40,
+          bottom: 265,
           child: _footer(_yellow, Colors.white),
         ),
       ],
@@ -286,12 +306,14 @@ class PhotoFrameView extends StatelessWidget {
       children: [
         const Positioned.fill(child: CustomPaint(painter: _Dots())),
         for (final (e, x, y, a) in const [
-          ('✨', 40.0, 40.0, -0.6),
-          ('🎉', 960.0, 50.0, 0.3),
-          ('🎈', 970.0, 330.0, -0.2),
-          ('💥', 20.0, 420.0, 0.4),
-          ('🎊', 965.0, 620.0, 0.5),
-          ('⭐', 25.0, 760.0, -0.3),
+          ('✨', 60.0, 120.0, -0.6),
+          ('🎉', 940.0, 140.0, 0.3),
+          ('🎈', 970.0, 520.0, -0.2),
+          ('💥', 20.0, 620.0, 0.4),
+          ('🎊', 965.0, 1000.0, 0.5),
+          ('⭐', 25.0, 1160.0, -0.3),
+          ('🎈', 90.0, 1740.0, 0.2),
+          ('✨', 930.0, 1730.0, -0.4),
         ])
           Positioned(
             left: x,
@@ -302,10 +324,10 @@ class PhotoFrameView extends StatelessWidget {
             ),
           ),
         Positioned(
-          top: 110,
+          top: 290,
           left: 110,
           right: 110,
-          height: 830,
+          height: 1040,
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
@@ -324,7 +346,7 @@ class PhotoFrameView extends StatelessWidget {
           ),
         ),
         Positioned(
-          top: 985,
+          top: 1385,
           left: 140,
           right: 140,
           child: Container(
@@ -341,7 +363,7 @@ class PhotoFrameView extends StatelessWidget {
         Positioned(
           left: 80,
           right: 80,
-          bottom: 36,
+          bottom: 260,
           child: _footer(
             _ink,
             _yellow,
@@ -363,7 +385,7 @@ class PhotoFrameView extends StatelessWidget {
   Widget _film() {
     Widget holes() => Column(
       children: [
-        for (var i = 0; i < 14; i++)
+        for (var i = 0; i < 20; i++)
           Container(
             width: 70,
             height: 40,
@@ -403,15 +425,15 @@ class PhotoFrameView extends StatelessWidget {
             ),
           ),
           Positioned(
-            top: 90,
+            top: 280,
             left: 150,
             right: 150,
-            height: 900,
+            height: 1100,
             child: _photo(),
           ),
           Positioned(
             left: 180,
-            top: 920,
+            top: 1300,
             child: Text(
               stamp,
               textDirection: TextDirection.ltr,
@@ -425,7 +447,7 @@ class PhotoFrameView extends StatelessWidget {
             ),
           ),
           Positioned(
-            top: 1025,
+            top: 1410,
             left: 150,
             right: 150,
             child: _text(caption, 50, Colors.white),
@@ -433,7 +455,7 @@ class PhotoFrameView extends StatelessWidget {
           Positioned(
             left: 150,
             right: 150,
-            bottom: 50,
+            bottom: 265,
             child: _footer(const Color(0xFFBBBBBB), _yellow),
           ),
         ],
@@ -445,9 +467,9 @@ class PhotoFrameView extends StatelessWidget {
     color: const Color(0xFFFFFAF0),
     child: Stack(
       children: [
-        Positioned(top: 0, left: 0, right: 0, height: 1050, child: _photo()),
+        Positioned(top: 0, left: 0, right: 0, height: 1400, child: _photo()),
         PositionedDirectional(
-          top: 990,
+          top: 1340,
           start: 60,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
@@ -466,7 +488,7 @@ class PhotoFrameView extends StatelessWidget {
           ),
         ),
         Positioned(
-          top: 1090,
+          top: 1450,
           left: 60,
           right: 60,
           child: _text(caption, 52, _night, align: TextAlign.start),
@@ -474,7 +496,7 @@ class PhotoFrameView extends StatelessWidget {
         Positioned(
           left: 60,
           right: 60,
-          bottom: 36,
+          bottom: 265,
           child: _footer(
             _pink,
             _night,

@@ -53,8 +53,8 @@ class WordCategory {
 
   final String id;
 
-  /// Bonus categories are unlocked for the session by a rewarded ad (or
-  /// freely when ads are off / unavailable).
+  /// Bonus categories open for 24 hours after a fully watched rewarded ad,
+  /// a share, or a new visit to the player's invite link.
   final bool bonus;
   final String title;
   final String emoji;

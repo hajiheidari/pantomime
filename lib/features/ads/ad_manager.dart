@@ -144,7 +144,9 @@ class AdManager {
   /// Whether the bonus pack should be offered behind a rewarded ad.
   bool get rewardedOffered => _ads.enabled && _ads.rewardedEnabled;
 
-  Future<RewardOutcome> showRewarded() async {
+  /// [timeout] overrides [loadTimeout]: the player asked for this ad and
+  /// sees a loading indicator, so it may wait longer for a fill.
+  Future<RewardOutcome> showRewarded({Duration? timeout}) async {
     if (!rewardedOffered || _showing || _isGameplayActive()) {
       return RewardOutcome.unavailable;
     }
@@ -152,7 +154,7 @@ class AdManager {
     if (p == null) return RewardOutcome.unavailable;
     _showing = true;
     try {
-      final r = await p.showRewarded(timeout: loadTimeout);
+      final r = await p.showRewarded(timeout: timeout ?? loadTimeout);
       _record(p.id, r);
       if (!r.shown) return RewardOutcome.unavailable;
       return r.rewarded ? RewardOutcome.earned : RewardOutcome.skipped;

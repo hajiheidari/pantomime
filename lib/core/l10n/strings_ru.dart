@@ -227,6 +227,11 @@ class RuStrings extends AppStrings {
   @override
   String get unlockSkipped => 'Досмотри рекламу до конца, чтобы открыть.';
   @override
+  String get adUnavailable =>
+      'Сейчас рекламы нет. Попробуй позже или поделись игрой с друзьями, чтобы открыть.';
+  @override
+  String get adLoading => 'Загрузка рекламы…';
+  @override
   String get shareToUnlock => 'Отправить друзьям';
   @override
   String get inviteText =>
