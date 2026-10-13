@@ -54,9 +54,18 @@ class _GroupPhotoScreenState extends ConsumerState<GroupPhotoScreen> {
     _open();
   }
 
+  bool _opening = false;
+
   Future<void> _open() async {
+    if (_opening) return;
+    _opening = true;
+    // iOS runs one capture session at a time: a second camera opened while
+    // the first is still live shows a blank preview. Close the old one first.
+    final old = _camera;
+    if (mounted) setState(() => _camera = null);
+    await old?.dispose();
     try {
-      _cameras = await availableCameras();
+      if (_cameras.isEmpty) _cameras = await availableCameras();
       final want = _front
           ? CameraLensDirection.front
           : CameraLensDirection.back;
@@ -64,22 +73,33 @@ class _GroupPhotoScreenState extends ConsumerState<GroupPhotoScreen> {
         (c) => c.lensDirection == want,
         orElse: () => _cameras.first,
       );
-      final c = CameraController(
-        cam,
-        ResolutionPreset.veryHigh,
-        enableAudio: false,
-      );
-      await c.initialize();
+      CameraController? c;
+      // Full HD where the lens supports it, otherwise 720p.
+      for (final preset in [ResolutionPreset.veryHigh, ResolutionPreset.high]) {
+        final candidate = CameraController(cam, preset, enableAudio: false);
+        try {
+          await candidate.initialize().timeout(const Duration(seconds: 8));
+          c = candidate;
+          break;
+        } catch (e) {
+          debugPrint('group photo camera $preset: $e');
+          await candidate.dispose();
+        }
+      }
+      if (c == null) throw StateError('camera did not start');
       if (!mounted) {
         await c.dispose();
         return;
       }
-      final old = _camera;
-      setState(() => _camera = c);
-      await old?.dispose();
+      setState(() {
+        _camera = c;
+        _failed = false;
+      });
     } catch (e) {
       debugPrint('group photo camera: $e');
       if (mounted) setState(() => _failed = true);
+    } finally {
+      _opening = false;
     }
   }
 
@@ -203,7 +223,23 @@ class _GroupPhotoScreenState extends ConsumerState<GroupPhotoScreen> {
     final c = _camera;
     if (_failed) {
       return Center(
-        child: Text(s.noCamera, style: const TextStyle(fontSize: 18)),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(s.noCamera, style: const TextStyle(fontSize: 18)),
+            if (_cameras.length > 1) ...[
+              const SizedBox(height: 16),
+              IconButton(
+                iconSize: 44,
+                icon: const Icon(Icons.flip_camera_ios_rounded),
+                onPressed: () {
+                  _front = !_front;
+                  _open();
+                },
+              ),
+            ],
+          ],
+        ),
       );
     }
     if (c == null || !c.value.isInitialized) {
@@ -253,7 +289,7 @@ class _GroupPhotoScreenState extends ConsumerState<GroupPhotoScreen> {
                 IconButton(
                   iconSize: 36,
                   icon: const Icon(Icons.flip_camera_ios_rounded),
-                  onPressed: _countdown != null
+                  onPressed: _countdown != null || _opening
                       ? null
                       : () {
                           _front = !_front;
