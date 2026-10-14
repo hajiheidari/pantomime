@@ -36,7 +36,7 @@ export function privacyHtml(contact) {
 ${mail ? `<p>تماس: ${mail}</p>` : ''}
 
 <section lang="en">
-<h2>Privacy policy — Pantomime Party</h2>
+<h2>Privacy policy — Dorehami Pantomime (پانتومیم دورهمی)</h2>
 <ul>
   <li>No accounts, no sign-up, no personal data collected (no name, phone, email or location).</li>
   <li>Team names, settings and word history are stored only on your device.</li>

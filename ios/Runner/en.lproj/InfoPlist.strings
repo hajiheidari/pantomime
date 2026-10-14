@@ -1,5 +1,5 @@
 /* App name and permission texts (English). */
-"CFBundleDisplayName" = "Pantomime";
+"CFBundleDisplayName" = "Dorehami";
 "NSCameraUsageDescription" = "If you turn recording on, the front camera films your friends in Heads Up, or the back camera films the actor in a pantomime turn you choose to film. Videos stay on your phone.";
 "NSMicrophoneUsageDescription" = "To record the laughs with the game video. Videos stay on your phone.";
 "NSPhotoLibraryAddUsageDescription" = "To save the game video to your Photos, only when you ask.";

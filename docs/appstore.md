@@ -28,7 +28,7 @@ four secrets listed there; then push a tag `ios-<n>` to build and upload.
 | Field | Value |
 |---|---|
 | Platform | iOS |
-| Name (≤30) | `Pantomime Party: Charades` |
+| Name (≤30) | `Dorehami: Pantomime & Heads Up` (1.1; was `Pantomime Party: Charades`) |
 | Primary language | English (U.S.) |
 | Bundle ID | `com.espadna.pantomime` |
 | SKU | `pantomime` |

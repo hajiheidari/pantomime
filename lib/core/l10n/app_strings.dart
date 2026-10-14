@@ -554,7 +554,7 @@ class EnStrings extends AppStrings {
   String n(int value) => '$value';
 
   @override
-  String get appName => 'Pantomime Party';
+  String get appName => 'Dorehami Pantomime';
   @override
   String get tagline => 'Act it out, laugh out loud!';
   @override
@@ -764,7 +764,7 @@ class EnStrings extends AppStrings {
   String get shareToUnlock => 'Send to Friends';
   @override
   String get inviteText =>
-      "Let's play Pantomime Party together! 🎭 The charades game for game night:";
+      "Let's play Dorehami Pantomime together! 🎭 The charades game for game night:";
   @override
   String get updateAvailable => 'A new version is available in the store!';
 
@@ -804,14 +804,14 @@ class EnStrings extends AppStrings {
   String get share => 'Share';
   @override
   String shareCaption(int points) =>
-      'We scored $points in Pantomime Party! 🎭 Can you beat us?';
+      'We scored $points in Dorehami Pantomime! 🎭 Can you beat us?';
   @override
   String get shareResultCaption =>
-      'Our Pantomime Party results 🎭🏆 Come play with us!';
+      'Our Dorehami Pantomime results 🎭🏆 Come play with us!';
   @override
   String get cardCorrectWords => 'Words We Got';
   @override
-  String get downloadCta => 'Get Pantomime Party and play with friends!';
+  String get downloadCta => 'Get Dorehami Pantomime and play with friends!';
 
   @override
   String get roundSummary => 'Turn Summary';
@@ -865,7 +865,7 @@ class EnStrings extends AppStrings {
   String get about => 'About';
   @override
   String get aboutBody =>
-      'Pantomime Party — a charades game for family and friends.\n'
+      'Dorehami Pantomime — a charades game for family and friends.\n'
       'Fully offline, no sign-up.';
   @override
   String get privacyPolicy => 'Privacy Policy';

@@ -47,7 +47,7 @@
       var lang = q === 'fa' || q === 'en' || q === 'ar' ? q
         : /(^|,)(fa|prs)|[-_](ir|af)(,|$)/.test(langs) || off === 210 || off === 270 ? 'fa'
         : /(^|,)ar/.test(langs) ? 'ar' : 'en';
-      var name = { fa: 'پانتومیم دورهمی', en: 'Pantomime Party', ar: 'بانتومايم الحفلات' }[lang];
+      var name = { fa: 'پانتومیم دورهمی', en: 'Dorehami Pantomime', ar: 'بانتومايم الحفلات' }[lang];
       document.documentElement.lang = lang;
       document.documentElement.dir = lang === 'en' ? 'ltr' : 'rtl';
       document.title = name;

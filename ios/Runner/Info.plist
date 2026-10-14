@@ -7,7 +7,7 @@
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>
-		<string>Pantomime</string>
+		<string>Dorehami</string>
 		<key>NSCameraUsageDescription</key>
 		<string>If you turn recording on, the front camera films your friends in Heads Up, or the back camera films the actor in a pantomime turn you choose to film. Videos stay on your phone.</string>
 		<key>NSMicrophoneUsageDescription</key>
