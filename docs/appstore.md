@@ -10,7 +10,10 @@ answers, EU Digital Services Act status, and pressing Submit.
 Build: `.github/workflows/ios.yml` (TestFlight, no Mac needed). Needs the
 four secrets listed there; then push a tag `ios-<n>` to build and upload.
 
-## Next version (after 1.0)
+## Version 1.1.0 (submitted 2026-10-14, build 22)
+
+Name, subtitle, ru/tr listings, language line, posters (`store/appstore/posters`), Game Center and review notes were all set through the API. The items below are done.
+
 
 - The English name of forehead mode is now **Heads Up** (in the app since
   build 17+). Update the description, review notes and screenshots with the
