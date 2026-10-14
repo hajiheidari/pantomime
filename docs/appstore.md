@@ -15,6 +15,13 @@ four secrets listed there; then push a tag `ios-<n>` to build and upload.
 - The English name of forehead mode is now **Heads Up** (in the app since
   build 17+). Update the description, review notes and screenshots with the
   next version.
+- First line of every description lists the languages, so Iranian users see
+  the app is in Persian: `🌍 English · فارسی · العربية · Русский · Türkçe`.
+- A more distinctive store name (several apps are already called "Pantomime
+  Party"): waiting on the owner's choice.
+- Designed (poster-style) screenshots instead of raw screen captures: people
+  playing with the phone on the forehead, big headline, device mockup.
+- Attach Game Center to the version; add ru / tr listings.
 
 ## App record (Apps → ➕ → New App)
 
