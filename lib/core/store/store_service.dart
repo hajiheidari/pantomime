@@ -58,6 +58,10 @@ class StoreLinks {
       uri: 'itms-apps://itunes.apple.com/app/id$iosAppId?action=write-review',
       web: 'https://apps.apple.com/app/id$iosAppId?action=write-review',
     ),
+    AppStore.direct => const StoreLink(
+      uri: 'https://espadna.com/pantomime-app/',
+      web: 'https://espadna.com/pantomime-app/',
+    ),
     AppStore.web => StoreLink(
       uri: 'https://cafebazaar.ir/app/$packageName',
       web: 'https://cafebazaar.ir/app/$packageName',
@@ -83,6 +87,10 @@ class StoreLinks {
     AppStore.ios => StoreLink(
       uri: 'itms-apps://itunes.apple.com/app/id$iosAppId',
       web: 'https://apps.apple.com/app/id$iosAppId',
+    ),
+    AppStore.direct => const StoreLink(
+      uri: 'https://espadna.com/pantomime-app/',
+      web: 'https://espadna.com/pantomime-app/',
     ),
     AppStore.web => StoreLink(
       uri: 'https://cafebazaar.ir/app/$packageName',

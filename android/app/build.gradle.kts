@@ -14,7 +14,7 @@ plugins {
 //   keyPassword=…
 // Without that file the release build is signed with the debug key (fine for
 // local testing, never for uploading).
-val stores = listOf("play", "bazaar", "myket")
+val stores = listOf("play", "bazaar", "myket", "direct")
 
 fun keyProps(store: String): Properties? {
     val f = rootProject.file("keys/$store.properties")

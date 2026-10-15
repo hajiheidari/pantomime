@@ -64,6 +64,33 @@ void main() {
     );
   });
 
+  test('direct APK uses the Bazaar entries and never AdMob', () {
+    final c = ads((a) => a['ab_split'] = null);
+    expect(
+      providerChain(
+        ads: c,
+        store: AppStore.direct,
+        installId: 'x',
+        compiled: all,
+      ),
+      providerChain(
+        ads: c,
+        store: AppStore.bazaar,
+        installId: 'x',
+        compiled: all,
+      ),
+    );
+    expect(
+      providerChain(
+        ads: c,
+        store: AppStore.direct,
+        installId: 'x',
+        compiled: all,
+      ),
+      isNot(contains('admob')),
+    );
+  });
+
   test('split winner comes first', () {
     final c = ads();
     final chain = providerChain(

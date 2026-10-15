@@ -3,6 +3,7 @@
 #   tool/release.sh play     → AAB  (Google Play)
 #   tool/release.sh bazaar   → APK  (Cafe Bazaar)
 #   tool/release.sh myket    → APK  (Myket)
+#   tool/release.sh direct   → APK  (download from espadna.com)
 #   tool/release.sh bazaar --split-per-abi → one smaller APK per CPU type
 #   tool/release.sh ios      → IPA  (App Store; macOS + Xcode only)
 #
@@ -15,8 +16,8 @@ cd "$(dirname "$0")/.."
 store="${1:-}"
 extra=("${@:2}") # e.g. --split-per-abi
 case "$store" in
-  play | bazaar | myket | ios) ;;
-  *) echo "usage: tool/release.sh <play|bazaar|myket|ios>" >&2; exit 64 ;;
+  play | bazaar | myket | direct | ios) ;;
+  *) echo "usage: tool/release.sh <play|bazaar|myket|direct|ios>" >&2; exit 64 ;;
 esac
 
 defines=()
@@ -37,7 +38,7 @@ restore() {
 trap restore EXIT
 
 dart run tool/store.dart "$store"
-if [[ "$store" == "bazaar" || "$store" == "myket" ]]; then
+if [[ "$store" == "bazaar" || "$store" == "myket" || "$store" == "direct" ]]; then
   flutter pub get
 else
   flutter pub upgrade google_mobile_ads
@@ -49,7 +50,7 @@ case "$store" in
     flutter build appbundle --flavor play "${common[@]}" "${gradle_props[@]}"
     echo "→ build/app/outputs/bundle/playRelease/app-play-release.aab"
     ;;
-  bazaar | myket)
+  bazaar | myket | direct)
     flutter build apk --flavor "$store" "${common[@]}" "${extra[@]}"
     echo "→ build/app/outputs/flutter-apk/app-$store-release.apk"
     ;;

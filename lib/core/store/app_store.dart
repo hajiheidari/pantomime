@@ -9,11 +9,18 @@ enum AppStore {
   myket,
   ios,
 
+  /// APK downloaded straight from espadna.com (no store; same ad networks
+  /// and remote-config entries as Bazaar, language follows the device).
+  direct,
+
   /// Browser / PWA build (no ad SDKs yet; see docs/web.md).
   web;
 
   /// Bazaar / Myket builds must not use Google Play Services or AdMob.
   bool get allowsGooglePlayServices => this == play || this == ios;
+
+  /// Store whose remote-config ad entries this build uses.
+  AppStore get adStore => this == direct ? bazaar : this;
 
   static AppStore? tryParse(String? value) {
     for (final s in values) {

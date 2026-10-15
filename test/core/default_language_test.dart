@@ -16,7 +16,12 @@ void main() {
   });
 
   test('Play, App Store, web: Persian-looking devices → Persian', () {
-    for (final store in [AppStore.play, AppStore.ios, AppStore.web]) {
+    for (final store in [
+      AppStore.play,
+      AppStore.ios,
+      AppStore.direct,
+      AppStore.web,
+    ]) {
       expect(defaultLanguage(store, london), AppLanguage.en, reason: '$store');
       expect(
         defaultLanguage(store, const DeviceLocale(locales: ['de', 'fa_IR'])),

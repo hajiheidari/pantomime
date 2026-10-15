@@ -37,16 +37,17 @@ List<String> providerChain({
   required Set<String> compiled,
   Set<String> failed = const {},
 }) {
-  final split = ads.abSplit[store];
+  final key = store.adStore;
+  final split = ads.abSplit[key];
   final primary = split != null && split.isNotEmpty
-      ? pickFromSplit(split, installId, store)
-      : ads.activeProvider[store];
+      ? pickFromSplit(split, installId, key)
+      : ads.activeProvider[key];
   final ordered = <String>[
     ?primary,
-    ...?ads.fallbackChain[store],
+    ...?ads.fallbackChain[key],
     // If an A/B provider is missing from this build, the store's active
     // provider is the next best choice.
-    ?ads.activeProvider[store],
+    ?ads.activeProvider[key],
   ];
   final out = <String>[];
   for (final p in ordered) {
