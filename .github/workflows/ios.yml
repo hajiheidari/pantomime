@@ -67,8 +67,8 @@ jobs:
           channel: stable
           cache: true
 
-      # Same profile as tool/release.sh ios: AdMob only.
-      - run: dart run tool/store.dart ios && flutter pub upgrade google_mobile_ads
+      # Same profile as tool/release.sh ios: no ad SDK for now.
+      - run: dart run tool/store.dart ios && flutter pub get
 
       - name: AdMob app id
         env:

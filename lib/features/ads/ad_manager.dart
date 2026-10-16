@@ -141,8 +141,10 @@ class AdManager {
     }
   }
 
-  /// Whether the bonus pack should be offered behind a rewarded ad.
-  bool get rewardedOffered => _ads.enabled && _ads.rewardedEnabled;
+  /// Whether the bonus pack should be offered behind a rewarded ad: only
+  /// when this build has a network that can show one.
+  bool get rewardedOffered =>
+      _ads.enabled && _ads.rewardedEnabled && chain.isNotEmpty;
 
   /// [timeout] overrides [loadTimeout]: the player asked for this ad and
   /// sees a loading indicator, so it may wait longer for a fill.

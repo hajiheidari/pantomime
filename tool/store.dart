@@ -24,7 +24,9 @@ List<String> _profile(String store, bool withTapsell) => switch (store) {
   'dev' => ['adivery', if (withTapsell) 'tapsell', 'admob'],
   'play' => ['adivery', if (withTapsell) 'tapsell', 'admob'],
   'bazaar' || 'myket' || 'direct' => ['adivery', if (withTapsell) 'tapsell'],
-  'ios' => ['admob'],
+  // No ads on iOS until a network is chosen (App Review flags any ad SDK
+  // while the age rating says "no advertising").
+  'ios' => [],
   'web' => [], // no ad SDKs in the browser yet (docs/web.md)
   _ => throw ArgumentError('unknown store "$store"'),
 };

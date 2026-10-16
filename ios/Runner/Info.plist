@@ -16,15 +16,6 @@
 		<string>To save the game video to your Photos, only when you ask. The game never reads your photos.</string>
 		<key>NSPhotoLibraryAddUsageDescription</key>
 		<string>To save the game video to your Photos, only when you ask.</string>
-		<key>GADApplicationIdentifier</key>
-		<string>$(ADMOB_APP_ID)</string>
-		<key>SKAdNetworkItems</key>
-		<array>
-			<dict>
-				<key>SKAdNetworkIdentifier</key>
-				<string>cstr6suwn9.skadnetwork</string>
-			</dict>
-		</array>
 		<key>CFBundleLocalizations</key>
 		<array>
 			<string>fa</string>

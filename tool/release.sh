@@ -38,7 +38,7 @@ restore() {
 trap restore EXIT
 
 dart run tool/store.dart "$store"
-if [[ "$store" == "bazaar" || "$store" == "myket" || "$store" == "direct" ]]; then
+if [[ "$store" != "play" ]]; then
   flutter pub get
 else
   flutter pub upgrade google_mobile_ads

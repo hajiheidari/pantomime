@@ -104,6 +104,12 @@ void main() {
     expect(m.homeBanner(), isNull);
   });
 
+  test('no ad network in the build (iOS) → no rewarded offer', () async {
+    final m = manager(store: AppStore.ios, compiled: const {});
+    expect(m.rewardedOffered, isFalse);
+    expect(await m.showRewarded(), RewardOutcome.unavailable);
+  });
+
   test('3 consecutive failures → next provider in the chain', () async {
     config = cfg((a) => a['interstitial_every_n_rounds'] = 1);
     fakes['adivery']!.next = const AdShowResult.notReady();
