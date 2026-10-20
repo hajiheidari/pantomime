@@ -9,43 +9,38 @@ import 'round_recorder.dart';
 
 const _offeredKey = 'recording.offered';
 
-/// Explains recording (camera + microphone, videos stay on the phone) and,
-/// if the player agrees, lets the OS ask for permission and turns it on.
-/// Returns whether recording is on afterwards.
-Future<bool> askToEnableRecording(
-  BuildContext context,
-  WidgetRef ref, {
-  bool firstTime = false,
-}) async {
+/// The player turned recording on: explains it (camera + microphone, videos
+/// stay on the phone), then lets the OS ask for permission. App Review
+/// (5.1.1): a message shown before a permission request has a single
+/// "Continue" button that always leads to the request; the player decides
+/// in the system prompt. Returns whether recording is on afterwards.
+Future<bool> askToEnableRecording(BuildContext context, WidgetRef ref) async {
   final s = ref.read(stringsProvider);
-  final ok = await showDialog<bool>(
+  await showDialog<void>(
     context: context,
-    builder: (context) => AlertDialog(
-      title: Text(s.recordingExplainTitle),
-      content: Text(s.recordingExplainBody),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, false),
-          child: Text(
-            firstTime ? s.notNow : s.cancel,
-            style: const TextStyle(color: AppColors.ink),
+    barrierDismissible: false,
+    builder: (context) => PopScope(
+      canPop: false,
+      child: AlertDialog(
+        title: Text(s.recordingExplainTitle),
+        content: Text(s.recordingExplainBody),
+        actions: [
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.green,
+              foregroundColor: AppColors.ink,
+            ),
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              s.continueLabel,
+              style: const TextStyle(fontWeight: FontWeight.w900),
+            ),
           ),
-        ),
-        FilledButton(
-          style: FilledButton.styleFrom(
-            backgroundColor: AppColors.green,
-            foregroundColor: AppColors.ink,
-          ),
-          onPressed: () => Navigator.pop(context, true),
-          child: Text(
-            s.allow,
-            style: const TextStyle(fontWeight: FontWeight.w900),
-          ),
-        ),
-      ],
+        ],
+      ),
     ),
   );
-  if (ok != true) return false;
+  if (!context.mounted) return false;
   // Opening the camera triggers the OS camera + microphone prompts.
   final recorder = ref.read(roundRecorderFactoryProvider)();
   final granted = await recorder.prepare();
@@ -59,12 +54,33 @@ Future<bool> askToEnableRecording(
 }
 
 /// The first time forehead mode is picked (recording off, not on the web),
-/// suggest turning recording on. Asked only once; settings can change it.
+/// mention that recording can be turned on in Settings. Shown once; it asks
+/// for no permission.
 Future<void> offerRecordingOnce(BuildContext context, WidgetRef ref) async {
   if (kIsWeb || ref.read(settingsProvider).recordingOn) return;
   final prefs = ref.read(sharedPreferencesProvider);
   if (prefs.getBool(_offeredKey) ?? false) return;
   await prefs.setBool(_offeredKey, true);
   if (!context.mounted) return;
-  await askToEnableRecording(context, ref, firstTime: true);
+  final s = ref.read(stringsProvider);
+  await showDialog<void>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(s.recordingExplainTitle),
+      content: Text(s.recordingTip),
+      actions: [
+        FilledButton(
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.green,
+            foregroundColor: AppColors.ink,
+          ),
+          onPressed: () => Navigator.pop(context),
+          child: Text(
+            s.gotIt,
+            style: const TextStyle(fontWeight: FontWeight.w900),
+          ),
+        ),
+      ],
+    ),
+  );
 }

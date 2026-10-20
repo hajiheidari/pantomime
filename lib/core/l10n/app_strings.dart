@@ -147,6 +147,8 @@ abstract class AppStrings {
 
   // Recording & sharing
   String get recordingExplainTitle;
+  String get recordingTip;
+  String get gotIt;
   String get recordingExplainBody;
   String get allow;
   String get notNow;
@@ -425,6 +427,11 @@ class FaStrings extends AppStrings {
   @override
   String get updateAvailable => 'نسخه جدید بازی آمده؛ از فروشگاه به‌روز کن!';
 
+  @override
+  String get recordingTip =>
+      'در حالت «گوشی روی پیشونی» می‌توانید از ادا درآوردن دوستانتان فیلم بگیرید و بعد ببینید و بخندید. هر وقت خواستید از تنظیمات ⚙️ «ضبط ویدیو» را روشن کنید.';
+  @override
+  String get gotIt => 'فهمیدم';
   @override
   String get recordingExplainTitle => 'ضبط ویدیوی خنده‌دار 🎥';
   @override
@@ -768,6 +775,11 @@ class EnStrings extends AppStrings {
   @override
   String get updateAvailable => 'A new version is available in the store!';
 
+  @override
+  String get recordingTip =>
+      'In Heads Up you can film your friends acting and laugh at it afterwards. Turn on video recording any time in Settings ⚙️.';
+  @override
+  String get gotIt => 'Got It';
   @override
   String get recordingExplainTitle => 'Record the Fun 🎥';
   @override
@@ -1113,6 +1125,11 @@ class ArStrings extends AppStrings {
   @override
   String get updateAvailable => 'يتوفر إصدار جديد في المتجر!';
 
+  @override
+  String get recordingTip =>
+      'في وضع الجبين يمكنك تصوير أصدقائك وهم يمثّلون لتضحكوا لاحقًا. شغّل تسجيل الفيديو متى شئت من الإعدادات ⚙️.';
+  @override
+  String get gotIt => 'حسنًا';
   @override
   String get recordingExplainTitle => 'سجّل اللحظات المضحكة 🎥';
   @override

@@ -81,7 +81,9 @@ void main() {
     final offered = find.text('ضبط ویدیوی خنده‌دار 🎥');
     expect(offered, recordingOn ? findsNothing : findsOneWidget);
     if (!recordingOn) {
-      await tester.tap(find.text('فعلاً نه'));
+      // A tip only (no permission request): one button.
+      expect(find.text('فعلاً نه'), findsNothing);
+      await tester.tap(find.text('فهمیدم'));
       await settle(tester);
     }
     expect(find.text('بازیکن‌ها'), findsOneWidget);

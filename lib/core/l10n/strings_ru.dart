@@ -240,6 +240,11 @@ class RuStrings extends AppStrings {
   String get updateAvailable => 'В магазине доступна новая версия!';
 
   @override
+  String get recordingTip =>
+      'В режиме Heads Up можно снимать, как друзья показывают слова, и потом смеяться. Включите запись видео в любой момент в настройках ⚙️.';
+  @override
+  String get gotIt => 'Понятно';
+  @override
   String get recordingExplainTitle => 'Сними самое смешное 🎥';
   @override
   String get recordingExplainBody =>

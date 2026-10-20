@@ -226,6 +226,11 @@ class TrStrings extends AppStrings {
   String get updateAvailable => 'Mağazada yeni bir sürüm var!';
 
   @override
+  String get recordingTip =>
+      'Heads Up modunda arkadaşlarının anlatışını çekip sonra gülebilirsin. Video kaydını istediğin zaman Ayarlar\'dan ⚙️ aç.';
+  @override
+  String get gotIt => 'Anladım';
+  @override
   String get recordingExplainTitle => 'Eğlenceyi Kaydet 🎥';
   @override
   String get recordingExplainBody =>
