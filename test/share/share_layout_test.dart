@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pantomime/core/l10n/app_strings.dart';
 import 'package:pantomime/core/store/app_store.dart';
+import 'package:pantomime/core/store/iran_links.dart';
 import 'package:pantomime/core/widgets/cartoon.dart';
 import 'package:pantomime/features/game/domain/game_state.dart';
 import 'package:pantomime/features/share/share_cards.dart';
@@ -130,5 +131,5 @@ void main() {
       appPageLink('en', AppStore.ios),
       'https://espadna.com/pantomime-app/',
     );
-  });
+  }, skip: !iranLinks);
 }

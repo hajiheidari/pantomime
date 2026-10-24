@@ -10,7 +10,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-defines=()
+defines=(--dart-define=IRAN_LINKS=true) # web runs on espadna.ir too
 [[ -f ad_keys.json ]] && defines+=(--dart-define-from-file=ad_keys.json)
 
 restore() {

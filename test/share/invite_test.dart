@@ -24,7 +24,8 @@ void main() {
       final p = await prefs();
       var iranVisits = 0;
       final client = MockClient((req) async {
-        if (req.url.host == 'espadna.ir') {
+        // Last endpoint: the Iranian copy on Android, the main API on iOS.
+        if (req.url.host == Uri.parse(inviteEndpoints.last).host) {
           return http.Response('{"visits":$iranVisits}', 200);
         }
         throw Exception('offline');

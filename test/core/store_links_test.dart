@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pantomime/core/store/app_store.dart';
+import 'package:pantomime/core/store/iran_links.dart';
 import 'package:pantomime/core/store/store_service.dart';
 
 void main() {
@@ -12,7 +13,7 @@ void main() {
     expect(rate.edit, isTrue);
     expect(rate.web, 'https://cafebazaar.ir/app/$pkg');
     expect(const StoreLinks(AppStore.bazaar, pkg).details.edit, isFalse);
-  });
+  }, skip: !iranLinks);
 
   test('Myket: comment page for rating, details for update', () {
     const l = StoreLinks(AppStore.myket, pkg);
@@ -20,7 +21,17 @@ void main() {
     expect(l.details.uri, 'myket://details?id=$pkg');
     expect(l.rate.package, 'ir.mservices.market');
     expect(l.details.web, 'https://myket.ir/app/$pkg');
-  });
+  }, skip: !iranLinks);
+
+  test('without IRAN_LINKS (iOS builds): no Iranian links at all', () {
+    for (final st in AppStore.values) {
+      final l = StoreLinks(st, pkg);
+      for (final link in [l.rate, l.details]) {
+        expect(link.uri, isNot(contains('.ir/')), reason: '$st');
+        expect(link.web, isNot(contains('.ir/')), reason: '$st');
+      }
+    }
+  }, skip: iranLinks);
 
   test('Google Play', () {
     const l = StoreLinks(AppStore.play, pkg);

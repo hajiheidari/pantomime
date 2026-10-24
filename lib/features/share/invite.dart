@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/providers.dart';
+import '../../core/store/iran_links.dart';
 import '../words/words_providers.dart';
 import 'share_link.dart';
 
@@ -16,7 +17,10 @@ import 'share_link.dart';
 /// Worker, server/src/invite.js, or its copy on the Iranian host), and once
 /// a friend opens the link the special categories open for 24 hours (like
 /// sharing itself or a rewarded ad, see [bonusUnlockProvider]).
-const inviteEndpoints = ['https://api.espadna.com', 'https://espadna.ir/api'];
+const inviteEndpoints = [
+  'https://api.espadna.com',
+  if (iranLinks) 'https://espadna.ir/api',
+];
 
 class InviteService {
   InviteService(this._prefs, {http.Client? client, List<String>? endpoints})
@@ -80,9 +84,10 @@ Future<void> reportInviteVisit({http.Client? client}) async {
   if (!kIsWeb) return;
   final code = Uri.base.queryParameters['i'];
   if (code == null || !InviteService._valid.hasMatch(code)) return;
-  final api = Uri.base.host.endsWith('espadna.ir')
-      ? inviteEndpoints[1]
-      : inviteEndpoints[0];
+  var api = inviteEndpoints.first;
+  if (iranLinks && Uri.base.host.endsWith('espadna.ir')) {
+    api = inviteEndpoints.last;
+  }
   try {
     await (client ?? http.Client())
         .post(Uri.parse('$api/invite/$code'))

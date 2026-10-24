@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../../core/store/app_store.dart';
+import '../../core/store/iran_links.dart';
 
 /// Links sent with every shared invite, image or video: the web game itself
 /// (pantomime.espadna.com), so a friend can play right away; its install bar
@@ -8,21 +9,25 @@ import '../../core/store/app_store.dart';
 ///
 /// Bazaar / Myket builds (and the web game on espadna.ir) are used in Iran:
 /// the espadna.ir copy opens there even on the national internet.
+/// Always false in builds without [iranLinks] (iOS).
 bool _inIran(AppStore s) =>
-    s == AppStore.bazaar ||
-    s == AppStore.myket ||
-    (kIsWeb && Uri.base.host.endsWith('espadna.ir'));
+    iranLinks &&
+    (s == AppStore.bazaar ||
+        s == AppStore.myket ||
+        (kIsWeb && Uri.base.host.endsWith('espadna.ir')));
 
 String shareLink(String languageCode, [AppStore? store]) {
   final s = store ?? AppStore.detect();
-  final host = _inIran(s) ? 'pantomime.espadna.ir' : 'pantomime.espadna.com';
-  return 'https://$host/?lang=$languageCode';
+  if (iranLinks && _inIran(s)) {
+    return 'https://pantomime.espadna.ir/?lang=$languageCode';
+  }
+  return 'https://pantomime.espadna.com/?lang=$languageCode';
 }
 
 /// The app's page on the studio site (description + all store links).
 String appPageLink(String languageCode, [AppStore? store]) {
   final s = store ?? AppStore.detect();
-  if (_inIran(s)) return 'https://espadna.ir/pantomime-app/fa/';
+  if (iranLinks && _inIran(s)) return 'https://espadna.ir/pantomime-app/fa/';
   return switch (languageCode) {
     'fa' => 'https://espadna.com/pantomime-app/fa/',
     'ar' => 'https://espadna.com/pantomime-app/ar/',

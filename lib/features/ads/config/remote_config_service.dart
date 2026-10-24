@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../core/store/iran_links.dart';
 import 'remote_config.dart';
 
 /// Config endpoints. Override per build with
@@ -27,13 +28,13 @@ const configFallbackUrl = String.fromEnvironment(
 /// fast from Iran, and still reachable on Iran's national internet.
 const configIranUrl = String.fromEnvironment(
   'CONFIG_IRAN_URL',
-  defaultValue: 'https://espadna.ir/api/config.json',
+  defaultValue: iranLinks ? 'https://espadna.ir/api/config.json' : '',
 );
 
 /// Older mirror on another Iranian host (server/mirror/pantomime-config.php).
 const configMirrorUrl = String.fromEnvironment(
   'CONFIG_MIRROR_URL',
-  defaultValue: 'https://gabia.ir/pantomime-config.php',
+  defaultValue: iranLinks ? 'https://gabia.ir/pantomime-config.php' : '',
 );
 
 /// Loads the ad config: cached (last good) → bundled default, then refreshes

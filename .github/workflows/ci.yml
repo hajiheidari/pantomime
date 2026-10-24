@@ -27,6 +27,8 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test
+      # Android/web behaviour with the Iranian mirrors and stores.
+      - run: flutter test --dart-define=IRAN_LINKS=true
       - name: Ad packages (standalone analysis)
         run: |
           for p in packages/*/; do
@@ -53,7 +55,7 @@ jobs:
       # Bazaar profile: no Google Play Services, installs on any Android 7+.
       # Debug-signed: for testing only, never for store upload.
       - run: dart run tool/store.dart bazaar && flutter pub get
-      - run: flutter build apk --flavor bazaar --release --split-per-abi
+      - run: flutter build apk --flavor bazaar --release --split-per-abi --dart-define=IRAN_LINKS=true
       - uses: actions/upload-artifact@v4
         with:
           name: pantomime-test-apks
