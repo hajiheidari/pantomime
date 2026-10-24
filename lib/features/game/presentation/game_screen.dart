@@ -46,6 +46,20 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   /// The group photo is offered once, before the first turn of the game.
   bool _photoAsked = false;
 
+  /// iOS (App Review 5.1.1): no dismissible prompt before the camera
+  /// permission, so the group photo is a button on the first ready screen
+  /// instead of a pop-up.
+  bool get _photoAsButton =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
+
+  Future<void> _openGroupPhoto() async {
+    final names =
+        ref.read(gameControllerProvider)?.config.teamNames ?? const [];
+    await Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => GroupPhotoScreen(names: names)));
+  }
+
   Future<void> _offerGroupPhoto() async {
     if (!mounted) return;
     final s = ref.read(stringsProvider);
@@ -74,11 +88,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       ),
     );
     if (yes != true || !mounted) return;
-    final names =
-        ref.read(gameControllerProvider)?.config.teamNames ?? const [];
-    await Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (_) => GroupPhotoScreen(names: names)));
+    await _openGroupPhoto();
   }
 
   bool get _canFilm => !_forehead && !kIsWeb;
@@ -232,6 +242,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     });
     if (session == null) return const Scaffold(body: SizedBox.shrink());
     if (!_photoAsked &&
+        !_photoAsButton &&
         _canFilm &&
         session.phase == GamePhase.ready &&
         session.game.turnIndex == 0) {
@@ -245,6 +256,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         s: s,
         film: _filmNext,
         onFilm: _canFilm ? _toggleFilm : null,
+        onPhoto: _photoAsButton && _canFilm && session.game.turnIndex == 0
+            ? _openGroupPhoto
+            : null,
       ),
       GamePhase.calibrating => CalibrateView(session: session, s: s),
       GamePhase.countdown => _CountdownView(session: session, s: s),
@@ -377,6 +391,7 @@ class _ReadyView extends ConsumerWidget {
     required this.s,
     this.film = false,
     this.onFilm,
+    this.onPhoto,
   });
 
   final GameSession session;
@@ -385,6 +400,9 @@ class _ReadyView extends ConsumerWidget {
   /// Pantomime modes: film this turn with the back camera (null: not here).
   final bool film;
   final VoidCallback? onFilm;
+
+  /// iOS: open the group photo (first turn only; null: not here).
+  final VoidCallback? onPhoto;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -465,6 +483,12 @@ class _ReadyView extends ConsumerWidget {
 
     final options = [
       if (session.isClassic) _CustomWordButton(session: session, s: s),
+      if (onPhoto != null)
+        CartoonChip(
+          label: s.groupPhotoTitle.replaceAll('?', '').replaceAll('؟', ''),
+          selected: false,
+          onTap: onPhoto!,
+        ),
       if (onFilm != null)
         CartoonChip(
           label: film ? '🎥 ${s.filmOn}' : '🎥 ${s.filmThisTurn}',
