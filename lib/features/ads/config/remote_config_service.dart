@@ -28,13 +28,13 @@ const configFallbackUrl = String.fromEnvironment(
 /// fast from Iran, and still reachable on Iran's national internet.
 const configIranUrl = String.fromEnvironment(
   'CONFIG_IRAN_URL',
-  defaultValue: iranLinks ? 'https://espadna.ir/api/config.json' : '',
+  defaultValue: irConfigUrl,
 );
 
 /// Older mirror on another Iranian host (server/mirror/pantomime-config.php).
 const configMirrorUrl = String.fromEnvironment(
   'CONFIG_MIRROR_URL',
-  defaultValue: iranLinks ? 'https://gabia.ir/pantomime-config.php' : '',
+  defaultValue: irMirrorUrl,
 );
 
 /// Loads the ad config: cached (last good) → bundled default, then refreshes

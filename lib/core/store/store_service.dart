@@ -54,18 +54,18 @@ class StoreLinks {
       !iranLinks
           ? _noStore
           : StoreLink(
-              uri: 'bazaar://details?id=$packageName',
-              package: 'com.farsitel.bazaar',
+              uri: '$bazaarScheme://details?id=$packageName',
+              package: bazaarPackage,
               edit: true,
-              web: 'https://cafebazaar.ir/app/$packageName',
+              web: '$bazaarWeb$packageName',
             ),
     AppStore.myket =>
       !iranLinks
           ? _noStore
           : StoreLink(
-              uri: 'myket://comment?id=$packageName',
-              package: 'ir.mservices.market',
-              web: 'https://myket.ir/app/$packageName',
+              uri: '$myketScheme://comment?id=$packageName',
+              package: myketPackage,
+              web: '$myketWeb$packageName',
             ),
     AppStore.ios => StoreLink(
       uri: 'itms-apps://itunes.apple.com/app/id$iosAppId?action=write-review',
@@ -79,8 +79,8 @@ class StoreLinks {
       !iranLinks
           ? _noStore
           : StoreLink(
-              uri: 'https://cafebazaar.ir/app/$packageName',
-              web: 'https://cafebazaar.ir/app/$packageName',
+              uri: '$bazaarWeb$packageName',
+              web: '$bazaarWeb$packageName',
             ),
   };
 
@@ -94,17 +94,17 @@ class StoreLinks {
       !iranLinks
           ? _noStore
           : StoreLink(
-              uri: 'bazaar://details?id=$packageName',
-              package: 'com.farsitel.bazaar',
-              web: 'https://cafebazaar.ir/app/$packageName',
+              uri: '$bazaarScheme://details?id=$packageName',
+              package: bazaarPackage,
+              web: '$bazaarWeb$packageName',
             ),
     AppStore.myket =>
       !iranLinks
           ? _noStore
           : StoreLink(
-              uri: 'myket://details?id=$packageName',
-              package: 'ir.mservices.market',
-              web: 'https://myket.ir/app/$packageName',
+              uri: '$myketScheme://details?id=$packageName',
+              package: myketPackage,
+              web: '$myketWeb$packageName',
             ),
     AppStore.ios => StoreLink(
       uri: 'itms-apps://itunes.apple.com/app/id$iosAppId',
@@ -118,8 +118,8 @@ class StoreLinks {
       !iranLinks
           ? _noStore
           : StoreLink(
-              uri: 'https://cafebazaar.ir/app/$packageName',
-              web: 'https://cafebazaar.ir/app/$packageName',
+              uri: '$bazaarWeb$packageName',
+              web: '$bazaarWeb$packageName',
             ),
   };
 }

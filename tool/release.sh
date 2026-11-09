@@ -23,7 +23,7 @@ esac
 defines=()
 # Iranian mirrors and stores: Android only, never in the iOS binary
 # (lib/core/store/iran_links.dart).
-[[ "$store" != "ios" ]] && defines+=(--dart-define=IRAN_LINKS=true)
+[[ "$store" != "ios" ]] && defines+=(--dart-define-from-file=tool/iran_links.json)
 if [[ -f ad_keys.json ]]; then
   defines+=(--dart-define-from-file=ad_keys.json)
 else

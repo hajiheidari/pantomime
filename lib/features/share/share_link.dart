@@ -14,12 +14,12 @@ bool _inIran(AppStore s) =>
     iranLinks &&
     (s == AppStore.bazaar ||
         s == AppStore.myket ||
-        (kIsWeb && Uri.base.host.endsWith('espadna.ir')));
+        (kIsWeb && Uri.base.host.endsWith(irHost)));
 
 String shareLink(String languageCode, [AppStore? store]) {
   final s = store ?? AppStore.detect();
   if (iranLinks && _inIran(s)) {
-    return 'https://pantomime.espadna.ir/?lang=$languageCode';
+    return 'https://$irGameHost/?lang=$languageCode';
   }
   return 'https://pantomime.espadna.com/?lang=$languageCode';
 }
@@ -27,7 +27,7 @@ String shareLink(String languageCode, [AppStore? store]) {
 /// The app's page on the studio site (description + all store links).
 String appPageLink(String languageCode, [AppStore? store]) {
   final s = store ?? AppStore.detect();
-  if (iranLinks && _inIran(s)) return 'https://espadna.ir/pantomime-app/fa/';
+  if (iranLinks && _inIran(s)) return irAppPage;
   return switch (languageCode) {
     'fa' => 'https://espadna.com/pantomime-app/fa/',
     'ar' => 'https://espadna.com/pantomime-app/ar/',

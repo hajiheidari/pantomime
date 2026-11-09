@@ -1,0 +1,15 @@
+{
+  "IRAN_LINKS": "true",
+  "IR_HOST": "espadna.ir",
+  "IR_API": "https://espadna.ir/api",
+  "IR_CONFIG_URL": "https://espadna.ir/api/config.json",
+  "IR_MIRROR_URL": "https://gabia.ir/pantomime-config.php",
+  "IR_GAME_HOST": "pantomime.espadna.ir",
+  "IR_APP_PAGE": "https://espadna.ir/pantomime-app/fa/",
+  "BAZAAR_SCHEME": "bazaar",
+  "BAZAAR_PKG": "com.farsitel.bazaar",
+  "BAZAAR_WEB": "https://cafebazaar.ir/app/",
+  "MYKET_SCHEME": "myket",
+  "MYKET_PKG": "ir.mservices.market",
+  "MYKET_WEB": "https://myket.ir/app/"
+}

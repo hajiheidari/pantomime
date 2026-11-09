@@ -19,7 +19,7 @@ import 'share_link.dart';
 /// sharing itself or a rewarded ad, see [bonusUnlockProvider]).
 const inviteEndpoints = [
   'https://api.espadna.com',
-  if (iranLinks) 'https://espadna.ir/api',
+  if (iranLinks) irApi,
 ];
 
 class InviteService {
@@ -85,7 +85,7 @@ Future<void> reportInviteVisit({http.Client? client}) async {
   final code = Uri.base.queryParameters['i'];
   if (code == null || !InviteService._valid.hasMatch(code)) return;
   var api = inviteEndpoints.first;
-  if (iranLinks && Uri.base.host.endsWith('espadna.ir')) {
+  if (iranLinks && Uri.base.host.endsWith(irHost)) {
     api = inviteEndpoints.last;
   }
   try {

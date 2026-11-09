@@ -130,6 +130,18 @@ jobs:
           --build-number=${{ github.run_number }}
           --dart-define=IOS_APP_ID=$IOS_APP_ID
 
+      # App Review guideline 5 (US sanctions): the iOS app must not contain
+      # any Iranian host or store. They come only from tool/iran_links.json,
+      # which Android and web builds pass; stop if any slipped in.
+      - name: No Iranian links in the iOS app
+        run: |
+          pattern='espadna\.ir|cafebazaar|myket\.ir|gabia\.ir|farsitel|mservices'
+          if grep -r -a -l -i -E "$pattern" build/ios/iphoneos/Runner.app; then
+            echo "::error::Iranian link found in the iOS app (see files above)"
+            exit 1
+          fi
+          echo "OK: no Iranian links in Runner.app"
+
       - name: Archive
         run: |
           set -o pipefail
